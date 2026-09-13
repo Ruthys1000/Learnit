@@ -27,6 +27,7 @@
     --shadow-sm:0 1px 2px rgba(0,0,0,.4); --shadow-md:0 6px 18px rgba(0,0,0,.45); --shadow-lg:0 20px 50px rgba(0,0,0,.6);
   }
   *{box-sizing:border-box}
+  [hidden]{display:none!important}
   html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.55;
     display:flex;flex-direction:column;height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
@@ -66,11 +67,15 @@
   .btn.accent:hover .ic{color:#fff}
   .btn:disabled{opacity:.45;cursor:not-allowed}
   .btn.sm{padding:5px 9px;font-size:12px;border-radius:8px;gap:5px}
+  .btn.active{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent-ink)}
+  .btn.active .ic{color:var(--accent-ink)}
   label.filebtn{position:relative;overflow:hidden}
   label.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
 
   /* ---------- Main layout ---------- */
-  .main{flex:1;display:grid;grid-template-columns:minmax(360px,42%) 1fr;grid-template-rows:minmax(0,1fr);min-height:0}
+  .main{flex:1;display:grid;grid-template-columns:minmax(360px,1.3fr) 1fr;grid-template-rows:minmax(0,1fr);min-height:0}
+  .main.no-preview{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr)}
+  .main.no-preview .previewWrap{display:none}
   .side{display:flex;flex-direction:column;min-width:0;min-height:0;border-inline-end:1px solid var(--line);background:var(--panel)}
   .tabs{display:flex;gap:3px;padding:9px 10px;border-bottom:1px solid var(--line);background:var(--panel-2)}
   .tab{border:1px solid transparent;background:transparent;color:var(--muted);padding:7px 12px;border-radius:8px;
@@ -186,6 +191,25 @@
   .empty .foot{max-width:420px;margin:16px auto 0;font-size:12.5px}
   @media (max-width:560px){ .flow{grid-template-columns:1fr 1fr} }
 
+  /* onboarding card inside the editor (empty state) */
+  .onboard{max-width:600px;margin:8px auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);
+    box-shadow:var(--shadow-sm);padding:26px 24px;text-align:center}
+  .onboard .ob-icon{width:48px;height:48px;margin:0 auto 12px;border-radius:14px;display:grid;place-items:center;
+    background:linear-gradient(150deg,var(--accent),var(--accent-deep));color:#fff}
+  .onboard .ob-icon .ic{width:24px;height:24px;stroke:#fff}
+  .onboard h3{margin:0 0 6px;font-size:18px;font-weight:800}
+  .onboard>p{margin:0 auto 18px;max-width:44ch;font-size:13px;color:var(--muted);line-height:1.6}
+  .onboard .ob-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+  .onboard .ob-actions .btn{padding:10px 16px;font-size:13px}
+  .onboard .ob-steps{counter-reset:ob;list-style:none;margin:0 auto;padding:0;max-width:46ch;text-align:start;display:flex;flex-direction:column;gap:9px}
+  .onboard .ob-steps li{counter-increment:ob;position:relative;padding-inline-start:34px;font-size:12.5px;color:var(--ink);line-height:1.55}
+  .onboard .ob-steps li::before{content:counter(ob);position:absolute;inset-inline-start:0;top:-1px;width:22px;height:22px;border-radius:50%;
+    background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-size:11.5px;font-weight:800}
+  .onboard .ob-link{margin-top:16px;background:transparent;border:0;color:var(--accent-ink);font-family:inherit;font-weight:700;font-size:12.5px;cursor:pointer}
+  .onboard .ob-link:hover{text-decoration:underline}
+  .welcome-min{max-width:420px}
+  .welcome-min .cta-row{margin-top:18px}
+
   .toast{position:fixed;inset-inline-start:50%;bottom:24px;transform:translateX(50%);background:var(--ink);color:var(--bg);
     padding:11px 20px;border-radius:10px;font-weight:700;font-size:13px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:60}
   .toast.show{opacity:1;transform:translateX(50%) translateY(-4px)}
@@ -207,17 +231,18 @@
     <button class="btn accent" id="btnPromptTop"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק פרומפט ל-AI</button>
     <button class="btn" id="btnExample"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L18.7 9l-4.9 1.8L12 15.7 10.2 10.8 5.3 9l4.9-1.1z"/><path d="M18 15l.7 1.8L20.5 17l-1.8.7L18 19.5 17.3 17.7 15.5 17l1.8-.2z"/></svg>טען דוגמה</button>
     <div class="divider"></div>
-    <label class="btn filebtn"><svg class="ic" viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/></svg>קובץ טקסט<input type="file" id="fileText" accept=".txt,.md,text/plain" /></label>
-    <label class="btn filebtn"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></svg>תיקיית מדיה<input type="file" id="fileAssets" webkitdirectory directory multiple /></label>
+    <label class="btn ghost filebtn"><svg class="ic" viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/></svg>קובץ טקסט<input type="file" id="fileText" accept=".txt,.md,text/plain" /></label>
+    <label class="btn ghost filebtn"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></svg>תיקיית מדיה<input type="file" id="fileAssets" webkitdirectory directory multiple /></label>
     <div class="grow"></div>
     <button class="btn" id="btnDownload" disabled><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 11l5 4 5-4"/><path d="M5 21h14"/></svg>שמור טקסט</button>
     <button class="btn primary" id="btnSite" disabled><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg>אתר עצמאי</button>
     <button class="btn primary" id="btnScorm" disabled><svg class="ic" viewBox="0 0 24 24"><path d="M22 9L12 5 2 9l10 4 10-4z"/><path d="M6 11v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg>SCORM</button>
     <div class="divider"></div>
+    <button class="btn" id="btnPreviewToggle" title="הצג/הסתר תצוגה מקדימה"><svg class="ic" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>תצוגה מקדימה</button>
     <button class="btn icon ghost" id="btnTheme" title="מצב כהה/בהיר"><svg class="ic" viewBox="0 0 24 24" id="themeIcon"><path d="M21 12.8A8 8 0 1 1 11.2 3a6 6 0 0 0 9.8 9.8z"/></svg></button>
   </div>
 
-  <div class="main">
+  <div class="main no-preview">
     <div class="side">
       <div class="tabs">
         <button class="tab active" data-tab="src"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>מקור</button>
@@ -228,7 +253,22 @@
 
       <!-- SOURCE -->
       <div class="tabpane active" data-pane="src">
-        <div class="hint">הטקסט הוא מקור האמת. כל עריכה כאן מתעדכנת מיד בתצוגה. לשמירה — "שמור טקסט".</div>
+        <div class="onboard" id="onboard">
+          <div class="ob-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5.5A2 2 0 0 1 6 4h5v15H6a2 2 0 0 0-2 1.5zM20 5.5A2 2 0 0 0 18 4h-5v15h5a2 2 0 0 1 2 1.5z"/></svg></div>
+          <h3>יוצרים לומדה חדשה</h3>
+          <p>הכלי הופך תוכן שנכתב בעזרת AI ללומדה אינטראקטיבית — עם שאלות, מילון ומדיה — ומייצא אתר עצמאי או חבילת SCORM.</p>
+          <div class="ob-actions">
+            <button type="button" class="btn primary" id="obExample"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L18.7 9l-4.9 1.8L12 15.7 10.2 10.8 5.3 9l4.9-1.1z"/></svg>טען דוגמה מלאה</button>
+            <button type="button" class="btn accent" id="obPrompt"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק פרומפט ל-AI</button>
+          </div>
+          <ol class="ob-steps">
+            <li>מעתיקים את הפרומפט ומדביקים ב-ChatGPT / Claude — ה-AI ישאל אתכם כמה שאלות, ואז יכתוב את הלומדה.</li>
+            <li>מדביקים כאן את הטקסט שהתקבל — ואפשר להפעיל "תצוגה מקדימה" כדי לראות את הלומדה מתעדכנת.</li>
+            <li>מעצבים מיתוג ומייצאים — אתר עצמאי או SCORM ל-Moodle.</li>
+          </ol>
+          <button type="button" class="ob-link" id="obGuide">למדריך המלא ←</button>
+        </div>
+        <div class="hint" id="srcHint">הטקסט הוא מקור האמת. כל עריכה כאן מתעדכנת מיד בתצוגה. לשמירה — "שמור טקסט".</div>
         <div class="fmtbar" id="fmtbar">
           <button type="button" class="btn sm" data-k="h1" title="עמוד חדש"># עמוד</button>
           <button type="button" class="btn sm" data-k="h2" title="תת-כותרת">## כותרת</button>
@@ -327,30 +367,27 @@
 
       <!-- GUIDE -->
       <div class="tabpane" data-pane="guide">
-        <div class="guide-intro">התהליך בקצרה: <b>יוצרים את התוכן עם AI חיצוני</b> (ChatGPT / Claude) — ואז <b>מרכיבים, מעצבים ומייצאים</b> כאן בכלי. שני השלבים למטה.</div>
+        <div class="guide-intro">שני שלבים: <b>כותבים את התוכן עם AI</b> (ChatGPT / Claude) — ואז <b>מרכיבים, מעצבים ומייצאים</b> כאן בכלי.</div>
 
         <div class="card">
-          <div class="phase"><span class="badge">שלב 1</span><b>יוצרים את התוכן עם AI חיצוני</b></div>
+          <div class="phase"><span class="badge">שלב 1</span><b>כותבים את התוכן עם AI</b></div>
           <div class="promptbox">
             <div class="phead"><svg class="ic sm" viewBox="0 0 24 24" style="color:var(--accent)"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg><b>הפרומפט המלא — הדביקו ב-ChatGPT / Claude</b><button class="btn sm primary" id="btnCopyPrompt"><svg class="ic sm" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק</button></div>
             <pre id="promptText"></pre>
           </div>
           <div class="steps">
-            <div class="step"><div class="n"></div><div class="b"><b>אספו את חומר הגלם</b><p>כל התוכן שצריך לכסות — סיכומים, נקודות, מקורות. ככל שהחומר מסודר יותר, כך הלומדה תצא טובה יותר.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>בקשו קודם מתאר</b><p>לפני התוכן המלא, בקשו: "בנה לי מתאר — רשימת עמודים עם מטרת למידה לכל עמוד, בלי לכתוב עדיין את התוכן". אשרו או תקנו. זה השלב הכי משפיע על האיכות.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>הריצו את הפרומפט</b><p>הדביקו את הפרומפט שלמעלה, יחד עם המתאר המאושר, חומר הגלם ורשימת שמות קבצי המדיה — ובקשו לכתוב את הספר המלא בפורמט.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>אם התשובה נקטעת</b><p>בתוכן ארוך ה-AI עלול לעצור. כתבו: "המשך בדיוק מהמקום שעצרת, באותו פורמט", וחברו את החלקים.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>בדקו לפי צ'קליסט איכות</b><ul><li>מטרת למידה ברורה בכל עמוד</li><li>שאלה מופיעה אחרי שרעיון הושלם — לא באמצע הסבר</li><li>מונחים מקצועיים מסומנים ב-<code>{{...}}</code></li><li>אין "קיר טקסט" — פסקאות קצרות, העמקות ב-<code>[more]</code></li><li>יש עמוד סיכום עם שאלות מסכמות</li></ul></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>מעתיקים ומדביקים</b><p>מעתיקים את הפרומפט שלמעלה ומדביקים ב-ChatGPT או Claude.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>עונים לשאלות</b><p>ה-AI ישאל אתכם כמה שאלות קצרות — נושא, קהל יעד, אורך, טון, ואילו קבצי מדיה יש לכם. פשוט עונים.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>מקבלים את הלומדה</b><p>ה-AI כותב את הלומדה המלאה בפורמט. מעתיקים את כל הטקסט שהתקבל.</p></div></div>
           </div>
         </div>
 
         <div class="card">
           <div class="phase"><span class="badge">שלב 2</span><b>מרכיבים ומייצאים בכלי</b></div>
           <div class="steps">
-            <div class="step"><div class="n"></div><div class="b"><b>הדביקו בלשונית "מקור"</b><p>הדביקו את הטקסט שקיבלתם מה-AI — התצוגה שמימין תתעדכן מיד ותראה את הלומדה.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>תקנו אזהרות</b><p>אם יש הערות פרסור צהובות (מונח לא במילון, שאלה בלי תשובה נכונה) — תקנו אותן בטקסט.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>עצבו מיתוג</b><p>בלשונית "מיתוג": לוגו, צבע מותג, פונט, גודל טקסט ורקע. הכול נשמר בתוך הטקסט.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>ייצאו</b><p><b>אתר עצמאי</b> (ZIP לאירוח) או <b>SCORM</b> להעלאה ל-Moodle. רק לצפייה מהירה — "פתח בכרטיסייה", בלי הורדה.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>מדביקים ב"מקור"</b><p>מדביקים את הטקסט בלשונית "מקור". להצגת הלומדה תוך כדי — מפעילים "תצוגה מקדימה" בסרגל העליון.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>מתקנים אזהרות</b><p>אם יש הערות צהובות (מונח לא במילון, שאלה בלי תשובה נכונה) — לוחצים עליהן כדי לקפוץ למקום בטקסט ולתקן.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>מעצבים ומייצאים</b><p>בלשונית "מיתוג" קובעים לוגו, צבע ופונט. ואז מייצאים <b>אתר עצמאי</b> או <b>SCORM</b> ל-Moodle.</p></div></div>
           </div>
         </div>
       </div>
@@ -362,24 +399,18 @@
         <div class="grow"></div>
         <button class="btn sm ghost" id="btnOpenTab"><svg class="ic sm" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg>פתח בכרטיסייה</button>
         <button class="btn sm ghost" id="btnReload"><svg class="ic sm" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-.9 4.5"/><path d="M20 4v5h-5"/></svg>רענן</button>
+        <button class="btn sm ghost" id="btnPvClose" title="הסתר תצוגה מקדימה"><svg class="ic sm" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </div>
       <iframe id="pv" title="תצוגה מקדימה"></iframe>
       <div class="empty" id="pvEmpty">
-        <div class="welcome">
+        <div class="welcome welcome-min">
           <div class="glyph"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5.5A2 2 0 0 1 6 4h5v15H6a2 2 0 0 0-2 1.5zM20 5.5A2 2 0 0 0 18 4h-5v15h5a2 2 0 0 1 2 1.5z"/></svg></div>
-          <h4>מחולל לומדות דיגיטליות</h4>
-          <div class="lede">הכלי הופך תוכן שנכתב בעזרת AI ל<b>ספר לימוד אינטראקטיבי</b> — עם שאלות הבנה, מילון מונחים ומדיה — ומייצא אותו כאתר עצמאי או כחבילת SCORM ל-Moodle. כך זה עובד:</div>
-          <div class="flow">
-            <div class="flowstep"><div class="fn">1</div><b>מעתיקים פרומפט</b><span>מעתיקים את הפרומפט ומדביקים ב-ChatGPT / Claude יחד עם התוכן שלכם.</span></div>
-            <div class="flowstep"><div class="fn">2</div><b>מדביקים לכאן</b><span>ה-AI מחזיר ספר בפורמט מובנה — מדביקים אותו בלשונית "מקור".</span></div>
-            <div class="flowstep"><div class="fn">3</div><b>מעצבים</b><span>קובעים לוגו, צבע ופונט בלשונית "מיתוג" (אופציונלי).</span></div>
-            <div class="flowstep"><div class="fn">4</div><b>מייצאים</b><span>מורידים אתר עצמאי, או חבילת SCORM להעלאה ל-Moodle.</span></div>
-          </div>
+          <h4>התצוגה המקדימה תופיע כאן</h4>
+          <div class="lede">הדביקו תוכן בלשונית <b>"מקור"</b> כדי לראות את הלומדה מתעדכנת. עדיין אין תוכן? התחילו מ<b>"טען דוגמה מלאה"</b>.</div>
           <div class="cta-row">
             <button class="btn primary" id="ctaExample"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L18.7 9l-4.9 1.8L12 15.7 10.2 10.8 5.3 9l4.9-1.1z"/></svg>טען דוגמה מלאה</button>
             <button class="btn accent" id="ctaPrompt"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק פרומפט ל-AI</button>
           </div>
-          <div class="hint foot">חדשים? התחילו מ<b>"טען דוגמה מלאה"</b> כדי לראות איך נראית התוצאה — ואז נסו ליצור משלכם. הסבר מלא בלשונית <b>"מדריך AI"</b>.</div>
         </div>
       </div>
     </div>
@@ -393,7 +424,20 @@
 /* ============================================================
    הפרומפט המלא — משודרג לעיצוב פדגוגי ולתוכן רחב
    ============================================================ */
-const PROMPT_TEXT = `אתה מעצב/ת למידה (Instructional Designer) מנוסה. המשימה שלך אינה "לחלק טקסט לעמודים", אלא לבנות תהליך למידה אפקטיבי: להחליט מה ללמד, באיזה סדר, מתי לבדוק הבנה, מתי להעמיק, ומתי להגדיר מונח. כתוב את כל הספר בפורמט המוגדר בלבד, בלי טקסט מחוץ לפורמט.
+const PROMPT_TEXT = `אתה מעצב/ת למידה (Instructional Designer) מנוסה. תפקידך לבנות לומדה אינטראקטיבית אפקטיבית: להחליט מה ללמד, באיזה סדר, מתי לבדוק הבנה ומתי להעמיק. בסוף התהליך תכתוב את כל הלומדה בפורמט המוגדר בלבד, בלי טקסט מחוץ לפורמט.
+
+═══════════════════════════════════
+איך נעבוד — קודם תשאל אותי, ורק אחר כך תכתוב
+═══════════════════════════════════
+אל תתחיל לכתוב את הלומדה מיד. קודם ראיין אותי בקצרה כדי להבין מה צריך: שאל כמה שאלות בכל פעם (לא הכול בבת אחת), חכה לתשובות, והמשך עד שיש לך תמונה ברורה. כדאי לכסות:
+• נושא הלומדה ומטרתה
+• קהל היעד (גיל / רקע / ידע קודם)
+• אורך רצוי (מספר עמודים משוער — ברירת מחדל: 15)
+• טון וסגנון (למשל ענייני, ידידותי, אקדמי)
+• חומר גלם — בקש ממני להדביק סיכומים / נקודות / מקורות לכיסוי (אם יש)
+• קבצי מדיה — שאל אילו קבצי תמונה/וידאו יש לי ומה השמות המדויקים (או שאין)
+
+כשיש לך מספיק מידע, הצג לי בשורות קצרות מתאר עמודים לאישור. אחרי שאאשר — כתוב את הלומדה המלאה בפורמט שלמטה, ורק אותה. (אם התשובה ארוכה ונקטעת — המשך מעצמך באותו פורמט.)
 
 ═══════════════════════════════════
 עקרונות עיצוב הלמידה (חשובים לא פחות מהתחביר)
@@ -494,18 +538,9 @@ EXPLAIN: אידוי הוא המעבר ממצב נוזלי לגזי בהשפעת 
 [/quiz]
 
 ═══════════════════════════════════
-פרטי המשימה (מלא/י לפני שליחה)
+מתחילים
 ═══════════════════════════════════
-נושא הספר: ____
-קהל יעד: ____
-מספר עמודים רצוי: ____ (ברירת מחדל: 15)
-טון וסגנון: ____ (למשל: ענייני, ידידותי, אקדמי)
-קבצי מדיה זמינים (שם מדויק כפי שבתיקייה, אחד בכל שורה):
-____
-חומר הגלם (הדבק כאן את התוכן/הסיכומים שיש לכסות):
-____
-
-צעד ראשון: אם החומר רחב, קודם החזר לי מתאר בלבד (רשימת עמודים + מטרת למידה לכל עמוד) לאישור. אחרי שאאשר — כתוב את הספר המלא בפורמט שהוגדר, ורק אותו.`;
+התחל עכשיו בשאלות אליי — אל תכתוב את הלומדה עד שאישרתי את המתאר. כשתכתוב, הקפד על הפורמט שלמעלה בלבד, והשתמש רק בשמות קבצי המדיה שמסרתי לך (בלי להמציא קבצים).`;
 
 /* ============================================================
    ספר לדוגמה מובנה
@@ -1361,6 +1396,10 @@ function renderAll(){
   const text=srcEl.value, hasText=text.trim().length>0;
   const model=parseBook(text); state.model=model;
 
+  // מסך פתיחה בעורך כשריק; סרגל תחביר רק כשיש תוכן
+  const ob=$('#onboard'), sh=$('#srcHint'), fb=$('#fmtbar');
+  if(ob) ob.hidden=hasText; if(sh) sh.hidden=!hasText; if(fb) fb.hidden=!hasText;
+
   if(hasText && model.pages.length){ pvEmpty.style.display='none'; pvEl.style.display='block'; updatePreview(model); }
   else { pvEl.style.display='none'; pvEmpty.style.display='grid'; pvReady=false; pvSig=null; }
 
@@ -1607,6 +1646,19 @@ async function copyPrompt(){ try{ await navigator.clipboard.writeText(PROMPT_TEX
 $('#btnCopyPrompt').addEventListener('click',copyPrompt);
 $('#btnPromptTop').addEventListener('click',copyPrompt);
 $('#ctaPrompt').addEventListener('click',copyPrompt);
+$('#obPrompt').addEventListener('click',copyPrompt);
+$('#obGuide').addEventListener('click',()=>activateTab('guide'));
+
+/* ---------- תצוגה מקדימה: הצג/הסתר (ברירת מחדל — עורך רחב) ---------- */
+const VIEWKEY='tbg_show_preview';
+function setPreview(on){
+  document.querySelector('.main').classList.toggle('no-preview', !on);
+  const btn=$('#btnPreviewToggle'); if(btn) btn.classList.toggle('active', on);
+  try{ localStorage.setItem(VIEWKEY, on?'1':'0'); }catch(e){}
+  if(on) renderAll();
+}
+$('#btnPreviewToggle').addEventListener('click',()=>setPreview(document.querySelector('.main').classList.contains('no-preview')));
+$('#btnPvClose').addEventListener('click',()=>setPreview(false));
 
 /* ---------- טעינת דוגמה ---------- */
 function loadExample(){
@@ -1614,11 +1666,12 @@ function loadExample(){
   state.assets={};
   const reg=(name,svg)=>{ const bl=new Blob([svg],{type:'image/svg+xml'}); state.assets[name]={file:bl,url:URL.createObjectURL(bl)}; };
   reg('security_pillars.svg',EXAMPLE_SVG); reg('phishing_flags.svg',EXAMPLE_PHISH); reg('logo.svg',EXAMPLE_LOGO);
-  state.assetsChosen=true; srcEl.value=EXAMPLE_TEXT; renderAll();
+  state.assetsChosen=true; srcEl.value=EXAMPLE_TEXT; setPreview(true); renderAll();
   toast('ספר הדוגמה נטען — נסו לנווט, ללחוץ על מונחים ולענות על השאלות');
 }
 $('#btnExample').addEventListener('click',loadExample);
 $('#ctaExample').addEventListener('click',loadExample);
+$('#obExample').addEventListener('click',loadExample);
 
 /* ---------- מצב כהה ---------- */
 $('#btnTheme').addEventListener('click',()=>{
@@ -1703,6 +1756,9 @@ $('#btnScorm').addEventListener('click',async()=>{
 
 /* ---------- אתחול ---------- */
 buildSwatches();
+let _showPv=false; try{ _showPv=localStorage.getItem(VIEWKEY)==='1'; }catch(e){}
+document.querySelector('.main').classList.toggle('no-preview', !_showPv);
+$('#btnPreviewToggle').classList.toggle('active', _showPv);
 renderAll();
 </script>
 </body>
