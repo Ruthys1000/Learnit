@@ -105,9 +105,6 @@
   .warnbox li.warnjump{cursor:pointer;border-radius:5px;padding:1px 4px;margin-inline-start:-4px}
   .warnbox li.warnjump:hover{background:rgba(154,103,0,.14);text-decoration:underline}
 
-  .fmtbar{display:flex;flex-wrap:wrap;gap:5px}
-  .fmtbar .btn.sm{padding:5px 8px;font-size:11.5px}
-  .fmtbar .btn.sm b,.fmtbar .btn.sm i{font-size:13px}
   .okbox{border:1px solid var(--ok);background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:9px 12px;font-size:12.5px;
     display:flex;align-items:center;gap:8px;font-weight:700}
 
@@ -263,23 +260,6 @@
           <div class="ob-flow">העתקת פרומפט ל-AI  ←  הדבקת התוכן כאן  ←  מיתוג וייצוא</div>
         </div>
         <div class="hint" id="srcHint">הטקסט הוא מקור האמת. כל עריכה כאן מתעדכנת מיד בתצוגה. לשמירה — "שמור טקסט".</div>
-        <div class="fmtbar" id="fmtbar">
-          <button type="button" class="btn sm" data-k="h1" title="עמוד חדש"># עמוד</button>
-          <button type="button" class="btn sm" data-k="h2" title="תת-כותרת">## כותרת</button>
-          <button type="button" class="btn sm" data-k="bold" title="הדגשה"><b>B</b></button>
-          <button type="button" class="btn sm" data-k="italic" title="נטוי"><i>I</i></button>
-          <button type="button" class="btn sm" data-k="term" title="מונח מילון">‏{{מונח}}</button>
-          <label class="btn sm filebtn" title="העלאת תמונה / וידאו והוספה במקום הסמן"><svg class="ic sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></svg>מדיה<input type="file" id="fileMediaInsert" accept="image/*,video/*" /></label>
-          <button type="button" class="btn sm" data-k="more" title="קטע מתקפל">[more]</button>
-          <div class="menu">
-            <button type="button" class="btn sm" id="btnAddQuiz" title="הוספת שאלה">＋ שאלה<svg class="ic caret sm" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="menu-list">
-              <button type="button" data-k="single"><span class="mtxt">בחירה יחידה<span class="mdesc">תשובה נכונה אחת</span></span></button>
-              <button type="button" data-k="multi"><span class="mtxt">בחירה מרובה<span class="mdesc">כמה תשובות נכונות</span></span></button>
-              <button type="button" data-k="tf"><span class="mtxt">אמת / שקר<span class="mdesc">קביעה נכונה או שגויה</span></span></button>
-            </div>
-          </div>
-        </div>
         <div class="warnbox" id="warns"></div>
         <div class="okbox" id="okbox" style="display:none"><svg class="ic sm" viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg><span>הטקסט תקין — כל האלמנטים פורסרו בהצלחה.</span></div>
         <div class="pastelabel" id="pasteLabel"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg>הדביקו כאן את התוכן שקיבלתם מה-AI</div>
@@ -369,6 +349,7 @@
       <div class="pvbar">
         <span class="lbl"><span class="pvdot"></span>תצוגה מקדימה — כך רואה הלומד/ת</span>
         <div class="grow"></div>
+        <label class="btn sm accent filebtn" title="הוספת תמונה/וידאו לעמוד המוצג"><svg class="ic sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></svg>הוסף מדיה<input type="file" id="fileMediaInsert" accept="image/*,video/*" /></label>
         <button class="btn sm ghost" id="btnOpenTab"><svg class="ic sm" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg>פתח בכרטיסייה</button>
         <button class="btn sm ghost" id="btnReload"><svg class="ic sm" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-.9 4.5"/><path d="M20 4v5h-5"/></svg>רענן</button>
         <button class="btn sm ghost" id="btnPvClose" title="הסתר תצוגה מקדימה"><svg class="ic sm" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
@@ -1389,8 +1370,8 @@ function renderAll(){
   const model=parseBook(text); state.model=model;
 
   // מסך פתיחה בעורך כשריק; סרגל תחביר רק כשיש תוכן
-  const ob=$('#onboard'), sh=$('#srcHint'), fb=$('#fmtbar'), pl=$('#pasteLabel');
-  if(ob) ob.hidden=hasText; if(sh) sh.hidden=!hasText; if(fb) fb.hidden=!hasText; if(pl) pl.hidden=hasText;
+  const ob=$('#onboard'), sh=$('#srcHint'), pl=$('#pasteLabel');
+  if(ob) ob.hidden=hasText; if(sh) sh.hidden=!hasText; if(pl) pl.hidden=hasText;
 
   if(hasText && model.pages.length){ pvEmpty.style.display='none'; pvEl.style.display='block'; updatePreview(model); }
   else { pvEl.style.display='none'; pvEmpty.style.display='grid'; pvReady=false; pvSig=null; }
@@ -1580,19 +1561,23 @@ $('#fileLogo').addEventListener('change',e=>{
 });
 $('#btnLogoRemove').addEventListener('click',()=>{ setMeta('LOGO',''); toast('הלוגו הוסר'); });
 
-/* ---------- העלאת תמונה/וידאו והוספה במקום הסמן ---------- */
+/* ---------- העלאת תמונה/וידאו מצד התצוגה — הוספה לעמוד המוצג ---------- */
 $('#fileMediaInsert').addEventListener('change',e=>{
   const f=e.target.files[0]; if(!f){ return; }
   const bn=baseName(f.name).replace(/[()\[\]]/g,'').replace(/\s+/g,'_');
   state.assets[bn]={file:f,url:URL.createObjectURL(f)}; state.assetsChosen=true;
-  const cap='כיתוב', ref='![', mid=']('+'assets/'+bn+')';
-  const el=srcEl, start=el.selectionStart, val=el.value;
-  const pre=(start>0 && val[start-1]!=='\n') ? '\n\n' : '';
-  const ins=pre+ref+cap+mid+'\n\n';
-  el.value=val.slice(0,start)+ins+val.slice(el.selectionEnd);
-  const a=start+pre.length+ref.length; el.focus(); el.setSelectionRange(a,a+cap.length);
-  renderAll(); e.target.value='';
-  toast(/^(mp4|webm|mov)$/i.test((bn.split('.').pop()||''))?'הסרטון נוסף':'התמונה נוספה');
+  const cap=(prompt('כיתוב לתמונה/וידאו (לא חובה):','')||'').trim();
+  const line='!['+cap+'](assets/'+bn+')';
+  const {preamble,chunks}=splitPages(srcEl.value);
+  if(chunks.length){
+    const idx=(previewPage>=0 && previewPage<chunks.length) ? previewPage : chunks.length-1;
+    chunks[idx]=chunks[idx].replace(/\n+$/,'')+'\n\n'+line+'\n';
+    writePages(preamble,chunks); // מריץ renderAll
+  } else {
+    srcEl.value=srcEl.value.replace(/\n+$/,'')+'\n\n'+line+'\n'; renderAll();
+  }
+  e.target.value='';
+  toast(/^(mp4|webm|mov)$/i.test((bn.split('.').pop()||''))?'הסרטון נוסף לעמוד המוצג':'התמונה נוספה לעמוד המוצג');
 });
 
 /* ---------- טופס פרטים/מיתוג -> טקסט ---------- */
@@ -1605,34 +1590,6 @@ $('#sizeSel').addEventListener('change',e=>setMeta('SIZE',e.target.value));
 $('#accentPick').addEventListener('input',e=>{ setMeta('ACCENT2',''); setMeta('ACCENT',e.target.value); });
 document.querySelectorAll('#surfaceSel button').forEach(b=>b.addEventListener('click',()=>setMeta('SURFACE',b.dataset.v)));
 srcEl.addEventListener('input',scheduleRender);
-
-/* ---------- סרגל הוספת תחביר ---------- */
-const SNIPPETS = {
-  h1:{block:true, text:'# כותרת העמוד\n\n'},
-  h2:{block:true, text:'## תת-כותרת\n\n'},
-  bold:{wrap:['**','**'], ph:'טקסט מודגש'},
-  italic:{wrap:['*','*'], ph:'טקסט נטוי'},
-  term:{wrap:['{{','}}'], ph:'מונח'},
-  more:{block:true, text:'[more: כותרת הקטע]\nתוכן שמוצג רק בלחיצה.\n[/more]\n\n'},
-  single:{block:true, text:'[quiz: single]\nQ: נוסח השאלה\n- תשובה שגויה\n- *תשובה נכונה\n- תשובה שגויה\nEXPLAIN: משפט הסבר קצר שמלמד\n[/quiz]\n\n'},
-  multi:{block:true, text:'[quiz: multi]\nQ: נוסח השאלה\n- *תשובה נכונה\n- תשובה שגויה\n- *תשובה נכונה\n[/quiz]\n\n'},
-  tf:{block:true, text:'[quiz: truefalse]\nQ: נוסח הקביעה\nANSWER: true\n[/quiz]\n\n'}
-};
-function insertSnippet(k){
-  const s=SNIPPETS[k]; if(!s) return;
-  const el=srcEl, start=el.selectionStart, end=el.selectionEnd, val=el.value;
-  if(s.wrap){
-    const inner=val.slice(start,end)||s.ph, ins=s.wrap[0]+inner+s.wrap[1];
-    el.value=val.slice(0,start)+ins+val.slice(end);
-    const a=start+s.wrap[0].length; el.focus(); el.setSelectionRange(a,a+inner.length);
-  } else {
-    const pre=(start>0 && val[start-1]!=='\n') ? '\n\n' : '';
-    const ins=pre+s.text; el.value=val.slice(0,start)+ins+val.slice(end);
-    const caret=start+ins.length; el.focus(); el.setSelectionRange(caret,caret);
-  }
-  scheduleRender();
-}
-document.querySelectorAll('#fmtbar [data-k]').forEach(b=>b.addEventListener('click',()=>insertSnippet(b.dataset.k)));
 
 /* ---------- הורדת טקסט ---------- */
 $('#btnDownload').addEventListener('click',()=>{ const name=(state.model&&state.model.title?state.model.title:'textbook').replace(/[\\/:*?"<>|]/g,'_'); downloadBlob(new Blob([srcEl.value],{type:'text/plain;charset=utf-8'}),name+'.txt'); toast('הטקסט נשמר'); });
@@ -1695,7 +1652,6 @@ function setupMenu(btnId){
   menu.querySelectorAll('.menu-list button').forEach(b=>b.addEventListener('click',()=>menu.classList.remove('open')));
 }
 setupMenu('btnExport');
-setupMenu('btnAddQuiz');
 document.addEventListener('click',()=>document.querySelectorAll('.menu.open').forEach(m=>m.classList.remove('open')));
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.menu.open').forEach(m=>m.classList.remove('open')); });
 
