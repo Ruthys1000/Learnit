@@ -555,7 +555,7 @@ Q: נוסח השאלה
 Q: נוסח הקביעה
 ANSWER: true
 [/quiz]
-(בבחירה יחידה — בדיוק כוכבית אחת. בבחירה מרובה — כוכבית לפני כל נכונה. ANSWER — רק true או false.)
+⚠️ חובה — סימון התשובה הנכונה: זהו החלק הקריטי ביותר. לפני התשובה הנכונה חייבת לבוא כוכבית אחת ( * ) צמודה לטקסט התשובה — בבחירה יחידה בדיוק כוכבית אחת בסך הכול, בבחירה מרובה כוכבית לפני כל תשובה נכונה. באמת/שקר: שורת ANSWER עם true או false בלבד. לעולם אל תשאיר שאלה בלי סימון של התשובה הנכונה, ואל תסמן אותה בדרך אחרת (בלי הדגשה/צבע/הערה "(נכון)"). התו שלפני כל תשובה יכול להיות "-" או "*" — הסימון של הנכונה הוא הכוכבית שאחריו. למשל: "- *התשובה הנכונה" או "* *התשובה הנכונה". (אפשר גם [x] לפני התשובה הנכונה במקום כוכבית.)
 
 8. אין להשתמש בשום תחביר אחר (בלי טבלאות, בלי קישורים, בלי HTML גולמי).
 
@@ -585,6 +585,18 @@ Q: מהו {{אידוי}}?
 - מים שקופאים לקרח
 EXPLAIN: אידוי הוא המעבר ממצב נוזלי לגזי בהשפעת חום.
 [/quiz]
+
+═══════════════════════════════════
+בדיקה עצמית לפני שליחה — חובה
+═══════════════════════════════════
+לפני שאתה שולח את הלומדה, עבור על כל השאלות ותקן לפי הרשימה הזו. אל תשלח עד שהכול תקין:
+✓ כל [quiz: single] — יש בדיוק תשובה נכונה אחת מסומנת בכוכבית ( * ) לפניה.
+✓ כל [quiz: multi] — יש לפחות תשובה נכונה אחת, וכוכבית ( * ) לפני כל תשובה נכונה.
+✓ כל [quiz: truefalse] — יש שורת ANSWER עם true או false.
+✓ כל מונח שסומן ב-{{...}} בטקסט מופיע גם בבלוק [glossary], מאויית בדיוק אותו הדבר.
+✓ כל קובץ מדיה שהוזכר לקוח מרשימת הקבצים שמסרתי — בלי להמציא שמות.
+✓ הפלט כתוב אך ורק בפורמט המוגדר, בלי טקסט מחוץ לפורמט.
+אם משהו לא עומד בבדיקה — תקן אותו, ורק אז שלח.
 
 ═══════════════════════════════════
 מתחילים
@@ -842,12 +854,21 @@ function parseBook(text){
       if (/^Q:/i.test(t)){ quiz.question = t.replace(/^Q:/i,'').trim(); continue; }
       if (/^EXPLAIN:/i.test(t)){ quiz.explain = t.replace(/^EXPLAIN:/i,'').trim(); continue; }
       if (/^ANSWER:/i.test(t)){ quiz.answer = (t.replace(/^ANSWER:/i,'').trim().toLowerCase()==='true'); continue; }
-      const mOpt = t.match(/^-\s*(\*?)\s*(.+)$/);
-      if (mOpt){ quiz.options.push({text:mOpt[2].trim(), correct:mOpt[1]==='*'}); continue; }
+      const mOpt = t.match(/^[-*+]\s+(.+)$/); // bullet may be -, * or +
+      if (mOpt){
+        let txt = mOpt[1].trim(); let correct = false;
+        if (/^\[\s*[xX✓✔]\s*\]/.test(txt))  { correct = true;  txt = txt.replace(/^\[\s*[xX✓✔]\s*\]\s*/,''); }
+        else if (/^\[\s*\]/.test(txt))       { correct = false; txt = txt.replace(/^\[\s*\]\s*/,''); }
+        else if (/^\*\s*/.test(txt))         { correct = true;  txt = txt.replace(/^\*+\s*/,''); }
+        else if (/^[✓✔]\s+/.test(txt))       { correct = true;  txt = txt.replace(/^[✓✔]\s+/,''); }
+        else if (/\s[✓✔]$/.test(txt))        { correct = true;  txt = txt.replace(/\s*[✓✔]$/,''); }
+        quiz.options.push({ text: txt.trim(), correct });
+        continue;
+      }
     }
     if (!quiz.question) warnings.push('שאלון ללא שורת Q:.');
-    if (qType==='single'){ const c=quiz.options.filter(o=>o.correct).length; if(c!==1) warnings.push('שאלת בחירה יחידה צריכה בדיוק תשובה נכונה אחת (נמצאו '+c+'): "'+quiz.question+'"'); }
-    else if (qType==='multi'){ const c=quiz.options.filter(o=>o.correct).length; if(c<1) warnings.push('שאלת בחירה מרובה ללא תשובה נכונה מסומנת: "'+quiz.question+'"'); }
+    if (qType==='single'){ const c=quiz.options.filter(o=>o.correct).length; if(c!==1) warnings.push('שאלת בחירה יחידה צריכה בדיוק תשובה נכונה אחת (נמצאו '+c+') — סמנו את הנכונה עם * לפניה: "'+quiz.question+'"'); }
+    else if (qType==='multi'){ const c=quiz.options.filter(o=>o.correct).length; if(c<1) warnings.push('שאלת בחירה מרובה ללא תשובה נכונה מסומנת — סמנו כל נכונה עם * לפניה: "'+quiz.question+'"'); }
     else if (qType==='truefalse'){ if(quiz.answer===null) warnings.push('שאלת אמת/שקר ללא ANSWER תקין: "'+quiz.question+'"'); }
     return quiz;
   }
