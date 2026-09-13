@@ -170,6 +170,8 @@
   .onboard .ob-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
   .onboard .ob-actions .btn{padding:10px 16px;font-size:13px}
   .onboard .ob-flow{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.01em}
+  .onboard .ob-link{margin-top:12px;background:transparent;border:0;color:var(--accent-ink);font-family:inherit;font-weight:700;font-size:12.5px;cursor:pointer}
+  .onboard .ob-link:hover{text-decoration:underline}
   /* paste label above the source box (empty state) */
   .pastelabel{display:flex;align-items:center;justify-content:center;gap:7px;margin:2px 0 -2px;
     font-size:12.5px;font-weight:800;color:var(--accent-ink)}
@@ -178,6 +180,18 @@
   .toast{position:fixed;inset-inline-start:50%;bottom:24px;transform:translateX(50%);background:var(--ink);color:var(--bg);
     padding:11px 20px;border-radius:10px;font-weight:700;font-size:13px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:60}
   .toast.show{opacity:1;transform:translateX(50%) translateY(-4px)}
+
+  /* media position chooser */
+  .posmodal{position:fixed;inset:0;background:rgba(16,24,40,.45);display:none;place-items:center;z-index:70;padding:20px}
+  .posmodal:not([hidden]){display:grid}
+  .posmodal-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-lg);
+    width:min(430px,92vw);max-height:80vh;display:flex;flex-direction:column;gap:10px;padding:16px}
+  .posmodal-h{font-weight:800;font-size:14px;color:var(--ink)}
+  .posmodal-list{display:flex;flex-direction:column;gap:5px;overflow:auto}
+  .posmodal-list button{border:1px solid var(--line);background:var(--panel-2);color:var(--ink);font-family:inherit;font-weight:600;
+    font-size:12.5px;text-align:start;padding:9px 11px;border-radius:8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .posmodal-list button:hover{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent-ink)}
+  .posmodal #posCancel{align-self:flex-start}
 
   /* ---------- Dropdown menu ---------- */
   .menu{position:relative;display:inline-flex}
@@ -254,16 +268,16 @@
           <h3>מתחילים כאן — יוצרים לומדה</h3>
           <p>מזינים ל-AI את חומרי הלמידה שכבר יש לכם, וה-AI בונה מהם לומדה אינטראקטיבית — עם שאלות, מילון ומדיה. הכלי מרכיב ומייצא אתר עצמאי או חבילת SCORM.</p>
           <div class="ob-actions">
-            <button type="button" class="btn primary" id="obExample"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L18.7 9l-4.9 1.8L12 15.7 10.2 10.8 5.3 9l4.9-1.1z"/></svg>טען דוגמה מלאה</button>
-            <button type="button" class="btn accent" id="obPrompt"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק פרומפט ל-AI</button>
+            <button type="button" class="btn primary" id="obPrompt"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק פרומפט ל-AI</button>
           </div>
           <div class="ob-flow">העתקת פרומפט ל-AI  ←  הדבקת התוכן כאן  ←  מיתוג וייצוא</div>
+          <button type="button" class="ob-link" id="obExample">רוצים לראות דוגמה מוכנה? טען דוגמה מלאה</button>
         </div>
         <div class="hint" id="srcHint">הטקסט הוא מקור האמת. כל עריכה כאן מתעדכנת מיד בתצוגה. לשמירה — "שמור טקסט".</div>
         <div class="warnbox" id="warns"></div>
         <div class="okbox" id="okbox" style="display:none"><svg class="ic sm" viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg><span>הטקסט תקין — כל האלמנטים פורסרו בהצלחה.</span></div>
         <div class="pastelabel" id="pasteLabel"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg>הדביקו כאן את התוכן שקיבלתם מה-AI</div>
-        <textarea id="src" spellcheck="false" placeholder="הדביקו כאן (Ctrl+V) את התוכן שקיבלתם מה-AI — או לחצו 'טען דוגמה מלאה' כדי לראות דוגמה."></textarea>
+        <textarea id="src" spellcheck="false" placeholder="הדביקו כאן (Ctrl+V) את התוכן שקיבלתם מה-AI."></textarea>
       </div>
 
       <!-- STRUCTURE -->
@@ -367,6 +381,14 @@
   </div>
 
   <div class="toast" id="toast"></div>
+
+  <div class="posmodal" id="posModal" hidden>
+    <div class="posmodal-card">
+      <div class="posmodal-h">היכן להוסיף את המדיה בעמוד?</div>
+      <div class="posmodal-list" id="posList"></div>
+      <button type="button" class="btn sm ghost" id="posCancel">ביטול</button>
+    </div>
+  </div>
 
 <script>
 "use strict";
@@ -1561,24 +1583,72 @@ $('#fileLogo').addEventListener('change',e=>{
 });
 $('#btnLogoRemove').addEventListener('click',()=>{ setMeta('LOGO',''); toast('הלוגו הוסר'); });
 
-/* ---------- העלאת תמונה/וידאו מצד התצוגה — הוספה לעמוד המוצג ---------- */
-$('#fileMediaInsert').addEventListener('change',e=>{
-  const f=e.target.files[0]; if(!f){ return; }
+/* ---------- העלאת תמונה/וידאו מצד התצוגה — בחירת מיקום בעמוד ---------- */
+// חלוקת גוף העמוד לבלוקים ברמה העליונה, בסדר שבו הקורא מציג — תואם parseBook
+function pageTopBlocks(lines){
+  const blocks=[]; let k=0, paraStart=-1;
+  const pushPara=(end)=>{ if(paraStart>=0){ const txt=lines.slice(paraStart,end).join(' ').replace(/\s+/g,' ').trim();
+    const lbl=txt.length>28?txt.slice(0,28)+'…':txt; blocks.push({start:paraStart,end,label:lbl||'פסקה'}); paraStart=-1; } };
+  while(k<lines.length){
+    const t=lines[k].trim();
+    if(t===''){ pushPara(k); k++; continue; }
+    if(/^##\s+/.test(t)){ pushPara(k); const s=t.replace(/^##\s+/,'').trim(); blocks.push({start:k,end:k+1,label:'כותרת: '+(s.length>24?s.slice(0,24)+'…':s)}); k++; continue; }
+    if(/^!\[(.*?)\]\((.*?)\)\s*$/.test(t)){ pushPara(k); blocks.push({start:k,end:k+1,label:'מדיה קיימת'}); k++; continue; }
+    const mMore=t.match(/^\[more:\s*(.*?)\]\s*$/);
+    if(mMore){ pushPara(k); let j=k+1; while(j<lines.length && !/^\[\/more\]\s*$/.test(lines[j].trim()))j++; if(j<lines.length)j++; blocks.push({start:k,end:j,label:'קטע מתקפל'}); k=j; continue; }
+    const mQuiz=t.match(/^\[quiz:\s*(single|multi|truefalse)\s*\]\s*$/i);
+    if(mQuiz){ pushPara(k); let j=k+1; while(j<lines.length && !/^\[\/quiz\]\s*$/.test(lines[j].trim()))j++; if(j<lines.length)j++; blocks.push({start:k,end:j,label:'שאלה'}); k=j; continue; }
+    if(/^\[\/(more|quiz|glossary)\]/.test(t)){ k++; continue; }
+    if(paraStart<0) paraStart=k; k++;
+  }
+  pushPara(lines.length);
+  return blocks;
+}
+
+let pendingMedia=null;
+function closePosModal(){ $('#posModal').hidden=true; $('#posList').innerHTML=''; pendingMedia=null; }
+function openPosModal(){
+  const {chunks}=splitPages(srcEl.value);
+  if(!chunks.length){ insertPendingMedia(-1,0); return; }   // אין עמודים — פשוט מוסיף לסוף המקור
+  const idx=(previewPage>=0 && previewPage<chunks.length) ? previewPage : chunks.length-1;
+  const body=chunks[idx].replace(/\r\n?/g,'\n').split('\n').slice(1);
+  const blocks=pageTopBlocks(body);
+  const items=[{at:0,label:'בתחילת העמוד'}];
+  blocks.forEach((b,i)=>items.push({at:b.end,label:(i===blocks.length-1)?'בסוף העמוד':'אחרי: '+b.label}));
+  const list=$('#posList'); list.innerHTML='';
+  items.forEach(it=>{ const btn=document.createElement('button'); btn.type='button'; btn.textContent=it.label;
+    btn.addEventListener('click',()=>{ const at=it.at; closePosModalKeepPending(); insertPendingMedia(idx,at); }); list.appendChild(btn); });
+  $('#posModal').hidden=false;
+}
+function closePosModalKeepPending(){ $('#posModal').hidden=true; $('#posList').innerHTML=''; }
+function insertPendingMedia(idx,at){
+  if(!pendingMedia) return;
+  const f=pendingMedia.file, cap=pendingMedia.cap; pendingMedia=null;
   const bn=baseName(f.name).replace(/[()\[\]]/g,'').replace(/\s+/g,'_');
   state.assets[bn]={file:f,url:URL.createObjectURL(f)}; state.assetsChosen=true;
-  const cap=(prompt('כיתוב לתמונה/וידאו (לא חובה):','')||'').trim();
   const line='!['+cap+'](assets/'+bn+')';
   const {preamble,chunks}=splitPages(srcEl.value);
-  if(chunks.length){
-    const idx=(previewPage>=0 && previewPage<chunks.length) ? previewPage : chunks.length-1;
-    chunks[idx]=chunks[idx].replace(/\n+$/,'')+'\n\n'+line+'\n';
+  if(chunks.length && idx>=0 && idx<chunks.length){
+    const chunkLines=chunks[idx].replace(/\r\n?/g,'\n').split('\n');
+    const title=chunkLines[0], body=chunkLines.slice(1);
+    body.splice(at,0,'',line,'');
+    chunks[idx]=(title+'\n'+body.join('\n')).replace(/\n{3,}/g,'\n\n').replace(/\s+$/,'')+'\n';
     writePages(preamble,chunks); // מריץ renderAll
   } else {
     srcEl.value=srcEl.value.replace(/\n+$/,'')+'\n\n'+line+'\n'; renderAll();
   }
+  toast(/^(mp4|webm|mov)$/i.test((bn.split('.').pop()||''))?'הסרטון נוסף':'התמונה נוספה');
+}
+$('#fileMediaInsert').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f){ return; }
+  const cap=(prompt('כיתוב לתמונה/וידאו (לא חובה):','')||'').trim();
+  pendingMedia={file:f, cap};
   e.target.value='';
-  toast(/^(mp4|webm|mov)$/i.test((bn.split('.').pop()||''))?'הסרטון נוסף לעמוד המוצג':'התמונה נוספה לעמוד המוצג');
+  openPosModal();
 });
+$('#posCancel').addEventListener('click',closePosModal);
+$('#posModal').addEventListener('click',e=>{ if(e.target.id==='posModal') closePosModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !$('#posModal').hidden) closePosModal(); });
 
 /* ---------- טופס פרטים/מיתוג -> טקסט ---------- */
 $('#fTitle').addEventListener('input',e=>setMeta('TITLE',e.target.value));
