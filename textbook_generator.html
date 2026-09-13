@@ -3,194 +3,290 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>מחולל ספרי לימוד דיגיטליים</title>
+<title>מחולל לומדות דיגיטליות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Heebo:wght@400;500;700;800&family=Rubik:wght@400;500;600;700;800&family=Noto+Sans+Hebrew:wght@400;500;700;800&display=swap">
 <style>
   :root{
-    --bg:#eef2f9; --panel:#ffffff; --ink:#16202e; --muted:#5b6779; --line:#dbe3ef;
-    --brand:#2563eb; --brand-soft:#e8f1ff; --brand-ink:#1d4ed8; --danger:#dc2626;
-    --ok:#15803d; --ok-soft:#dcfce7; --warn:#b45309; --warn-soft:#fef3c7;
-    --shadow:0 16px 40px rgba(20,30,55,.12); --radius:14px;
+    --bg:#f5f6f8; --panel:#ffffff; --panel-2:#fafbfc; --ink:#141a24; --muted:#697586;
+    --line:#e6e8ee; --line-2:#eef0f4;
+    --accent:#1d4ed8; --accent-ink:#1e40af; --accent-deep:#1e3a8a; --accent-soft:#eef3ff; --accent-line:#d7e2ff;
+    --danger:#dc2626; --ok:#16794c; --ok-soft:#e6f6ee; --warn:#9a6700; --warn-soft:#fff6e0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+    --shadow-md:0 4px 12px rgba(16,24,40,.08);
+    --shadow-lg:0 18px 44px rgba(16,24,40,.14);
+    --radius:12px; --radius-sm:9px;
+    --font:'Assistant',system-ui,'Segoe UI',Arial,sans-serif;
   }
   :root[data-theme="dark"]{
-    --bg:#0d1320; --panel:#141c2b; --ink:#e9eefb; --muted:#9aa7bd; --line:#28344a;
-    --brand:#4f8cff; --brand-soft:#182339; --brand-ink:#8fb6ff; --danger:#f87171;
-    --ok:#4ade80; --ok-soft:#0f2a1c; --warn:#fbbf24; --warn-soft:#2a2210;
-    --shadow:0 16px 40px rgba(0,0,0,.5);
+    --bg:#0c1017; --panel:#141a24; --panel-2:#111722; --ink:#e8ecf3; --muted:#93a0b4;
+    --line:#232c3a; --line-2:#1c2431;
+    --accent:#5b8bff; --accent-ink:#7ba2ff; --accent-deep:#9cbaff; --accent-soft:#16203a; --accent-line:#26375e;
+    --danger:#f87171; --ok:#4ade80; --ok-soft:#0f2a1c; --warn:#fbbf24; --warn-soft:#2a2210;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4); --shadow-md:0 6px 18px rgba(0,0,0,.45); --shadow-lg:0 20px 50px rgba(0,0,0,.6);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:'Heebo','Assistant','Segoe UI',Arial,sans-serif;
-    line-height:1.5;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.55;
+    display:flex;flex-direction:column;height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
+  svg{display:block}
+  .ic{width:17px;height:17px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .ic.sm{width:15px;height:15px}
 
-  .top{display:flex;align-items:center;gap:9px;padding:10px 16px;background:var(--panel);
-    border-bottom:1px solid var(--line);flex-wrap:wrap}
-  .logo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:15px}
-  .logo .m{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
-    background:linear-gradient(135deg,var(--brand),#7c3aed);color:#fff;font-size:17px}
+  /* ---------- Top bar ---------- */
+  .top{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--panel);
+    border-bottom:1px solid var(--line);flex-wrap:wrap;box-shadow:var(--shadow-sm);z-index:5}
+  .brand{display:flex;align-items:center;gap:10px;padding-inline-end:6px}
+  .brand .mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+    background:linear-gradient(150deg,var(--accent),var(--accent-deep));color:#fff;box-shadow:var(--shadow-sm)}
+  .brand .mark .ic{width:19px;height:19px;stroke:#fff;stroke-width:1.9}
+  .brand .txt{display:flex;flex-direction:column;line-height:1.15}
+  .brand .txt b{font-weight:800;font-size:14.5px;letter-spacing:-.01em}
+  .brand .txt span{font-size:11px;color:var(--muted);font-weight:600}
   .grow{flex:1}
-  .btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;
-    padding:8px 13px;font-weight:800;font-size:12.5px;cursor:pointer;font-family:inherit;
-    display:inline-flex;align-items:center;gap:6px;transition:transform .12s,border-color .2s,background .2s}
-  .btn:hover{transform:translateY(-1px);border-color:var(--brand)}
-  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
-  .btn.primary:hover{background:var(--brand-ink)}
-  .btn.icon{padding:8px;width:36px;height:36px;justify-content:center}
-  .btn.sm{padding:5px 9px;font-size:12px}
-  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .divider{width:1px;height:24px;background:var(--line);margin:0 4px}
+
+  .btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;
+    padding:7px 12px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;
+    display:inline-flex;align-items:center;gap:7px;transition:background .15s,border-color .15s,box-shadow .15s,transform .1s;white-space:nowrap}
+  .btn:hover{background:var(--panel-2);border-color:#cfd4de}
+  :root[data-theme="dark"] .btn:hover{border-color:#3a4658}
+  .btn:active{transform:translateY(1px)}
+  .btn .ic{color:var(--muted)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:var(--shadow-sm)}
+  .btn.primary .ic{color:#fff}
+  .btn.primary:hover{background:var(--accent-ink);border-color:var(--accent-ink)}
+  .btn.icon{padding:7px;width:34px;height:34px;justify-content:center}
+  .btn.ghost{border-color:transparent;background:transparent}
+  .btn.ghost:hover{background:var(--panel-2);border-color:var(--line)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.sm{padding:5px 9px;font-size:12px;border-radius:8px;gap:5px}
   label.filebtn{position:relative;overflow:hidden}
   label.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
-  .sep{width:1px;height:26px;background:var(--line);margin:0 3px}
 
-  .main{flex:1;display:grid;grid-template-columns:minmax(340px,44%) 1fr;min-height:0}
+  /* ---------- Main layout ---------- */
+  .main{flex:1;display:grid;grid-template-columns:minmax(360px,42%) 1fr;min-height:0}
   .side{display:flex;flex-direction:column;min-width:0;border-inline-end:1px solid var(--line);background:var(--panel)}
-  .tabs{display:flex;gap:4px;padding:8px 10px 0;border-bottom:1px solid var(--line)}
-  .tab{border:1px solid transparent;border-bottom:none;background:transparent;color:var(--muted);
-    padding:7px 13px;border-radius:10px 10px 0 0;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit}
-  .tab.active{background:var(--bg);color:var(--ink);border-color:var(--line)}
-  .tabpane{flex:1;min-height:0;overflow:auto;padding:12px;display:none;flex-direction:column;gap:10px}
+  .tabs{display:flex;gap:3px;padding:9px 10px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+  .tab{border:1px solid transparent;background:transparent;color:var(--muted);padding:7px 12px;border-radius:8px;
+    font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+  .tab:hover{color:var(--ink);background:var(--panel)}
+  .tab.active{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent-line)}
+  .tab .ic{width:15px;height:15px}
+  .tabpane{flex:1;min-height:0;overflow:auto;padding:14px;display:none;flex-direction:column;gap:12px}
   .tabpane.active{display:flex}
 
-  textarea#src{flex:1;min-height:260px;width:100%;resize:none;border:1px solid var(--line);
-    border-radius:12px;padding:12px 13px;background:var(--bg);color:var(--ink);
-    font-family:'SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.7;
-    direction:rtl;unicode-bidi:plaintext}
-  textarea#src:focus{outline:2px solid var(--brand-soft);border-color:var(--brand)}
+  textarea#src{flex:1;min-height:280px;width:100%;resize:none;border:1px solid var(--line);border-radius:var(--radius);
+    padding:13px 14px;background:var(--panel-2);color:var(--ink);font-family:ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+    font-size:13px;line-height:1.75;direction:rtl;unicode-bidi:plaintext}
+  textarea#src:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 
-  .hint{font-size:12.5px;color:var(--muted)}
-  .card{border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:12px}
-  .card h3{margin:0 0 8px;font-size:13.5px}
-  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px}
-  .field label{font-size:12px;color:var(--muted);font-weight:700}
-  .field input{border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:var(--panel);
-    color:var(--ink);font-family:inherit;font-size:13px}
+  .hint{font-size:12.5px;color:var(--muted);line-height:1.6}
+  .card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:14px}
+  .card>h3{margin:0 0 10px;font-size:13px;font-weight:800;display:flex;align-items:center;gap:7px;color:var(--ink)}
+  .card>h3 .ic{color:var(--accent)}
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:130px}
+  .field label{font-size:11.5px;color:var(--muted);font-weight:700}
+  .field input,.field select{border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--panel-2);
+    color:var(--ink);font-family:inherit;font-size:13px;width:100%}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 
-  .struct{display:flex;flex-direction:column;gap:6px}
-  .pageItem{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;
-    padding:7px 9px;background:var(--panel)}
-  .pageItem .idx{width:22px;height:22px;border-radius:6px;background:var(--brand-soft);color:var(--brand-ink);
-    display:grid;place-items:center;font-size:11px;font-weight:900;flex:none}
-  .pageItem .nm{flex:1;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .pageItem .tag{font-size:10.5px;color:var(--muted);flex:none}
-
-  .warnbox{border:1px solid var(--warn);background:var(--warn-soft);color:var(--warn);
-    border-radius:10px;padding:9px 11px;font-size:12.5px;display:none}
+  .warnbox{border:1px solid var(--warn);background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:12.5px;display:none}
   .warnbox.show{display:block}
   .warnbox ul{margin:6px 0 0;padding-inline-start:18px}
-  .assetlist{font-size:12px;color:var(--muted);max-height:140px;overflow:auto}
+  .okbox{border:1px solid var(--ok);background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:9px 12px;font-size:12.5px;
+    display:flex;align-items:center;gap:8px;font-weight:700}
+
+  .struct{display:flex;flex-direction:column;gap:6px}
+  .pageItem{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel-2)}
+  .pageItem .idx{width:22px;height:22px;border-radius:7px;background:var(--accent-soft);color:var(--accent-ink);
+    display:grid;place-items:center;font-size:11px;font-weight:800;flex:none}
+  .pageItem .nm{flex:1;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pageItem .tag{font-size:10.5px;color:var(--muted);flex:none;background:var(--panel);border:1px solid var(--line);padding:2px 7px;border-radius:999px}
+
+  .assetlist{font-size:12px;color:var(--muted);max-height:150px;overflow:auto;display:flex;flex-direction:column;gap:3px;margin-top:6px}
   .assetlist .miss{color:var(--danger);font-weight:700}
-  .assetlist .ok{color:var(--ok)}
+  .assetlist .ok{color:var(--ok);font-weight:700}
 
+  /* branding controls */
+  .swatches{display:flex;gap:9px;flex-wrap:wrap}
+  .sw{width:30px;height:30px;border-radius:8px;cursor:pointer;border:2px solid transparent;box-shadow:var(--shadow-sm);position:relative}
+  .sw.active{border-color:var(--ink);box-shadow:0 0 0 3px var(--accent-soft)}
+  .logoPrev{display:flex;align-items:center;gap:12px}
+  .logoPrev .box{width:64px;height:64px;border-radius:12px;border:1px dashed var(--line);background:var(--panel-2);display:grid;place-items:center;overflow:hidden}
+  .logoPrev .box img{max-width:100%;max-height:100%}
+  .logoPrev .box .ic{color:var(--muted);width:22px;height:22px}
+  .colorpick{display:flex;align-items:center;gap:8px}
+  .colorpick input[type=color]{width:40px;height:34px;padding:2px;border-radius:8px;border:1px solid var(--line);background:var(--panel);cursor:pointer}
+
+  /* guide */
+  .steps{display:flex;flex-direction:column;gap:0;counter-reset:st}
+  .step{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line-2)}
+  .step:last-child{border-bottom:none}
+  .step .n{counter-increment:st;flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-weight:800;font-size:13px}
+  .step .n::before{content:counter(st)}
+  .step .b{flex:1}
+  .step .b b{display:block;font-size:13.5px;margin-bottom:3px}
+  .step .b p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.6}
+  .promptbox{position:relative;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel-2);overflow:hidden}
+  .promptbox .phead{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .promptbox .phead b{flex:1;font-size:12.5px}
+  .promptbox pre{margin:0;max-height:280px;overflow:auto;padding:12px 14px;white-space:pre-wrap;
+    font-family:ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;font-size:11.5px;line-height:1.6;direction:rtl;unicode-bidi:plaintext}
+
+  /* ---------- Preview ---------- */
   .previewWrap{display:flex;flex-direction:column;min-width:0;background:var(--bg)}
-  .pvbar{display:flex;align-items:center;gap:8px;padding:8px 13px;border-bottom:1px solid var(--line);background:var(--panel)}
-  .pvbar .lbl{font-weight:800;font-size:12.5px;color:var(--muted)}
-  .pvdot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+  .pvbar{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .pvbar .lbl{font-weight:700;font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .pvdot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
   iframe#pv{flex:1;width:100%;border:0;background:#fff}
-
   .empty{flex:1;display:grid;place-items:center;color:var(--muted);text-align:center;padding:24px}
-  .empty .big{font-size:44px;margin-bottom:10px}
+  .empty .glyph{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+  .empty .glyph .ic{width:28px;height:28px}
+  .empty h4{margin:0 0 6px;font-size:15px;color:var(--ink)}
 
-  /* prompt modal */
-  .modal{position:fixed;inset:0;background:rgba(8,14,26,.55);display:none;place-items:center;z-index:50;padding:20px}
-  .modal.show{display:grid}
-  .sheet{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:820px;width:100%;
-    max-height:86vh;display:flex;flex-direction:column;box-shadow:var(--shadow)}
-  .sheet header{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
-  .sheet header h2{margin:0;font-size:16px;flex:1}
-  .sheet .body{overflow:auto;padding:16px 18px}
-  .sheet pre{white-space:pre-wrap;font-family:'SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
-    font-size:12.5px;line-height:1.65;background:var(--bg);border:1px solid var(--line);border-radius:12px;
-    padding:14px;margin:0;direction:rtl;unicode-bidi:plaintext}
+  .toast{position:fixed;inset-inline-start:50%;bottom:24px;transform:translateX(50%);background:var(--ink);color:var(--bg);
+    padding:11px 20px;border-radius:10px;font-weight:700;font-size:13px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:60}
+  .toast.show{opacity:1;transform:translateX(50%) translateY(-4px)}
 
-  .toast{position:fixed;inset-inline-start:50%;bottom:24px;transform:translateX(50%);
-    background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:800;font-size:13px;
-    box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s;z-index:60}
-  .toast.show{opacity:1}
-
-  @media (max-width:820px){
+  @media (max-width:860px){
     .main{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
     .side{border-inline-end:none;border-bottom:1px solid var(--line)}
+    .brand .txt span{display:none}
   }
 </style>
 </head>
 <body>
   <div class="top">
-    <div class="logo"><span class="m">📚</span><span>מחולל ספרי לימוד דיגיטליים</span></div>
-    <div class="sep"></div>
-    <button class="btn" id="btnPrompt">📋 העתקת פרומפט</button>
-    <button class="btn" id="btnExample">✨ טען דוגמה</button>
-    <div class="sep"></div>
-    <label class="btn filebtn">📄 טעינת קובץ טקסט
-      <input type="file" id="fileText" accept=".txt,.md,text/plain" />
-    </label>
-    <label class="btn filebtn">🖼️ בחירת תיקיית מדיה
-      <input type="file" id="fileAssets" webkitdirectory directory multiple />
-    </label>
+    <div class="brand">
+      <div class="mark"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5.5A2 2 0 0 1 6 4h5v15H6a2 2 0 0 0-2 1.5zM20 5.5A2 2 0 0 0 18 4h-5v15h5a2 2 0 0 1 2 1.5z"/></svg></div>
+      <div class="txt"><b>מחולל לומדות</b><span>עורך ספרי לימוד דיגיטליים</span></div>
+    </div>
+    <div class="divider"></div>
+    <button class="btn" id="btnExample"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L18.7 9l-4.9 1.8L12 15.7 10.2 10.8 5.3 9l4.9-1.1z"/><path d="M18 15l.7 1.8L20.5 17l-1.8.7L18 19.5 17.3 17.7 15.5 17l1.8-.2z"/></svg>טען דוגמה</button>
+    <div class="divider"></div>
+    <label class="btn filebtn"><svg class="ic" viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/></svg>קובץ טקסט<input type="file" id="fileText" accept=".txt,.md,text/plain" /></label>
+    <label class="btn filebtn"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></svg>תיקיית מדיה<input type="file" id="fileAssets" webkitdirectory directory multiple /></label>
     <div class="grow"></div>
-    <button class="btn" id="btnDownload" disabled>💾 הורדת טקסט מעודכן</button>
-    <button class="btn primary" id="btnSite" disabled>🌐 ייצוא אתר עצמאי</button>
-    <button class="btn primary" id="btnScorm" disabled>🎓 ייצוא SCORM</button>
-    <div class="sep"></div>
-    <button class="btn icon" id="btnTheme" title="מצב כהה/בהיר">🌙</button>
+    <button class="btn" id="btnDownload" disabled><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 11l5 4 5-4"/><path d="M5 21h14"/></svg>שמור טקסט</button>
+    <button class="btn primary" id="btnSite" disabled><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg>אתר עצמאי</button>
+    <button class="btn primary" id="btnScorm" disabled><svg class="ic" viewBox="0 0 24 24"><path d="M22 9L12 5 2 9l10 4 10-4z"/><path d="M6 11v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg>SCORM</button>
+    <div class="divider"></div>
+    <button class="btn icon ghost" id="btnTheme" title="מצב כהה/בהיר"><svg class="ic" viewBox="0 0 24 24" id="themeIcon"><path d="M21 12.8A8 8 0 1 1 11.2 3a6 6 0 0 0 9.8 9.8z"/></svg></button>
   </div>
 
   <div class="main">
     <div class="side">
       <div class="tabs">
-        <button class="tab active" data-tab="src">✍️ מקור טקסט</button>
-        <button class="tab" data-tab="struct">🗂️ מבנה ומדיה</button>
+        <button class="tab active" data-tab="src"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>מקור</button>
+        <button class="tab" data-tab="struct"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="4" rx="1"/><rect x="4" y="10" width="16" height="4" rx="1"/><rect x="4" y="16" width="16" height="4" rx="1"/></svg>מבנה</button>
+        <button class="tab" data-tab="brand"><svg class="ic" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="17" cy="14" r="2.5"/><path d="M12 22a10 10 0 1 1 10-10"/></svg>מיתוג</button>
+        <button class="tab" data-tab="guide"><svg class="ic" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4c0 2 2 2.5 2 4h4c0-1.5 2-2 2-4a4 4 0 0 0-4-4z"/><path d="M10 20h4M12 3v1"/></svg>מדריך AI</button>
       </div>
 
+      <!-- SOURCE -->
       <div class="tabpane active" data-pane="src">
-        <div class="hint">הטקסט הוא מקור האמת. כל עריכה כאן מתעדכנת מיד בתצוגה שמימין. לשמירה — "הורדת טקסט מעודכן".</div>
+        <div class="hint">הטקסט הוא מקור האמת. כל עריכה כאן מתעדכנת מיד בתצוגה. לשמירה — "שמור טקסט".</div>
         <div class="warnbox" id="warns"></div>
-        <textarea id="src" spellcheck="false" placeholder="טענו קובץ טקסט, או הדביקו כאן את תוכן הספר בפורמט המוגדר...
-לחצו על 'העתקת פרומפט' כדי לקבל את ההנחיות ל-AI חיצוני."></textarea>
+        <div class="okbox" id="okbox" style="display:none"><svg class="ic sm" viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg><span>הטקסט תקין — כל האלמנטים פורסרו בהצלחה.</span></div>
+        <textarea id="src" spellcheck="false" placeholder="לחצו 'טען דוגמה' כדי להתחיל, או הדביקו כאן את תוכן הספר בפורמט המוגדר (ראו לשונית 'מדריך AI')."></textarea>
       </div>
 
+      <!-- STRUCTURE -->
       <div class="tabpane" data-pane="struct">
         <div class="card">
-          <h3>פרטי הספר</h3>
+          <h3><svg class="ic" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>פרטי הספר</h3>
           <div class="row">
             <div class="field"><label>כותרת (TITLE)</label><input id="fTitle" type="text" placeholder="שם הספר" /></div>
-            <div class="field" style="max-width:130px"><label>ציון מעבר % (PASS)</label><input id="fPass" type="number" min="0" max="100" placeholder="70" /></div>
+            <div class="field" style="max-width:140px"><label>ציון מעבר % (PASS)</label><input id="fPass" type="number" min="0" max="100" placeholder="70" /></div>
           </div>
         </div>
         <div class="card">
-          <h3>עמודים <span class="hint" id="pageCount"></span></h3>
+          <h3><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="4" rx="1"/><rect x="4" y="11" width="16" height="4" rx="1"/><rect x="4" y="17" width="10" height="4" rx="1"/></svg>עמודים <span class="hint" id="pageCount"></span></h3>
           <div class="struct" id="structList"><div class="hint">אין עמודים עדיין.</div></div>
         </div>
         <div class="card">
-          <h3>קבצי מדיה</h3>
+          <h3><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></svg>קבצי מדיה</h3>
           <div class="hint" id="assetsSummary">לא נבחרה תיקיית מדיה.</div>
           <div class="assetlist" id="assetList"></div>
+        </div>
+      </div>
+
+      <!-- BRANDING -->
+      <div class="tabpane" data-pane="brand">
+        <div class="hint">כל בחירות המיתוג נשמרות בתוך הטקסט (SUBTITLE / AUTHOR / ACCENT / FONT / LOGO) וזורמות אל התוצר המיוצא.</div>
+        <div class="card">
+          <h3><svg class="ic" viewBox="0 0 24 24"><path d="M4 16l5-6 4 4 3-3 4 5"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>לוגו</h3>
+          <div class="logoPrev">
+            <div class="box" id="logoBox"><svg class="ic" viewBox="0 0 24 24"><path d="M4 16l5-6 4 4 3-3 4 5"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg></div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label class="btn sm filebtn"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 15V4M8 8l4-4 4 4"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg>העלאת לוגו<input type="file" id="fileLogo" accept="image/*" /></label>
+              <button class="btn sm ghost" id="btnLogoRemove" style="display:none"><svg class="ic sm" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>הסר</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3><svg class="ic" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="17" cy="14" r="2.5"/><path d="M12 22a10 10 0 1 1 10-10"/></svg>צבע מותג</h3>
+          <div class="swatches" id="swatches"></div>
+          <div class="colorpick" style="margin-top:11px">
+            <input type="color" id="accentPick" value="#1d4ed8" />
+            <span class="hint">צבע מותאם אישית — לחצו לבחירה</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3><svg class="ic" viewBox="0 0 24 24"><path d="M6 4h12M9 4v16M7 20h4"/><path d="M15 9h5M17 9v11M15.5 20h3"/></svg>פונט</h3>
+          <div class="field"><select id="fontSel">
+            <option value="Assistant">Assistant — ברירת מחדל</option>
+            <option value="Heebo">Heebo</option>
+            <option value="Rubik">Rubik</option>
+            <option value="Noto Sans Hebrew">Noto Sans Hebrew</option>
+          </select></div>
+        </div>
+        <div class="card">
+          <h3><svg class="ic" viewBox="0 0 24 24"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg>כותרת משנה ומחבר (לדף השער)</h3>
+          <div class="field" style="margin-bottom:10px"><label>כותרת משנה (SUBTITLE)</label><input id="fSubtitle" type="text" placeholder="למשל: יחידת לימוד אינטראקטיבית" /></div>
+          <div class="field"><label>מחבר / ארגון (AUTHOR)</label><input id="fAuthor" type="text" placeholder="למשל: המרכז ללימודי סביבה" /></div>
+        </div>
+      </div>
+
+      <!-- GUIDE -->
+      <div class="tabpane" data-pane="guide">
+        <div class="card">
+          <h3><svg class="ic" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4c0 2 2 2.5 2 4h4c0-1.5 2-2 2-4a4 4 0 0 0-4-4z"/><path d="M10 20h4"/></svg>איך לעבוד עם ה-AI (במיוחד לתוכן רחב)</h3>
+          <div class="steps">
+            <div class="step"><div class="n"></div><div class="b"><b>ארגנו את חומר הגלם</b><p>אספו את כל התוכן שצריך לכסות — סיכומים, נקודות, מקורות. ככל שהחומר מסודר יותר, הספר יהיה טוב יותר.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>בקשו קודם מתאר (תוכן עניינים)</b><p>לפני כתיבת הספר המלא, בקשו מה-AI: "בנה לי מתאר — רשימת עמודים עם מטרת למידה לכל עמוד, בלי לכתוב עדיין את התוכן". אשרו או תקנו את המבנה. זה השלב החשוב ביותר לאיכות.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>הריצו את הפרומפט</b><p>העתיקו את הפרומפט (למטה), הדביקו יחד עם המתאר המאושר + חומר הגלם + רשימת קבצי המדיה, ובקשו לכתוב את הספר המלא בפורמט.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>אם התשובה נקטעת</b><p>לתוכן ארוך, ה-AI עלול לעצור באמצע. פשוט כתבו: "המשך בדיוק מהמקום שעצרת, באותו פורמט". חברו את החלקים לקובץ אחד.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>בדקו לפי צ'קליסט איכות</b><p>מטרת למידה ברורה בכל עמוד? שאלות מופיעות אחרי שרעיון הושלם (לא באמצע)? מונחים מקצועיים מסומנים ב-<code>{{...}}</code>? אין "קיר טקסט" — פסקאות קצרות, העמקות ב-[more]? יש עמוד סיכום?</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>טענו, לטשו וייצאו</b><p>הדביקו את הטקסט כאן, תקנו אזהרות פרסור, קבעו מיתוג (לשונית "מיתוג"), ואז ייצאו אתר עצמאי או SCORM.</p></div></div>
+          </div>
+        </div>
+        <div class="promptbox">
+          <div class="phead"><svg class="ic sm" viewBox="0 0 24 24" style="color:var(--accent)"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg><b>הפרומפט המלא</b><button class="btn sm primary" id="btnCopyPrompt"><svg class="ic sm" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק</button></div>
+          <pre id="promptText"></pre>
         </div>
       </div>
     </div>
 
     <div class="previewWrap">
       <div class="pvbar">
-        <span class="pvdot"></span>
-        <span class="lbl">תצוגה מקדימה — קורא הספר</span>
-        <div class="grow" style="flex:1"></div>
-        <button class="btn sm" id="btnReload">↻ רענון</button>
+        <span class="lbl"><span class="pvdot"></span>תצוגה מקדימה — קורא הספר</span>
+        <div class="grow"></div>
+        <button class="btn sm ghost" id="btnOpenTab"><svg class="ic sm" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg>פתח בכרטיסייה</button>
+        <button class="btn sm ghost" id="btnReload"><svg class="ic sm" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-.9 4.5"/><path d="M20 4v5h-5"/></svg>רענן</button>
       </div>
       <iframe id="pv" title="תצוגה מקדימה"></iframe>
       <div class="empty" id="pvEmpty">
-        <div><div class="big">📖</div>טענו קובץ טקסט כדי לראות את הספר כאן.</div>
+        <div>
+          <div class="glyph"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5.5A2 2 0 0 1 6 4h5v15H6a2 2 0 0 0-2 1.5zM20 5.5A2 2 0 0 0 18 4h-5v15h5a2 2 0 0 1 2 1.5z"/></svg></div>
+          <h4>עדיין אין תוכן להצגה</h4>
+          <div class="hint">לחצו "טען דוגמה" בסרגל העליון כדי לראות ספר לדוגמה מלא.</div>
+        </div>
       </div>
-    </div>
-  </div>
-
-  <div class="modal" id="promptModal">
-    <div class="sheet">
-      <header>
-        <h2>פרומפט ליצירת ספר ב-AI חיצוני</h2>
-        <button class="btn primary sm" id="btnCopyPrompt">📋 העתק ללוח</button>
-        <button class="btn sm" id="btnClosePrompt">סגור</button>
-      </header>
-      <div class="body"><pre id="promptText"></pre></div>
     </div>
   </div>
 
@@ -200,21 +296,31 @@
 "use strict";
 
 /* ============================================================
-   הפרומפט המלא (סעיף 5 במסמך התכנון)
+   הפרומפט המלא — משודרג לעיצוב פדגוגי ולתוכן רחב
    ============================================================ */
-const PROMPT_TEXT = `אתה עוזר ליצירת ספר לימוד דיגיטלי. המטרה שלך היא לא רק להעביר תוכן, אלא לעצב תהליך למידה: לבחור מתי להסביר, מתי לבדוק הבנה, מתי להעמיק, ומתי להסביר מונח חדש. כתוב את כל הספר בפורמט הבא בלבד, בלי הסברים מחוץ לפורמט.
+const PROMPT_TEXT = `אתה מעצב/ת למידה (Instructional Designer) מנוסה. המשימה שלך אינה "לחלק טקסט לעמודים", אלא לבנות תהליך למידה אפקטיבי: להחליט מה ללמד, באיזה סדר, מתי לבדוק הבנה, מתי להעמיק, ומתי להגדיר מונח. כתוב את כל הספר בפורמט המוגדר בלבד, בלי טקסט מחוץ לפורמט.
 
-### עקרונות פדגוגיים (חשובים לא פחות מהתחביר!)
-- לא כל עמוד צריך שאלה. עמודי תוכן טהור, שמסבירים רעיון חדש בלי הפרעה, הם חלק לגיטימי ורצוי מהמבנה.
-- הוסף שאלת הבנה [quiz] בסמוך למקום שבו רעיון מרכזי הושלם — כדי לבדוק שהלומד/ת קלטו אותו לפני שממשיכים.
-- אם מושג דורש כמה עמודים כדי להתבסס, אפשר לדחות את הבדיקה לעמוד מאוחר יותר שמאחד כמה רעיונות יחד, במקום לבדוק כל פרט בנפרד.
-- כשמופיע מונח מקצועי חדש בפעם הראשונה, סמן אותו כמונח מילון (כלל 6) כדי שאפשר יהיה ללחוץ ולראות הגדרה, במקום לעצור את זרימת הפסקה בהסבר ארוך.
-- תוכן העשרה, דוגמה נוספת, או פרטים שלא כולם חייבים לקרוא — שים בקטע מתקפל (כלל 7), כדי שהעמוד הראשי יישאר קצר וממוקד.
+═══════════════════════════════════
+עקרונות עיצוב הלמידה (חשובים לא פחות מהתחביר)
+═══════════════════════════════════
+1. מטרת למידה לכל עמוד: כל עמוד צריך "לעשות" דבר אחד ברור — להסביר רעיון, להדגים, או לאחד. אל תערבב יותר מדי רעיונות בעמוד אחד.
+2. סקאפולדינג (בנייה הדרגתית): סדר את העמודים מהפשוט למורכב. אל תניח ידע שעוד לא הוצג.
+3. לא כל עמוד צריך שאלה: עמוד תוכן טהור שמסביר רעיון ברצף, בלי הפרעה, הוא מבנה לגיטימי ורצוי.
+4. שאלה במקום הנכון: הוסף [quiz] מיד אחרי שרעיון מרכזי הושלם — לא באמצע הסבר. אם מושג נבנה על פני כמה עמודים, דחה את הבדיקה לעמוד מאוחר שמאחד כמה רעיונות.
+5. מונחים: כשמופיע מונח מקצועי חדש בפעם הראשונה, הכנס אותו למילון וסמן אותו בטקסט ב-{{...}}, במקום לעצור את הזרימה בהסבר ארוך בתוך הפסקה.
+6. הימנע מ"קיר טקסט": פסקאות קצרות (2–4 משפטים). תוכן העשרה, דוגמה נוספת או פירוט שלא כולם חייבים — הכנס ל-[more].
+7. שפה: ברורה, ישירה, מותאמת לקהל היעד. הסבר במילים פשוטות לפני שמשתמשים במונח טכני.
+8. אורך: כוון למספר העמודים המבוקש. אל תמתח תוכן דליל ואל תדחוס נושא עמוס לעמוד אחד — פצל אותו.
+9. עמוד פתיחה ועמוד סיכום: פתח בעמוד קצר שממסגר מה נלמד ולמה זה חשוב; סיים בעמוד סיכום שמאחד את הרעיונות, ובו כמה שאלות מסכמות.
+10. איכות שאלות: הסחות (תשובות שגויות) צריכות להיות סבירות, לא אבסורדיות. הוסף EXPLAIN קצר שמלמד, לא רק "נכון/לא נכון".
 
-### כללי הפורמט
-
-1. מטא-דאטה בתחילת הקובץ:
+═══════════════════════════════════
+כללי הפורמט
+═══════════════════════════════════
+1. מטא-דאטה בתחילת הקובץ (SUBTITLE ו-AUTHOR אופציונליים):
 TITLE: <כותרת הספר>
+SUBTITLE: <כותרת משנה קצרה, אופציונלי>
+AUTHOR: <מחבר או ארגון, אופציונלי>
 PASS: <ציון מעבר באחוזים, למשל 70>
 
 2. מילון מונחים — בלוק אחד, מיד אחרי המטא-דאטה, לפני העמוד הראשון:
@@ -223,39 +329,33 @@ PASS: <ציון מעבר באחוזים, למשל 70>
 מונח שני: הגדרה קצרה וברורה
 [/glossary]
 
-3. כל עמוד מתחיל בשורה עם סולמית אחת וכותרת:
-# כותרת העמוד
+3. כל עמוד מתחיל בשורה עם סולמית אחת:  # כותרת העמוד
+   תת-כותרת בתוך עמוד:  ## תת-כותרת
+   פסקה = טקסט חופשי; אפשר **הדגשה** ו*נטוי*.
 
-4. פסקה רגילה = טקסט חופשי. אפשר **הדגשה** ו*נטוי*.
-תת-כותרת בתוך עמוד:
-## תת-כותרת
+4. סימון מונח מילון לחיץ — עטוף בסוגריים מסולסלים כפולים, בדיוק כפי שהמונח מופיע במילון:
+   ...תהליך שנקרא {{מונח ראשון}} מתרחש...
 
-5. כדי לסמן מילה כמונח מילון לחיץ, עטפו אותה בסוגריים מסולסלים כפולים, בדיוק כפי שהיא מופיעה במילון:
-טקסט לפני {{מונח ראשון}} טקסט אחרי.
+5. תמונה או וידאו — אותו תחביר, הסוג נקבע לפי הסיומת:
+   ![כיתוב](assets/שם_קובץ.jpg)
+   ![כיתוב](assets/שם_קובץ.mp4)
+   תמונה: jpg png gif webp svg  |  וידאו: mp4 webm mov
+   חשוב: השתמש רק בשמות קבצים מרשימת "קבצי המדיה הזמינים" למטה. אל תמציא קבצים. אם אין קובץ מתאים — אל תוסיף מדיה שם.
 
-6. תמונה או וידאו — אותו תחביר, ההבדל נקבע לפי סיומת הקובץ:
-![כיתוב](assets/שם_קובץ.jpg)
-![כיתוב](assets/שם_קובץ.mp4)
-סיומות תמונה: jpg, png, gif, webp, svg. סיומות וידאו: mp4, webm, mov.
-חשוב מאוד: השתמשו רק בשמות קבצים מתוך רשימת "קבצי המדיה הזמינים" למטה. אל תמציאו קבצים. אם אין קובץ מתאים — אל תוסיפו תמונה/וידאו באותו מקום.
-
-7. קטע מתקפל (תוכן העשרה אופציונלי):
-[more: כותרת הקטע המתקפל]
-תוכן שיוצג רק כשלוחצים על הכותרת.
+6. קטע מתקפל (העשרה אופציונלית):
+[more: כותרת הקטע]
+תוכן שמוצג רק בלחיצה.
 [/more]
 
-8. שאלת הערכה — שלושה סוגים, כל שאלה בין [quiz: ...] ל-[/quiz]:
-
-בחירה יחידה (כוכבית לפני התשובה הנכונה, רק אחת):
+7. שאלוני הערכה — שלושה סוגים, כל שאלה בין [quiz: ...] ל-[/quiz]:
 [quiz: single]
 Q: נוסח השאלה
 - תשובה שגויה
 - *תשובה נכונה
 - תשובה שגויה
-EXPLAIN: הסבר קצר לאחר מענה (אופציונלי)
+EXPLAIN: משפט הסבר שמלמד (אופציונלי)
 [/quiz]
 
-בחירה מרובה (כוכבית לפני כל תשובה נכונה, אפשר כמה):
 [quiz: multi]
 Q: נוסח השאלה
 - *תשובה נכונה
@@ -263,30 +363,31 @@ Q: נוסח השאלה
 - *תשובה נכונה
 [/quiz]
 
-אמת/שקר:
 [quiz: truefalse]
 Q: נוסח הקביעה
 ANSWER: true
 [/quiz]
-(ANSWER יכול להיות רק true או false)
+(בבחירה יחידה — בדיוק כוכבית אחת. בבחירה מרובה — כוכבית לפני כל נכונה. ANSWER — רק true או false.)
 
-9. אין להשתמש בשום תחביר אחר (בלי טבלאות, בלי קישורים, בלי HTML גולמי).
+8. אין להשתמש בשום תחביר אחר (בלי טבלאות, בלי קישורים, בלי HTML גולמי).
 
-### דוגמה לעמוד תקין
-
+═══════════════════════════════════
+דוגמה קצרה
+═══════════════════════════════════
+TITLE: מבוא למחזור המים
+SUBTITLE: יחידת לימוד אינטראקטיבית
+PASS: 70
 [glossary]
-אידוי: תהליך שבו נוזל הופך לגז בהשפעת חום
-עיבוי: תהליך שבו גז הופך לנוזל בהתקררות
+אידוי: מעבר של מים ממצב נוזלי לגז בהשפעת חום
 [/glossary]
 
-# מבוא למחזור המים
+# למה יש מחזור מים?
+כמות המים על כדור הארץ כמעט קבועה — המים פשוט נעים ומחליפים צורה שוב ושוב.
 
-מחזור המים הוא התהליך שבו מים נעים בין האוקיינוס, האטמוספרה והיבשה. שלב מרכזי בתהליך נקרא {{אידוי}}, ושלב נוסף נקרא {{עיבוי}}.
+![סכמת מחזור המים](assets/water_cycle.png)
 
-![תרשים מחזור המים](assets/water_cycle_diagram.png)
-
-[more: לרוצים להעמיק — מחזור המים בעולם החקלאות]
-מחזור המים משפיע ישירות על תכנון השקיה בחקלאות מודרנית, ועל תחזיות בצורת ושיטפונות.
+[more: להרחבה — השפעה על חקלאות]
+מחזור המים משפיע ישירות על תכנון השקיה ועל תחזיות בצורת.
 [/more]
 
 [quiz: single]
@@ -297,23 +398,29 @@ Q: מהו {{אידוי}}?
 EXPLAIN: אידוי הוא המעבר ממצב נוזלי לגזי בהשפעת חום.
 [/quiz]
 
-### פרטי המשימה
-
+═══════════════════════════════════
+פרטי המשימה (מלא/י לפני שליחה)
+═══════════════════════════════════
 נושא הספר: ____
 קהל יעד: ____
 מספר עמודים רצוי: ____ (ברירת מחדל: 15)
-קבצי מדיה זמינים (שם מדויק כפי שהוא בתיקייה, אחד בכל שורה):
+טון וסגנון: ____ (למשל: ענייני, ידידותי, אקדמי)
+קבצי מדיה זמינים (שם מדויק כפי שבתיקייה, אחד בכל שורה):
+____
+חומר הגלם (הדבק כאן את התוכן/הסיכומים שיש לכסות):
 ____
 
-חומר הגלם לכתיבת הספר (הדביקו כאן את התוכן/הסיכומים/הנקודות שיש לכסות):
-____
-
-כתוב כעת את כל הספר בפורמט שהוגדר למעלה, ורק אותו.`;
+צעד ראשון: אם החומר רחב, קודם החזר לי מתאר בלבד (רשימת עמודים + מטרת למידה לכל עמוד) לאישור. אחרי שאאשר — כתוב את הספר המלא בפורמט שהוגדר, ורק אותו.`;
 
 /* ============================================================
-   ספר לדוגמה מובנה (כפתור "טען דוגמה")
+   ספר לדוגמה מובנה
    ============================================================ */
 const EXAMPLE_TEXT = `TITLE: מסע המים — מבוא למחזור המים בטבע
+SUBTITLE: יחידת לימוד אינטראקטיבית · מדעי הסביבה
+AUTHOR: המרכז ללימודי סביבה
+FONT: Assistant
+ACCENT: #1d4ed8
+LOGO: assets/logo.svg
 PASS: 70
 [glossary]
 אידוי: המעבר של מים ממצב נוזלי למצב גזי (אדי מים) בהשפעת חום
@@ -340,8 +447,8 @@ PASS: 70
 
 לא רק גופי מים "מאדים". צמחים משחררים אדי מים דרך העלים בתהליך משלים, ולכן יער גדול תורם כמות מים עצומה לאוויר מדי יום.
 
-[more: למתעניינים — כמה מים מאדים באמת?]
-מכל אגן הים התיכון מתאדים מדי שנה מיליארדי מטרים מעוקבים של מים. אילו האידוי היה נעצר, מפלס הים היה עולה — אך העיבוי והמשקעים מחזירים את המים למעגל.
+[more: למתעניינים — כמה מים מתאדים באמת?]
+מאגן הים התיכון מתאדים מדי שנה מיליארדי מטרים מעוקבים של מים. אילו האידוי היה נעצר, המעגל כולו היה נשבר — אך העיבוי והמשקעים מחזירים את המים בחזרה.
 [/more]
 
 [quiz: single]
@@ -386,42 +493,52 @@ EXPLAIN: השמש מספקת את החום שמאפשר את האידוי — ו
 [/quiz]
 `;
 
-// דיאגרמת SVG מוטמעת עבור הדוגמה (מדמה קובץ assets/water_cycle.svg)
-const EXAMPLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" font-family="Heebo,Arial,sans-serif">
-<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe3ff"/><stop offset="1" stop-color="#eaf6ff"/></linearGradient></defs>
+const EXAMPLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" font-family="Assistant,Arial,sans-serif">
+<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe6ff"/><stop offset="1" stop-color="#eef6ff"/></linearGradient></defs>
 <rect width="640" height="360" fill="url(#sky)"/>
-<circle cx="565" cy="60" r="38" fill="#ffd54a"/><g stroke="#ffd54a" stroke-width="4"><line x1="565" y1="6" x2="565" y2="-6"/></g>
+<circle cx="565" cy="58" r="34" fill="#ffd54a"/>
 <path d="M0 265 Q160 235 340 262 T640 258 L640 360 L0 360 Z" fill="#2f7fd1"/>
-<ellipse cx="180" cy="120" rx="70" ry="30" fill="#ffffff" opacity=".95"/><ellipse cx="230" cy="110" rx="55" ry="26" fill="#ffffff" opacity=".95"/>
-<g stroke="#1f5fa8" stroke-width="3" fill="none" marker-end="url(#a)">
-<marker id="a" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#1f5fa8"/></marker>
-<path d="M120 250 C90 200 100 150 150 140"/>
-<path d="M300 120 C360 120 420 150 470 200"/>
-<path d="M470 250 C520 250 560 240 590 235"/>
+<ellipse cx="185" cy="118" rx="66" ry="28" fill="#ffffff" opacity=".96"/><ellipse cx="232" cy="108" rx="52" ry="24" fill="#ffffff" opacity=".96"/>
+<marker id="a" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#1e40af"/></marker>
+<g stroke="#1e40af" stroke-width="3" fill="none" marker-end="url(#a)">
+<path d="M120 250 C90 200 100 152 150 142"/>
+<path d="M300 118 C360 118 420 150 470 200"/>
+<path d="M470 250 C520 250 560 240 588 234"/>
 </g>
-<g stroke="#3a7fd5" stroke-width="3"><line x1="205" y1="150" x2="200" y2="185"/><line x1="230" y1="150" x2="225" y2="190"/><line x1="255" y1="150" x2="252" y2="182"/></g>
-<g font-size="17" font-weight="700" fill="#0f3b66">
-<text x="70" y="205">אידוי ↑</text>
-<text x="330" y="105">עיבוי</text>
-<text x="205" y="215">משקעים ↓</text>
-<text x="500" y="230">נגר עילי</text>
-<text x="300" y="315" fill="#eaf6ff">ים ואגמים</text>
-</g>
-<text x="20" y="30" font-size="20" font-weight="900" fill="#0f3b66">מחזור המים</text>
-</svg>`;
+<g stroke="#3a7fd5" stroke-width="3"><line x1="205" y1="150" x2="200" y2="184"/><line x1="230" y1="150" x2="225" y2="188"/><line x1="255" y1="150" x2="252" y2="181"/></g>
+<g font-size="16" font-weight="700" fill="#0f3b66">
+<text x="66" y="205">אידוי ↑</text><text x="330" y="104">עיבוי</text><text x="200" y="214">משקעים ↓</text><text x="498" y="228">נגר עילי</text>
+<text x="300" y="316" fill="#eef6ff">ים ואגמים</text></g>
+<text x="20" y="30" font-size="19" font-weight="800" fill="#0f3b66">מחזור המים</text></svg>`;
+
+const EXAMPLE_LOGO = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#1d4ed8"/><path d="M24 12c5 6 8 10 8 14a8 8 0 1 1-16 0c0-4 3-8 8-14z" fill="#fff"/><path d="M24 30a4 4 0 0 1-4-4" stroke="#1d4ed8" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
 
 /* ============================================================
    קבועים
    ============================================================ */
 const IMAGE_EXT = ['jpg','jpeg','png','gif','webp','svg','avif'];
 const VIDEO_EXT = ['mp4','webm','mov','m4v','ogv'];
-function mediaKind(src){
-  const ext = (src.split('.').pop()||'').toLowerCase();
-  if (VIDEO_EXT.includes(ext)) return 'video';
-  if (IMAGE_EXT.includes(ext)) return 'image';
-  return 'image';
-}
+function mediaKind(src){ const ext=(src.split('.').pop()||'').toLowerCase(); return VIDEO_EXT.includes(ext)?'video':'image'; }
 function baseName(p){ return (p||'').split('/').pop().split('\\').pop(); }
+
+const ACCENT_PRESETS = [
+  {name:'כחול רויאל', hex:'#1d4ed8'},
+  {name:'נייבי', hex:'#1e3a8a'},
+  {name:'אינדיגו', hex:'#4f46e5'},
+  {name:'טורקיז', hex:'#0d9488'},
+  {name:'אמרלד', hex:'#047857'},
+  {name:'בורדו', hex:'#9f1239'},
+  {name:'פלאם', hex:'#7c3aed'},
+  {name:'כתום שרוף', hex:'#c2410c'},
+  {name:'גרפיט', hex:'#334155'}
+];
+
+const FONT_MAP = {
+  'Assistant':        {stack:"'Assistant',system-ui,'Segoe UI',Arial,sans-serif", google:'Assistant:wght@400;500;600;700;800'},
+  'Heebo':            {stack:"'Heebo',system-ui,Arial,sans-serif",                google:'Heebo:wght@400;500;700;800'},
+  'Rubik':            {stack:"'Rubik',system-ui,Arial,sans-serif",                google:'Rubik:wght@400;500;600;700;800'},
+  'Noto Sans Hebrew': {stack:"'Noto Sans Hebrew',system-ui,Arial,sans-serif",     google:'Noto+Sans+Hebrew:wght@400;500;700;800'}
+};
 
 /* ============================================================
    פרסר דטרמיניסטי: טקסט -> מודל
@@ -431,15 +548,11 @@ function parseBook(text){
   const raw = String(text||'').replace(/\r\n?/g,'\n');
   const lines = raw.split('\n');
   let i = 0;
-  const book = { title:'', pass:70, glossary:[], pages:[] };
+  const book = { title:'', subtitle:'', author:'', pass:70, accent:'', font:'', logo:'', cover:'', glossary:[], pages:[] };
+  let passSeen=false, titleSeen=false;
 
-  // --- מטא-דאטה + מבוא (עד לבלוק הראשון) ---
-  // נסרוק את כל השורות שלפני העמוד הראשון / המילון עבור TITLE ו-PASS
-  let passSeen = false, titleSeen = false;
+  const isPageStart = s => /^#\s+/.test(s) && !/^##/.test(s);
 
-  function isPageStart(s){ return /^#\s+/.test(s) && !/^##/.test(s); }
-
-  // מילון מונחים
   function parseGlossary(startIdx){
     let j = startIdx+1;
     while (j < lines.length && !/^\[\/glossary\]\s*$/.test(lines[j])){
@@ -452,153 +565,85 @@ function parseBook(text){
       j++;
     }
     if (j >= lines.length) warnings.push('בלוק [glossary] נפתח אך לא נסגר ב-[/glossary].');
-    return j; // index of [/glossary] or end
+    return j;
   }
 
-  // מעבר ראשוני: מטא-דאטה + מילון, עד תחילת העמוד הראשון
   while (i < lines.length){
-    const ln = lines[i];
-    const t = ln.trim();
+    const ln = lines[i], t = ln.trim();
     if (isPageStart(ln)) break;
-    if (/^TITLE:/i.test(t)){ book.title = t.replace(/^TITLE:/i,'').trim(); titleSeen = true; i++; continue; }
-    if (/^PASS:/i.test(t)){
-      const v = parseInt(t.replace(/^PASS:/i,'').trim(),10);
-      if (!isNaN(v)) book.pass = Math.max(0,Math.min(100,v));
-      passSeen = true; i++; continue;
-    }
-    if (/^\[glossary\]\s*$/.test(t)){ i = parseGlossary(i) + 1; continue; }
-    i++; // דלג על שורות ריקות/אחרות שלפני העמוד הראשון
+    if (/^TITLE:/i.test(t)){ book.title = t.replace(/^TITLE:/i,'').trim(); titleSeen=true; i++; continue; }
+    if (/^SUBTITLE:/i.test(t)){ book.subtitle = t.replace(/^SUBTITLE:/i,'').trim(); i++; continue; }
+    if (/^AUTHOR:/i.test(t)){ book.author = t.replace(/^AUTHOR:/i,'').trim(); i++; continue; }
+    if (/^ACCENT:/i.test(t)){ book.accent = t.replace(/^ACCENT:/i,'').trim(); i++; continue; }
+    if (/^FONT:/i.test(t)){ book.font = t.replace(/^FONT:/i,'').trim(); i++; continue; }
+    if (/^LOGO:/i.test(t)){ book.logo = t.replace(/^LOGO:/i,'').trim(); i++; continue; }
+    if (/^COVER:/i.test(t)){ book.cover = t.replace(/^COVER:/i,'').trim(); i++; continue; }
+    if (/^PASS:/i.test(t)){ const v=parseInt(t.replace(/^PASS:/i,'').trim(),10); if(!isNaN(v)) book.pass=Math.max(0,Math.min(100,v)); passSeen=true; i++; continue; }
+    if (/^\[glossary\]\s*$/.test(t)){ i = parseGlossary(i)+1; continue; }
+    i++;
   }
   if (!titleSeen) warnings.push('לא נמצאה שורת TITLE בראש הקובץ.');
   if (!passSeen) warnings.push('לא נמצאה שורת PASS — נעשה שימוש בברירת מחדל 70%.');
 
-  // --- פרסור בלוקים בתוך עמוד ---
-  // parseBlocks עובד על טווח שורות ומחזיר מערך בלוקים
   function parseBlocks(arr){
-    const blocks = [];
-    let k = 0;
-    let para = [];
-    function flushPara(){
-      if (para.length){
-        const txt = para.join(' ').replace(/\s+/g,' ').trim();
-        if (txt) blocks.push({ type:'paragraph', text:txt });
-        para = [];
-      }
-    }
+    const blocks = []; let k=0, para=[];
+    function flushPara(){ if(para.length){ const txt=para.join(' ').replace(/\s+/g,' ').trim(); if(txt) blocks.push({type:'paragraph',text:txt}); para=[]; } }
     while (k < arr.length){
-      const ln = arr[k];
-      const t = ln.trim();
-
-      if (t === ''){ flushPara(); k++; continue; }
-
-      if (/^##\s+/.test(t)){ flushPara(); blocks.push({ type:'subheading', text:t.replace(/^##\s+/,'').trim() }); k++; continue; }
-
+      const t = arr[k].trim();
+      if (t===''){ flushPara(); k++; continue; }
+      if (/^##\s+/.test(t)){ flushPara(); blocks.push({type:'subheading',text:t.replace(/^##\s+/,'').trim()}); k++; continue; }
       const mMedia = t.match(/^!\[(.*?)\]\((.*?)\)\s*$/);
-      if (mMedia){ flushPara(); blocks.push({ type:'media', kind:mediaKind(mMedia[2].trim()), src:mMedia[2].trim(), caption:mMedia[1].trim() }); k++; continue; }
-
+      if (mMedia){ flushPara(); blocks.push({type:'media',kind:mediaKind(mMedia[2].trim()),src:mMedia[2].trim(),caption:mMedia[1].trim()}); k++; continue; }
       const mMore = t.match(/^\[more:\s*(.*?)\]\s*$/);
-      if (mMore){
-        flushPara();
-        const inner = [];
-        let j = k+1;
-        while (j < arr.length && !/^\[\/more\]\s*$/.test(arr[j].trim())){ inner.push(arr[j]); j++; }
-        if (j >= arr.length) warnings.push('בלוק [more] נפתח אך לא נסגר ב-[/more].');
-        blocks.push({ type:'more', title:mMore[1].trim(), blocks:parseBlocks(inner) });
-        k = j+1; continue;
-      }
-
+      if (mMore){ flushPara(); const inner=[]; let j=k+1; while(j<arr.length && !/^\[\/more\]\s*$/.test(arr[j].trim())){ inner.push(arr[j]); j++; } if(j>=arr.length) warnings.push('בלוק [more] נפתח אך לא נסגר.'); blocks.push({type:'more',title:mMore[1].trim(),blocks:parseBlocks(inner)}); k=j+1; continue; }
       const mQuiz = t.match(/^\[quiz:\s*(single|multi|truefalse)\s*\]\s*$/i);
-      if (mQuiz){
-        flushPara();
-        const qType = mQuiz[1].toLowerCase();
-        const inner = [];
-        let j = k+1;
-        while (j < arr.length && !/^\[\/quiz\]\s*$/.test(arr[j].trim())){ inner.push(arr[j]); j++; }
-        if (j >= arr.length) warnings.push('בלוק [quiz] נפתח אך לא נסגר ב-[/quiz].');
-        blocks.push(parseQuiz(qType, inner));
-        k = j+1; continue;
-      }
-
-      if (/^\[\/(more|quiz|glossary)\]/.test(t)){ k++; continue; } // סוגר יתום — התעלם
-      para.push(t);
-      k++;
+      if (mQuiz){ flushPara(); const qt=mQuiz[1].toLowerCase(); const inner=[]; let j=k+1; while(j<arr.length && !/^\[\/quiz\]\s*$/.test(arr[j].trim())){ inner.push(arr[j]); j++; } if(j>=arr.length) warnings.push('בלוק [quiz] נפתח אך לא נסגר.'); blocks.push(parseQuiz(qt,inner)); k=j+1; continue; }
+      if (/^\[\/(more|quiz|glossary)\]/.test(t)){ k++; continue; }
+      para.push(t); k++;
     }
-    flushPara();
-    return blocks;
+    flushPara(); return blocks;
   }
 
   function parseQuiz(qType, arr){
     const quiz = { type:'quiz', quizType:qType, question:'', options:[], answer:null, explain:'' };
-    for (let a=0; a<arr.length; a++){
-      const t = arr[a].trim();
-      if (t === '') continue;
+    for (const line of arr){
+      const t = line.trim(); if(!t) continue;
       if (/^Q:/i.test(t)){ quiz.question = t.replace(/^Q:/i,'').trim(); continue; }
       if (/^EXPLAIN:/i.test(t)){ quiz.explain = t.replace(/^EXPLAIN:/i,'').trim(); continue; }
-      if (/^ANSWER:/i.test(t)){
-        const v = t.replace(/^ANSWER:/i,'').trim().toLowerCase();
-        quiz.answer = (v === 'true');
-        continue;
-      }
+      if (/^ANSWER:/i.test(t)){ quiz.answer = (t.replace(/^ANSWER:/i,'').trim().toLowerCase()==='true'); continue; }
       const mOpt = t.match(/^-\s*(\*?)\s*(.+)$/);
-      if (mOpt){ quiz.options.push({ text:mOpt[2].trim(), correct: mOpt[1] === '*' }); continue; }
+      if (mOpt){ quiz.options.push({text:mOpt[2].trim(), correct:mOpt[1]==='*'}); continue; }
     }
-    // אימות
     if (!quiz.question) warnings.push('שאלון ללא שורת Q:.');
-    if (qType === 'single'){
-      const c = quiz.options.filter(o=>o.correct).length;
-      if (c !== 1) warnings.push('שאלת בחירה יחידה צריכה בדיוק תשובה נכונה אחת (נמצאו ' + c + '): "' + quiz.question + '"');
-    } else if (qType === 'multi'){
-      const c = quiz.options.filter(o=>o.correct).length;
-      if (c < 1) warnings.push('שאלת בחירה מרובה ללא תשובה נכונה מסומנת: "' + quiz.question + '"');
-    } else if (qType === 'truefalse'){
-      if (quiz.answer === null) warnings.push('שאלת אמת/שקר ללא ANSWER תקין (true/false): "' + quiz.question + '"');
-    }
+    if (qType==='single'){ const c=quiz.options.filter(o=>o.correct).length; if(c!==1) warnings.push('שאלת בחירה יחידה צריכה בדיוק תשובה נכונה אחת (נמצאו '+c+'): "'+quiz.question+'"'); }
+    else if (qType==='multi'){ const c=quiz.options.filter(o=>o.correct).length; if(c<1) warnings.push('שאלת בחירה מרובה ללא תשובה נכונה מסומנת: "'+quiz.question+'"'); }
+    else if (qType==='truefalse'){ if(quiz.answer===null) warnings.push('שאלת אמת/שקר ללא ANSWER תקין: "'+quiz.question+'"'); }
     return quiz;
   }
 
-  // --- פיצול לעמודים ---
   while (i < lines.length){
     if (isPageStart(lines[i])){
       const title = lines[i].replace(/^#\s+/,'').trim();
-      let j = i+1;
-      while (j < lines.length && !isPageStart(lines[j])) j++;
-      const body = lines.slice(i+1, j);
-      book.pages.push({ title, blocks:parseBlocks(body) });
-      i = j;
-    } else { i++; }
+      let j=i+1; while(j<lines.length && !isPageStart(lines[j])) j++;
+      book.pages.push({ title, blocks:parseBlocks(lines.slice(i+1,j)) });
+      i=j;
+    } else i++;
   }
+  if (book.pages.length===0) warnings.push('לא נמצאו עמודים (שורה שמתחילה ב-"# ").');
 
-  if (book.pages.length === 0) warnings.push('לא נמצאו עמודים (שורה שמתחילה ב-"# ").');
-
-  // הקצאת מזהי שאלון דטרמיניסטיים + ספירה
-  let qid = 0;
-  function assign(blocks){
-    blocks.forEach(b=>{
-      if (b.type === 'quiz') b._qid = 'q' + (qid++);
-      else if (b.type === 'more') assign(b.blocks);
-    });
-  }
-  book.pages.forEach(p=>assign(p.blocks));
+  let qid=0;
+  book.pages.forEach(p=>(function a(bl){ bl.forEach(b=>{ if(b.type==='quiz') b._qid='q'+(qid++); else if(b.type==='more') a(b.blocks); }); })(p.blocks));
   book.quizCount = qid;
 
-  // אימות הפניות מילון + מדיה
   const terms = new Set(book.glossary.map(g=>g.term));
   book.mediaRefs = [];
-  function scanRefs(blocks){
-    blocks.forEach(b=>{
-      if (b.type === 'paragraph' || b.type === 'subheading'){
-        const re = /\{\{(.+?)\}\}/g; let m;
-        while ((m = re.exec(b.text))){ if (!terms.has(m[1].trim())) warnings.push('הפניה למונח שאינו במילון: {{' + m[1].trim() + '}}'); }
-      } else if (b.type === 'media'){ book.mediaRefs.push(b.src); }
-      else if (b.type === 'more'){
-        if (b.title){ const re=/\{\{(.+?)\}\}/g; let m; while((m=re.exec(b.title))){ if(!terms.has(m[1].trim())) warnings.push('הפניה למונח שאינו במילון: {{'+m[1].trim()+'}}'); } }
-        scanRefs(b.blocks);
-      } else if (b.type === 'quiz'){
-        const chk = (s)=>{ const re=/\{\{(.+?)\}\}/g; let m; while((m=re.exec(s||''))){ if(!terms.has(m[1].trim())) warnings.push('הפניה למונח שאינו במילון: {{'+m[1].trim()+'}}'); } };
-        chk(b.question); (b.options||[]).forEach(o=>chk(o.text)); chk(b.explain);
-      }
-    });
-  }
+  function chkTerms(s){ const re=/\{\{(.+?)\}\}/g; let m; while((m=re.exec(s||''))){ if(!terms.has(m[1].trim())) warnings.push('הפניה למונח שאינו במילון: {{'+m[1].trim()+'}}'); } }
+  function scanRefs(blocks){ blocks.forEach(b=>{
+    if(b.type==='paragraph'||b.type==='subheading') chkTerms(b.text);
+    else if(b.type==='media') book.mediaRefs.push(b.src);
+    else if(b.type==='more'){ chkTerms(b.title); scanRefs(b.blocks); }
+    else if(b.type==='quiz'){ chkTerms(b.question); (b.options||[]).forEach(o=>chkTerms(o.text)); chkTerms(b.explain); }
+  }); }
   book.pages.forEach(p=>scanRefs(p.blocks));
 
   book.warnings = warnings;
@@ -606,954 +651,686 @@ function parseBook(text){
 }
 
 /* ============================================================
-   מנוע הקורא — פונקציה עצמאית שמוזרקת גם לתצוגה וגם לייצוא.
-   קוראת את window.__BOOK__ / __CFG__ / __ASSETS__.
+   מנוע הקורא — מוזרק לתצוגה ולייצוא
    ============================================================ */
 function READER_MAIN(){
   const BOOK = window.__BOOK__ || {pages:[],glossary:[],title:'',pass:70};
   const CFG  = window.__CFG__  || {};
   const ASSETS = window.__ASSETS__ || {};
   const mode = CFG.mode || 'standalone';
-  const pass = typeof BOOK.pass === 'number' ? BOOK.pass : 70;
+  const pass = typeof BOOK.pass==='number' ? BOOK.pass : 70;
 
-  const gloss = {};
-  (BOOK.glossary||[]).forEach(g=>{ gloss[g.term] = g.definition; });
+  const gloss = {}; (BOOK.glossary||[]).forEach(g=>gloss[g.term]=g.definition);
 
-  // איסוף שאלונים לפי סדר
   const quizzes = [];
-  (BOOK.pages||[]).forEach(p=>{
-    (function walk(blocks){ (blocks||[]).forEach(b=>{ if(b.type==='quiz') quizzes.push(b); else if(b.type==='more') walk(b.blocks); }); })(p.blocks);
-  });
+  (BOOK.pages||[]).forEach(p=>(function w(bl){ (bl||[]).forEach(b=>{ if(b.type==='quiz') quizzes.push(b); else if(b.type==='more') w(b.blocks); }); })(p.blocks));
   const totalQ = quizzes.length;
 
-  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  function escAttr(s){ return esc(s); }
+  const ICON = {
+    check:'<svg viewBox="0 0 24 24" class="ri"><path d="M5 12l5 5 9-11"/></svg>',
+    x:'<svg viewBox="0 0 24 24" class="ri"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    chevL:'<svg viewBox="0 0 24 24" class="ri"><path d="M15 6l-6 6 6 6"/></svg>',
+    chevR:'<svg viewBox="0 0 24 24" class="ri"><path d="M9 6l6 6-6 6"/></svg>',
+    menu:'<svg viewBox="0 0 24 24" class="ri"><path d="M4 6h16M4 12h16M4 18h16"/></svg>',
+    book:'<svg viewBox="0 0 24 24" class="ri"><path d="M4 5.5A2 2 0 0 1 6 4h5v15H6a2 2 0 0 0-2 1.5zM20 5.5A2 2 0 0 0 18 4h-5v15h5a2 2 0 0 1 2 1.5z"/></svg>',
+    flag:'<svg viewBox="0 0 24 24" class="ri"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>',
+    close:'<svg viewBox="0 0 24 24" class="ri"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    play:'<svg viewBox="0 0 24 24" class="ri"><path d="M6 4l14 8-14 8z"/></svg>'
+  };
 
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function inlineFmt(s){
     let out = esc(s);
-    out = out.replace(/\{\{(.+?)\}\}/g,(m,term)=>{
-      const t = term.trim();
-      if (Object.prototype.hasOwnProperty.call(gloss,t)){
-        return '<button type="button" class="term" data-def="'+escAttr(gloss[t])+'" data-term="'+escAttr(t)+'">'+esc(t)+'</button>';
-      }
-      return esc(t);
-    });
+    out = out.replace(/\{\{(.+?)\}\}/g,(m,term)=>{ const t=term.trim(); return Object.prototype.hasOwnProperty.call(gloss,t)
+      ? '<button type="button" class="term" data-def="'+esc(gloss[t])+'" data-term="'+esc(t)+'">'+esc(t)+'</button>' : esc(t); });
     out = out.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
     out = out.replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g,'$1<em>$2</em>');
     return out;
   }
+  function resolveAsset(src){ const b=src.split('/').pop(); return ASSETS[b]||src; }
 
-  function resolveAsset(src){
-    const b = src.split('/').pop();
-    if (ASSETS[b]) return ASSETS[b];
-    return src;
-  }
-
-  // ---------- אחסון מקומי ----------
-  const SKEY = 'tbg::' + (BOOK.title || 'book');
-  let state = { page:0, read:[], answers:{} };
-  try { const s = JSON.parse(localStorage.getItem(SKEY)||'null'); if (s && typeof s==='object'){ state = Object.assign(state,s); state.read = state.read||[]; state.answers = state.answers||{}; } } catch(e){}
+  const SKEY = 'tbg2::' + (BOOK.title||'book');
+  let state = { page:-1, read:[], answers:{} };
+  try { const s=JSON.parse(localStorage.getItem(SKEY)||'null'); if(s&&typeof s==='object'){ state=Object.assign(state,s); state.read=state.read||[]; state.answers=state.answers||{}; } } catch(e){}
   function save(){ try{ localStorage.setItem(SKEY, JSON.stringify(state)); }catch(e){} }
 
-  // ---------- SCORM 1.2 ----------
-  let API = null;
-  function findAPI(win){
-    let n = 0;
-    while (win && !win.API && win.parent && win.parent !== win && n < 10){ n++; win = win.parent; }
-    return win && win.API ? win.API : null;
-  }
-  function getAPI(){
-    let a = findAPI(window);
-    if (!a && window.opener) a = findAPI(window.opener);
-    return a;
-  }
-  let scormReady = false;
-  function scormInit(){
-    if (mode !== 'scorm') return;
-    API = getAPI();
-    if (!API) return;
-    try {
-      if (API.LMSInitialize('') === 'true' || API.LMSInitialize('') === true){}
-      scormReady = true;
-      const st = API.LMSGetValue('cmi.core.lesson_status');
-      if (!st || st==='not attempted' || st==='') { API.LMSSetValue('cmi.core.lesson_status','incomplete'); }
-      API.LMSCommit('');
-    } catch(e){}
-  }
-  function scormReport(percent, passed, done){
-    if (mode !== 'scorm' || !scormReady || !API) return;
-    try {
-      API.LMSSetValue('cmi.core.score.raw', String(percent));
-      API.LMSSetValue('cmi.core.score.min', '0');
-      API.LMSSetValue('cmi.core.score.max', '100');
-      if (done) API.LMSSetValue('cmi.core.lesson_status', passed ? 'passed' : 'failed');
-      else API.LMSSetValue('cmi.core.lesson_status', 'incomplete');
-      API.LMSCommit('');
-    } catch(e){}
-  }
-  function scormFinish(){ if (mode==='scorm' && scormReady && API){ try{ API.LMSFinish(''); }catch(e){} } }
+  /* SCORM 1.2 */
+  let API=null, scormReady=false;
+  function findAPI(win){ let n=0; while(win&&!win.API&&win.parent&&win.parent!==win&&n<10){ n++; win=win.parent; } return win&&win.API?win.API:null; }
+  function getAPI(){ let a=findAPI(window); if(!a&&window.opener) a=findAPI(window.opener); return a; }
+  function scormInit(){ if(mode!=='scorm')return; API=getAPI(); if(!API)return; try{ API.LMSInitialize(''); scormReady=true; const st=API.LMSGetValue('cmi.core.lesson_status'); if(!st||st==='not attempted'||st==='') API.LMSSetValue('cmi.core.lesson_status','incomplete'); API.LMSCommit(''); }catch(e){} }
+  function scormReport(percent,passed,done){ if(mode!=='scorm'||!scormReady||!API)return; try{ API.LMSSetValue('cmi.core.score.raw',String(percent)); API.LMSSetValue('cmi.core.score.min','0'); API.LMSSetValue('cmi.core.score.max','100'); API.LMSSetValue('cmi.core.lesson_status', done?(passed?'passed':'failed'):'incomplete'); API.LMSCommit(''); }catch(e){} }
+  function scormFinish(){ if(mode==='scorm'&&scormReady&&API){ try{ API.LMSFinish(''); }catch(e){} } }
   window.addEventListener('unload', scormFinish);
-  window.addEventListener('beforeunload', function(){ scormFinish(); });
 
-  // ---------- חישוב ציון ----------
-  function grade(){
-    let correct = 0;
-    quizzes.forEach(q=>{
-      const a = state.answers[q._qid];
-      if (a && a.correct) correct++;
-    });
-    const percent = totalQ ? Math.round(correct/totalQ*100) : 100;
-    return { correct, total:totalQ, percent, passed: percent >= pass };
-  }
+  function grade(){ let c=0; quizzes.forEach(q=>{ const a=state.answers[q._qid]; if(a&&a.correct) c++; }); const percent=totalQ?Math.round(c/totalQ*100):100; return {correct:c,total:totalQ,percent,passed:percent>=pass}; }
 
-  // ---------- בניית DOM ----------
   const root = document.createElement('div');
-  root.className = 'reader';
+  root.className='reader';
+  const logoHTML = BOOK.logo ? '<img class="logo" src="'+esc(resolveAsset(BOOK.logo))+'" alt="">' : '<span class="logo-fb">'+ICON.book+'</span>';
   root.innerHTML =
     '<aside class="sidebar" id="sidebar">'+
-      '<div class="bk-title">'+esc(BOOK.title||'ספר לימוד')+'</div>'+
+      '<button type="button" class="bk" id="bkHome">'+logoHTML+'<span class="bk-t">'+esc(BOOK.title||'ספר לימוד')+'</span></button>'+
       '<nav class="toc" id="toc"></nav>'+
       '<div class="side-foot">'+
-        (BOOK.glossary&&BOOK.glossary.length ? '<button type="button" class="gloss-link" id="glossBtn">📖 מילון מונחים</button>' : '')+
+        (BOOK.glossary&&BOOK.glossary.length?'<button type="button" class="gloss-link" id="glossBtn">'+ICON.book+' מילון מונחים</button>':'')+
         '<div class="prog" id="prog"></div>'+
       '</div>'+
     '</aside>'+
-    '<main class="content" id="content"><button type="button" class="menu-toggle" id="menuToggle">☰ תוכן</button><div id="page"></div></main>'+
+    '<main class="content" id="content">'+
+      '<div class="topbar"><button type="button" class="menu-toggle" id="menuToggle">'+ICON.menu+'</button><div class="pbar"><div class="pfill" id="pfill"></div></div></div>'+
+      '<div id="page"></div>'+
+    '</main>'+
     '<div class="popover" id="popover" hidden></div>'+
-    '<div class="gmodal" id="gmodal" hidden><div class="gsheet"><header><h2>מילון מונחים</h2><button type="button" id="gclose">סגור</button></header><div class="gbody" id="gbody"></div></div></div>';
+    '<div class="scrim" id="scrim" hidden></div>'+
+    '<div class="gmodal" id="gmodal" hidden><div class="gsheet"><header><h2>מילון מונחים</h2><button type="button" class="gclose" id="gclose">'+ICON.close+'</button></header><div class="gbody" id="gbody"></div></div></div>';
   document.body.appendChild(root);
 
-  const tocEl = root.querySelector('#toc');
-  const pageEl = root.querySelector('#page');
-  const contentEl = root.querySelector('#content');
-  const progEl = root.querySelector('#prog');
-  const popEl = root.querySelector('#popover');
-
-  const PAGES = BOOK.pages || [];
+  const tocEl=root.querySelector('#toc'), pageEl=root.querySelector('#page'), contentEl=root.querySelector('#content'),
+        progEl=root.querySelector('#prog'), popEl=root.querySelector('#popover'), pfill=root.querySelector('#pfill');
+  const PAGES = BOOK.pages||[];
   const RESULTS_INDEX = PAGES.length;
 
   function buildTOC(){
-    let html = '';
-    PAGES.forEach((p,idx)=>{
-      const done = state.read.indexOf(idx) >= 0;
-      html += '<button type="button" class="toc-item" data-i="'+idx+'"><span class="dot'+(done?' done':'')+'"></span><span class="t">'+esc(p.title||('עמוד '+(idx+1)))+'</span></button>';
-    });
-    if (totalQ) html += '<button type="button" class="toc-item results" data-i="'+RESULTS_INDEX+'"><span class="dot"></span><span class="t">🏁 סיום וציון</span></button>';
-    tocEl.innerHTML = html;
-    tocEl.querySelectorAll('.toc-item').forEach(b=>{
-      b.addEventListener('click',()=>{ go(parseInt(b.dataset.i,10)); closeMenu(); });
-    });
+    let html='';
+    PAGES.forEach((p,idx)=>{ const done=state.read.indexOf(idx)>=0;
+      html+='<button type="button" class="toc-item" data-i="'+idx+'"><span class="num'+(done?' done':'')+'">'+(done?ICON.check:(idx+1))+'</span><span class="t">'+esc(p.title||('עמוד '+(idx+1)))+'</span></button>'; });
+    if(totalQ) html+='<button type="button" class="toc-item results" data-i="'+RESULTS_INDEX+'"><span class="num">'+ICON.flag+'</span><span class="t">סיום וציון</span></button>';
+    tocEl.innerHTML=html;
+    tocEl.querySelectorAll('.toc-item').forEach(b=>b.addEventListener('click',()=>{ go(parseInt(b.dataset.i,10)); closeMenu(); }));
+    tocEl.querySelectorAll('.toc-item').forEach(b=>b.classList.toggle('active', parseInt(b.dataset.i,10)===state.page));
   }
 
   function renderBlocks(blocks){
-    let html = '';
+    let html='';
     (blocks||[]).forEach(b=>{
-      if (b.type==='subheading') html += '<h2 class="sub">'+inlineFmt(b.text)+'</h2>';
-      else if (b.type==='paragraph') html += '<p>'+inlineFmt(b.text)+'</p>';
-      else if (b.type==='media'){
-        const url = resolveAsset(b.src);
-        const cap = b.caption ? '<figcaption>'+esc(b.caption)+'</figcaption>' : '';
-        if (b.kind==='video') html += '<figure><video src="'+escAttr(url)+'" controls playsinline preload="metadata"></video>'+cap+'</figure>';
-        else html += '<figure><img src="'+escAttr(url)+'" alt="'+escAttr(b.caption||'')+'" loading="lazy">'+cap+'</figure>';
-      }
-      else if (b.type==='more'){
-        html += '<details class="more"><summary>'+inlineFmt(b.title||'להעמקה')+'</summary><div class="more-body">'+renderBlocks(b.blocks)+'</div></details>';
-      }
-      else if (b.type==='quiz'){ html += renderQuiz(b); }
+      if(b.type==='subheading') html+='<h2 class="sub">'+inlineFmt(b.text)+'</h2>';
+      else if(b.type==='paragraph') html+='<p>'+inlineFmt(b.text)+'</p>';
+      else if(b.type==='media'){ const url=resolveAsset(b.src); const cap=b.caption?'<figcaption>'+esc(b.caption)+'</figcaption>':'';
+        html += b.kind==='video' ? '<figure><video src="'+esc(url)+'" controls playsinline preload="metadata"></video>'+cap+'</figure>'
+                                 : '<figure><img src="'+esc(url)+'" alt="'+esc(b.caption||'')+'" loading="lazy">'+cap+'</figure>'; }
+      else if(b.type==='more') html+='<details class="more"><summary><span class="chev">'+ICON.chevR+'</span>'+inlineFmt(b.title||'להעמקה')+'</summary><div class="more-body">'+renderBlocks(b.blocks)+'</div></details>';
+      else if(b.type==='quiz') html+=renderQuiz(b);
     });
     return html;
   }
 
   function renderQuiz(q){
-    const id = q._qid;
-    const ans = state.answers[id];
-    const answered = !!ans;
-    let opts = '';
-    if (q.quizType==='truefalse'){
-      const choices = [{v:true,label:'נכון'},{v:false,label:'לא נכון'}];
-      opts = '<div class="tf">'+choices.map(c=>{
-        const sel = answered && ans.value===c.v;
-        let cls='tf-btn';
-        if (answered){ if (c.v===q.answer) cls+=' correct'; else if (sel) cls+=' wrong'; }
-        return '<button type="button" class="'+cls+'" data-v="'+c.v+'"'+(answered?' disabled':'')+'>'+esc(c.label)+'</button>';
-      }).join('')+'</div>';
+    const id=q._qid, ans=state.answers[id], answered=!!ans;
+    let opts='';
+    if(q.quizType==='truefalse'){
+      opts='<div class="tf">'+[{v:true,l:'נכון'},{v:false,l:'לא נכון'}].map(c=>{
+        const sel=answered&&ans.value===c.v; let cls='tf-btn'; if(answered){ if(c.v===q.answer) cls+=' correct'; else if(sel) cls+=' wrong'; }
+        return '<button type="button" class="'+cls+'" data-v="'+c.v+'"'+(answered?' disabled':'')+'>'+esc(c.l)+'</button>'; }).join('')+'</div>';
     } else {
-      const multi = q.quizType==='multi';
-      opts = '<div class="opts">'+q.options.map((o,oi)=>{
-        const selArr = answered ? (ans.value||[]) : [];
-        const sel = selArr.indexOf(oi)>=0;
-        let cls='opt';
-        if (answered){ if (o.correct) cls+=' correct'; else if (sel) cls+=' wrong'; }
-        const box = multi ? '<span class="box">'+(sel?'✓':'')+'</span>' : '<span class="radio'+(sel?' on':'')+'"></span>';
-        return '<button type="button" class="'+cls+'" data-oi="'+oi+'"'+(answered?' disabled':'')+'>'+box+'<span class="otext">'+inlineFmt(o.text)+'</span></button>';
-      }).join('')+'</div>';
+      const multi=q.quizType==='multi';
+      opts='<div class="opts">'+q.options.map((o,oi)=>{
+        const selArr=answered?(ans.value||[]):[]; const sel=selArr.indexOf(oi)>=0; let cls='opt'; if(answered){ if(o.correct) cls+=' correct'; else if(sel) cls+=' wrong'; }
+        const mark = answered ? (o.correct?'<span class="mk ok">'+ICON.check+'</span>':(sel?'<span class="mk no">'+ICON.x+'</span>':'<span class="mk"></span>'))
+                              : (multi?'<span class="box'+(sel?' on':'')+'"></span>':'<span class="radio'+(sel?' on':'')+'"></span>');
+        return '<button type="button" class="'+cls+'" data-oi="'+oi+'"'+(answered?' disabled':'')+'>'+mark+'<span class="otext">'+inlineFmt(o.text)+'</span></button>'; }).join('')+'</div>';
     }
-    let feedback = '';
-    if (answered){
-      feedback = '<div class="fb '+(ans.correct?'ok':'no')+'">'+(ans.correct?'✓ תשובה נכונה':'✗ תשובה לא נכונה')+
-        (q.explain?'<div class="ex">'+inlineFmt(q.explain)+'</div>':'')+'</div>';
-    }
-    const typeLabel = q.quizType==='multi' ? 'בחירה מרובה — סמנו את כל הנכונות' : (q.quizType==='truefalse'?'אמת / שקר':'בחירה יחידה');
-    const checkBtn = answered ? '' : '<button type="button" class="check" data-qid="'+id+'">בדיקת תשובה</button>';
-    return '<section class="quiz" data-qid="'+id+'" data-type="'+q.quizType+'">'+
-      '<div class="qhead"><span class="qbadge">שאלת הבנה</span><span class="qtype">'+typeLabel+'</span></div>'+
-      '<div class="qtext">'+inlineFmt(q.question)+'</div>'+opts+checkBtn+feedback+'</section>';
+    let fb=''; if(answered) fb='<div class="fb '+(ans.correct?'ok':'no')+'"><span class="fic">'+(ans.correct?ICON.check:ICON.x)+'</span><div><b>'+(ans.correct?'תשובה נכונה':'תשובה לא נכונה')+'</b>'+(q.explain?'<div class="ex">'+inlineFmt(q.explain)+'</div>':'')+'</div></div>';
+    const tl = q.quizType==='multi'?'בחירה מרובה — סמנו את כל הנכונות':(q.quizType==='truefalse'?'אמת / שקר':'בחירה יחידה');
+    const chk = answered?'':'<button type="button" class="check" data-qid="'+id+'">בדיקת תשובה</button>';
+    return '<section class="quiz" data-qid="'+id+'" data-type="'+q.quizType+'"><div class="qhead"><span class="qbadge">שאלת הבנה</span><span class="qtype">'+tl+'</span></div><div class="qtext">'+inlineFmt(q.question)+'</div>'+opts+chk+fb+'</section>';
   }
 
-  // מצב בחירה זמני לפני "בדיקת תשובה"
-  const pending = {}; // qid -> value (index/array/bool)
-
-  function bindQuiz(sectionEl, q){
-    const id = q._qid;
-    if (state.answers[id]) return;
-    if (q.quizType==='truefalse'){
-      sectionEl.querySelectorAll('.tf-btn').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          pending[id] = (btn.dataset.v==='true');
-          sectionEl.querySelectorAll('.tf-btn').forEach(x=>x.classList.remove('sel'));
-          btn.classList.add('sel');
-        });
-      });
+  const pending={};
+  function bindQuiz(sec,q){
+    const id=q._qid; if(state.answers[id]) return;
+    if(q.quizType==='truefalse'){
+      sec.querySelectorAll('.tf-btn').forEach(btn=>btn.addEventListener('click',()=>{ pending[id]=(btn.dataset.v==='true'); sec.querySelectorAll('.tf-btn').forEach(x=>x.classList.remove('sel')); btn.classList.add('sel'); }));
     } else {
-      const multi = q.quizType==='multi';
-      sectionEl.querySelectorAll('.opt').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          const oi = parseInt(btn.dataset.oi,10);
-          if (multi){
-            let arr = pending[id]||[];
-            const p = arr.indexOf(oi);
-            if (p>=0) arr.splice(p,1); else arr.push(oi);
-            pending[id]=arr;
-            btn.classList.toggle('sel');
-            const box = btn.querySelector('.box'); if (box) box.textContent = arr.indexOf(oi)>=0 ? '✓' : '';
-          } else {
-            pending[id]=[oi];
-            sectionEl.querySelectorAll('.opt').forEach(x=>{ x.classList.remove('sel'); const r=x.querySelector('.radio'); if(r) r.classList.remove('on'); });
-            btn.classList.add('sel'); const r=btn.querySelector('.radio'); if(r) r.classList.add('on');
-          }
-        });
-      });
+      const multi=q.quizType==='multi';
+      sec.querySelectorAll('.opt').forEach(btn=>btn.addEventListener('click',()=>{
+        const oi=parseInt(btn.dataset.oi,10);
+        if(multi){ let arr=pending[id]||[]; const p=arr.indexOf(oi); if(p>=0)arr.splice(p,1); else arr.push(oi); pending[id]=arr; btn.classList.toggle('sel'); const bx=btn.querySelector('.box'); if(bx) bx.classList.toggle('on', arr.indexOf(oi)>=0); }
+        else { pending[id]=[oi]; sec.querySelectorAll('.opt').forEach(x=>{ x.classList.remove('sel'); const r=x.querySelector('.radio'); if(r)r.classList.remove('on'); }); btn.classList.add('sel'); const r=btn.querySelector('.radio'); if(r)r.classList.add('on'); }
+      }));
     }
-    const chk = sectionEl.querySelector('.check');
-    if (chk) chk.addEventListener('click',()=>{
-      const val = pending[id];
-      if (q.quizType==='truefalse'){
-        if (val===undefined){ flash(chk,'בחרו תשובה'); return; }
-        const correct = (val===q.answer);
-        state.answers[id]={ value:val, correct };
-      } else if (q.quizType==='multi'){
-        if (!val || !val.length){ flash(chk,'בחרו לפחות תשובה אחת'); return; }
-        const correctSet = q.options.map((o,i)=>o.correct?i:-1).filter(i=>i>=0).sort().join(',');
-        const chosen = val.slice().sort((a,b)=>a-b).join(',');
-        state.answers[id]={ value:val, correct: correctSet===chosen };
-      } else {
-        if (!val || !val.length){ flash(chk,'בחרו תשובה'); return; }
-        const correct = q.options[val[0]] && q.options[val[0]].correct;
-        state.answers[id]={ value:val, correct: !!correct };
-      }
+    const chk=sec.querySelector('.check');
+    if(chk) chk.addEventListener('click',()=>{
+      const val=pending[id];
+      if(q.quizType==='truefalse'){ if(val===undefined){ flash(chk); return; } state.answers[id]={value:val,correct:val===q.answer}; }
+      else if(q.quizType==='multi'){ if(!val||!val.length){ flash(chk); return; } const cs=q.options.map((o,i)=>o.correct?i:-1).filter(i=>i>=0).sort().join(','); state.answers[id]={value:val,correct:cs===val.slice().sort((a,b)=>a-b).join(',')}; }
+      else { if(!val||!val.length){ flash(chk); return; } state.answers[id]={value:val,correct:!!(q.options[val[0]]&&q.options[val[0]].correct)}; }
       save();
-      // רינדור מחדש של השאלון בלבד
-      const fresh = document.createElement('div');
-      fresh.innerHTML = renderQuiz(q);
-      const node = fresh.firstElementChild;
-      sectionEl.replaceWith(node);
-      afterQuizRender(node,q);
-      const g = grade();
-      scormReport(g.percent, g.passed, false);
-      updateProg();
+      const fresh=document.createElement('div'); fresh.innerHTML=renderQuiz(q); const node=fresh.firstElementChild; sec.replaceWith(node); node.querySelectorAll('.term').forEach(bindTerm);
+      const g=grade(); scormReport(g.percent,g.passed,false); updateProg();
     });
   }
+  function flash(btn){ btn.classList.add('flash'); const o=btn.textContent; btn.textContent='בחרו תשובה תחילה'; setTimeout(()=>{ btn.classList.remove('flash'); btn.textContent=o; },1300); }
 
-  function afterQuizRender(node,q){
-    node.querySelectorAll('.term').forEach(bindTerm);
+  function bindTerm(btn){ btn.addEventListener('click',e=>{ e.stopPropagation(); showPopover(btn,btn.dataset.term,btn.dataset.def); }); }
+  function showPopover(anchor,term,def){
+    popEl.innerHTML='<strong>'+esc(term)+'</strong><span>'+esc(def)+'</span>'; popEl.hidden=false;
+    const r=anchor.getBoundingClientRect(), pr=popEl.getBoundingClientRect();
+    let left=r.left+window.scrollX; if(left+pr.width>window.innerWidth-12) left=window.innerWidth-pr.width-12; if(left<12) left=12;
+    popEl.style.top=(r.bottom+8+window.scrollY)+'px'; popEl.style.left=left+'px';
   }
+  document.addEventListener('click',()=>{ popEl.hidden=true; });
 
-  function flash(btn,msg){
-    const old = btn.textContent; btn.textContent = msg; btn.classList.add('flash');
-    setTimeout(()=>{ btn.textContent = old; btn.classList.remove('flash'); }, 1400);
-  }
+  function updateProg(){ const g=grade(), readN=state.read.length; let txt='התקדמות: '+readN+'/'+PAGES.length+' עמודים'; if(totalQ) txt+=' · ציון: '+g.percent+'%'; progEl.textContent=txt;
+    const pct = PAGES.length ? Math.round(Math.min(state.read.length,PAGES.length)/PAGES.length*100) : 0; pfill.style.width=pct+'%'; }
+  function markRead(idx){ if(idx>=0&&idx<PAGES.length&&state.read.indexOf(idx)<0){ state.read.push(idx); save(); } }
+  function go(idx){ state.page=idx; save(); render(); contentEl.scrollTop=0; window.scrollTo(0,0); }
 
-  function bindTerm(btn){
-    btn.addEventListener('click',(e)=>{
-      e.stopPropagation();
-      showPopover(btn, btn.dataset.term, btn.dataset.def);
-    });
-  }
-  function showPopover(anchor, term, def){
-    popEl.innerHTML = '<strong>'+esc(term)+'</strong><span>'+esc(def)+'</span>';
-    popEl.hidden = false;
-    const r = anchor.getBoundingClientRect();
-    const pr = popEl.getBoundingClientRect();
-    let top = r.bottom + 8 + window.scrollY;
-    let left = r.left + window.scrollX;
-    if (left + pr.width > window.innerWidth - 12) left = window.innerWidth - pr.width - 12;
-    if (left < 12) left = 12;
-    popEl.style.top = top+'px';
-    popEl.style.left = left+'px';
-  }
-  document.addEventListener('click',()=>{ popEl.hidden = true; });
-
-  function updateProg(){
-    const g = grade();
-    const readN = state.read.length;
-    let txt = 'התקדמות: '+readN+'/'+PAGES.length+' עמודים';
-    if (totalQ) txt += ' · ציון: '+g.percent+'%';
-    progEl.textContent = txt;
-  }
-
-  function markRead(idx){
-    if (idx>=0 && idx<PAGES.length && state.read.indexOf(idx)<0){ state.read.push(idx); save(); buildTOC(); }
-  }
-
-  function go(idx){
-    state.page = idx; save();
-    render();
-    contentEl.scrollTop = 0;
+  function renderCover(){
+    const g=grade();
+    const logo = BOOK.logo ? '<img class="cv-logo" src="'+esc(resolveAsset(BOOK.logo))+'" alt="">' : '';
+    const meta = '<div class="cv-meta">'+
+      '<span>'+PAGES.length+' עמודים</span>'+ (totalQ?'<span class="dot">·</span><span>'+totalQ+' שאלות</span><span class="dot">·</span><span>ציון מעבר '+pass+'%</span>':'')+'</div>';
+    pageEl.innerHTML='<div class="cover">'+logo+
+      '<h1>'+esc(BOOK.title||'ספר לימוד')+'</h1>'+
+      (BOOK.subtitle?'<p class="cv-sub">'+esc(BOOK.subtitle)+'</p>':'')+
+      meta+
+      '<button type="button" class="cv-start" id="cvStart">'+(state.read.length?'המשך ללמוד':'התחל ללמוד')+' '+ICON.chevL+'</button>'+
+      (BOOK.author?'<div class="cv-author">'+esc(BOOK.author)+'</div>':'')+
+    '</div>';
+    const s=pageEl.querySelector('#cvStart'); if(s) s.addEventListener('click',()=>go(0));
   }
 
   function renderResults(){
-    const g = grade();
-    let list = '';
-    if (totalQ){
-      quizzes.forEach((q,i)=>{
-        const a = state.answers[q._qid];
-        const stat = a ? (a.correct?'<span class="r-ok">✓</span>':'<span class="r-no">✗</span>') : '<span class="r-un">—</span>';
-        list += '<li>'+stat+'<span>שאלה '+(i+1)+': '+esc((q.question||'').replace(/\{\{|\}\}/g,''))+'</span></li>';
-      });
-    }
-    const ring = g.passed ? 'pass' : 'fail';
-    pageEl.innerHTML =
-      '<div class="results">'+
-        '<h1>סיכום וציון</h1>'+
-        (totalQ ?
-          '<div class="score-ring '+ring+'"><div class="pct">'+g.percent+'%</div><div class="sub">'+g.correct+' מתוך '+g.total+' נכון</div></div>'+
-          '<div class="verdict '+ring+'">'+(g.passed?'🎉 עברת! (ציון מעבר: '+pass+'%)':'לא עברת הפעם. ציון המעבר הוא '+pass+'%.')+'</div>'+
-          '<ul class="qsum">'+list+'</ul>'+
-          '<button type="button" class="retake" id="retake">התחלה מחדש של השאלונים</button>'
-          :
-          '<p class="noquiz">ספר זה אינו כולל שאלוני הערכה.</p>')+
-      '</div>';
-    const rt = pageEl.querySelector('#retake');
-    if (rt) rt.addEventListener('click',()=>{ state.answers={}; save(); scormReport(0,false,false); go(0); });
-    scormReport(g.percent, g.passed, true);
+    const g=grade(); let list='';
+    quizzes.forEach((q,i)=>{ const a=state.answers[q._qid]; const st=a?(a.correct?'<span class="r-ok">'+ICON.check+'</span>':'<span class="r-no">'+ICON.x+'</span>'):'<span class="r-un">—</span>'; list+='<li>'+st+'<span>שאלה '+(i+1)+': '+esc((q.question||'').replace(/\{\{|\}\}/g,''))+'</span></li>'; });
+    const cls=g.passed?'pass':'fail'; const deg=Math.round(g.percent*3.6);
+    pageEl.innerHTML='<div class="results"><h1>סיכום וציון</h1>'+ (totalQ?
+      '<div class="ring '+cls+'" style="--deg:'+deg+'deg"><div class="ring-in"><div class="pct">'+g.percent+'%</div><div class="pl">'+g.correct+'/'+g.total+' נכון</div></div></div>'+
+      '<div class="verdict '+cls+'">'+(g.passed?'עברת בהצלחה — ציון המעבר הוא '+pass+'%':'לא עברת הפעם. ציון המעבר הוא '+pass+'%')+'</div>'+
+      '<ul class="qsum">'+list+'</ul>'+
+      '<button type="button" class="retake" id="retake">התחלה מחדש של השאלונים</button>'
+      : '<p class="noquiz">ספר זה אינו כולל שאלוני הערכה.</p>')+'</div>';
+    const rt=pageEl.querySelector('#retake'); if(rt) rt.addEventListener('click',()=>{ state.answers={}; save(); scormReport(0,false,false); go(0); });
+    scormReport(g.percent,g.passed,true);
   }
 
   function render(){
-    buildTOC();
-    updateProg();
-    // סמן פריט TOC פעיל
-    tocEl.querySelectorAll('.toc-item').forEach(b=>b.classList.toggle('active', parseInt(b.dataset.i,10)===state.page));
+    buildTOC(); updateProg();
+    if(state.page===-1){ renderCover(); return; }
+    if(state.page>=RESULTS_INDEX && totalQ){ renderResults(); return; }
+    if(state.page<0) state.page=0;
+    if(state.page>=PAGES.length){ if(totalQ){ state.page=RESULTS_INDEX; renderResults(); return; } state.page=PAGES.length-1; }
+    if(PAGES.length===0){ pageEl.innerHTML='<div class="results"><p class="noquiz">אין תוכן להצגה.</p></div>'; return; }
 
-    if (state.page >= RESULTS_INDEX && totalQ){ renderResults(); return; }
-    if (state.page < 0) state.page = 0;
-    if (state.page >= PAGES.length) state.page = PAGES.length-1;
-    if (PAGES.length===0){ pageEl.innerHTML = '<div class="results"><p class="noquiz">אין תוכן להצגה.</p></div>'; return; }
+    const p=PAGES[state.page];
+    let nav='<div class="pagenav">';
+    nav += state.page>0 ? '<button type="button" class="nav" id="navPrev">'+ICON.chevR+' הקודם</button>' : '<span></span>';
+    const isLast=state.page===PAGES.length-1;
+    if(isLast&&totalQ) nav+='<button type="button" class="nav primary" id="navNext">סיום וציון '+ICON.flag+'</button>';
+    else if(!isLast) nav+='<button type="button" class="nav primary" id="navNext">הבא '+ICON.chevL+'</button>';
+    else nav+='<span></span>';
+    nav+='</div>';
 
-    const p = PAGES[state.page];
-    let nav = '<div class="pagenav">';
-    nav += state.page>0 ? '<button type="button" class="nav prev" id="navPrev">→ הקודם</button>' : '<span></span>';
-    const isLast = state.page===PAGES.length-1;
-    if (isLast && totalQ) nav += '<button type="button" class="nav next primary" id="navNext">סיום וציון 🏁</button>';
-    else if (!isLast) nav += '<button type="button" class="nav next primary" id="navNext">הבא ←</button>';
-    else nav += '<span></span>';
-    nav += '</div>';
+    pageEl.innerHTML='<article class="page"><div class="page-eyebrow">עמוד '+(state.page+1)+' מתוך '+PAGES.length+'</div><h1>'+esc(p.title||'')+'</h1>'+renderBlocks(p.blocks)+'</article>'+nav;
+    markRead(state.page); buildTOC(); updateProg();
 
-    pageEl.innerHTML = '<article class="page"><h1>'+esc(p.title||'')+'</h1>'+renderBlocks(p.blocks)+'</article>'+nav;
-
-    markRead(state.page);
-
-    // חיווט
-    pageEl.querySelectorAll('.quiz').forEach(sec=>{
-      const qid = sec.dataset.qid;
-      const q = quizzes.find(x=>x._qid===qid);
-      if (q){ if (state.answers[qid]) afterQuizRender(sec,q); else bindQuiz(sec,q); }
-    });
+    pageEl.querySelectorAll('.quiz').forEach(sec=>{ const q=quizzes.find(x=>x._qid===sec.dataset.qid); if(q){ if(state.answers[sec.dataset.qid]) sec.querySelectorAll('.term').forEach(bindTerm); else bindQuiz(sec,q); } });
     pageEl.querySelectorAll('.term').forEach(bindTerm);
-    const np = pageEl.querySelector('#navPrev'); if (np) np.addEventListener('click',()=>go(state.page-1));
-    const nn = pageEl.querySelector('#navNext'); if (nn) nn.addEventListener('click',()=>go(state.page+1));
+    const np=pageEl.querySelector('#navPrev'); if(np) np.addEventListener('click',()=>go(state.page-1));
+    const nn=pageEl.querySelector('#navNext'); if(nn) nn.addEventListener('click',()=>go(state.page+1));
   }
 
-  // מילון מודאלי
-  const gmodal = root.querySelector('#gmodal');
-  const glossBtn = root.querySelector('#glossBtn');
-  if (glossBtn){
-    glossBtn.addEventListener('click',()=>{
-      const gb = root.querySelector('#gbody');
-      gb.innerHTML = (BOOK.glossary||[]).map(g=>'<div class="grow"><dt>'+esc(g.term)+'</dt><dd>'+esc(g.definition)+'</dd></div>').join('');
-      gmodal.hidden = false;
-    });
-    root.querySelector('#gclose').addEventListener('click',()=>{ gmodal.hidden = true; });
-    gmodal.addEventListener('click',(e)=>{ if (e.target===gmodal) gmodal.hidden = true; });
+  const gmodal=root.querySelector('#gmodal'), scrim=root.querySelector('#scrim'), glossBtn=root.querySelector('#glossBtn');
+  if(glossBtn){
+    glossBtn.addEventListener('click',()=>{ root.querySelector('#gbody').innerHTML=(BOOK.glossary||[]).map(g=>'<div class="grow"><dt>'+esc(g.term)+'</dt><dd>'+esc(g.definition)+'</dd></div>').join(''); gmodal.hidden=false; });
+    root.querySelector('#gclose').addEventListener('click',()=>gmodal.hidden=true);
+    gmodal.addEventListener('click',e=>{ if(e.target===gmodal) gmodal.hidden=true; });
   }
+  root.querySelector('#bkHome').addEventListener('click',()=>{ go(-1); closeMenu(); });
 
-  // תפריט צד נייד
-  const menuToggle = root.querySelector('#menuToggle');
-  const sidebar = root.querySelector('#sidebar');
-  function closeMenu(){ sidebar.classList.remove('open'); }
-  if (menuToggle) menuToggle.addEventListener('click',()=>{ sidebar.classList.toggle('open'); });
+  const menuToggle=root.querySelector('#menuToggle'), sidebar=root.querySelector('#sidebar');
+  function closeMenu(){ sidebar.classList.remove('open'); scrim.hidden=true; }
+  function openMenu(){ sidebar.classList.add('open'); scrim.hidden=false; }
+  if(menuToggle) menuToggle.addEventListener('click',()=>{ sidebar.classList.contains('open')?closeMenu():openMenu(); });
+  scrim.addEventListener('click',closeMenu);
 
   scormInit();
   render();
 }
 
 /* ============================================================
-   CSS של הקורא (מוזרק לתצוגה ולייצוא)
+   CSS של הקורא
    ============================================================ */
 const READER_CSS = `
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-:root{--bg:#f4f6fb;--panel:#fff;--ink:#1a2433;--muted:#5f6b7e;--line:#e0e6f0;--brand:#2563eb;--brand-soft:#e8f1ff;--brand-ink:#1d4ed8;--ok:#15803d;--ok-soft:#dcfce7;--no:#dc2626;--no-soft:#fee2e2;--sidebar:#0f1b30;--sidebar-ink:#e8eefb;--sidebar-muted:#93a4c4;}
+:root{--font:'Assistant',system-ui,Arial,sans-serif;
+ --accent:#1d4ed8;--accent-ink:#1a44be;--accent-deep:#173a93;--accent-soft:#eef3ff;--accent-softer:#f6f9ff;--accent-line:#dbe6ff;
+ --bg:#f6f7f9;--panel:#fff;--ink:#141a24;--ink-2:#3a4658;--muted:#697586;--line:#e6e8ee;
+ --ok:#16794c;--ok-soft:#e6f6ee;--no:#c62828;--no-soft:#fdecec;
+ --sidebar:#0f1626;--sidebar-ink:#eef2fb;--sidebar-muted:#8ea0bd;--sidebar-line:rgba(255,255,255,.09);}
 html,body{margin:0;height:100%}
-body{font-family:'Heebo','Assistant','Segoe UI',Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65}
-.reader{display:grid;grid-template-columns:290px 1fr;height:100vh}
-.sidebar{background:var(--sidebar);color:var(--sidebar-ink);display:flex;flex-direction:column;min-height:0;padding:20px 14px}
-.bk-title{font-weight:900;font-size:18px;padding:6px 8px 14px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:10px;line-height:1.35}
+body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.65;-webkit-font-smoothing:antialiased}
+.ri{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.reader{display:grid;grid-template-columns:300px 1fr;height:100vh}
+
+/* sidebar */
+.sidebar{background:var(--sidebar);color:var(--sidebar-ink);display:flex;flex-direction:column;min-height:0;padding:18px 14px}
+.bk{display:flex;align-items:center;gap:11px;background:transparent;border:0;color:inherit;cursor:pointer;text-align:start;
+ padding:6px 8px 16px;border-bottom:1px solid var(--sidebar-line);margin-bottom:12px;width:100%}
+.bk .logo{width:40px;height:40px;border-radius:10px;object-fit:contain;background:#fff;padding:4px;flex:none}
+.bk .logo-fb{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--accent);flex:none}
+.bk .logo-fb .ri{stroke:#fff;width:22px;height:22px}
+.bk .bk-t{font-weight:800;font-size:16px;line-height:1.3}
 .toc{flex:1;overflow:auto;display:flex;flex-direction:column;gap:2px}
-.toc-item{display:flex;align-items:center;gap:9px;background:transparent;border:0;color:var(--sidebar-muted);text-align:start;
-  padding:9px 10px;border-radius:9px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;transition:background .15s,color .15s}
+.toc-item{display:flex;align-items:center;gap:11px;background:transparent;border:0;color:var(--sidebar-muted);text-align:start;
+ padding:9px 10px;border-radius:9px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;transition:.15s}
 .toc-item:hover{background:rgba(255,255,255,.06);color:var(--sidebar-ink)}
-.toc-item.active{background:var(--brand);color:#fff}
-.toc-item .dot{width:8px;height:8px;border-radius:50%;border:1.5px solid currentColor;flex:none;opacity:.7}
-.toc-item .dot.done{background:#4ade80;border-color:#4ade80}
-.toc-item.active .dot{border-color:#fff}
-.toc-item .t{flex:1;overflow:hidden;text-overflow:ellipsis}
-.toc-item.results{margin-top:6px;border-top:1px solid rgba(255,255,255,.1);padding-top:12px}
-.side-foot{padding-top:12px;margin-top:8px;border-top:1px solid rgba(255,255,255,.1)}
-.gloss-link{width:100%;background:rgba(255,255,255,.08);border:0;color:var(--sidebar-ink);padding:10px;border-radius:9px;
-  font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:8px}
+.toc-item.active{background:var(--accent);color:#fff}
+.toc-item .num{width:24px;height:24px;border-radius:7px;border:1.5px solid currentColor;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none;opacity:.85}
+.toc-item .num .ri{width:14px;height:14px}
+.toc-item .num.done{background:#1f9d63;border-color:#1f9d63;color:#fff;opacity:1}
+.toc-item.active .num{border-color:#fff;opacity:1}
+.toc-item .t{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc-item.results{margin-top:6px;padding-top:12px;border-top:1px solid var(--sidebar-line)}
+.side-foot{padding-top:12px;margin-top:8px;border-top:1px solid var(--sidebar-line)}
+.gloss-link{width:100%;display:flex;align-items:center;gap:8px;justify-content:center;background:rgba(255,255,255,.08);border:0;color:var(--sidebar-ink);
+ padding:10px;border-radius:9px;font-family:inherit;font-weight:700;font-size:13.5px;cursor:pointer;margin-bottom:10px}
 .gloss-link:hover{background:rgba(255,255,255,.15)}
+.gloss-link .ri{width:16px;height:16px}
 .prog{font-size:12px;color:var(--sidebar-muted)}
 
-.content{overflow:auto;min-width:0;padding:0}
-.menu-toggle{display:none}
-.page,.results{max-width:760px;margin:0 auto;padding:44px 40px 80px}
-.page h1{font-size:30px;line-height:1.25;margin:0 0 22px;font-weight:900;letter-spacing:-.01em}
-.page h2.sub{font-size:20px;margin:30px 0 10px;font-weight:800}
-.page p{font-size:17px;margin:0 0 16px}
-.page figure{margin:22px 0}
-.page img,.page video{width:100%;border-radius:14px;border:1px solid var(--line);display:block;background:#000}
-.page img{background:var(--panel)}
-.page figcaption{font-size:13.5px;color:var(--muted);text-align:center;margin-top:8px}
+/* content */
+.content{overflow:auto;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:8;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(246,247,249,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.menu-toggle{display:none;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:7px;cursor:pointer;color:var(--ink)}
+.pbar{flex:1;height:6px;background:var(--line);border-radius:999px;overflow:hidden}
+.pfill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-ink));transition:width .3s}
+.page,.results,.cover{max-width:760px;margin:0 auto;padding:38px 44px 90px;width:100%}
+.page-eyebrow{font-size:12.5px;font-weight:800;letter-spacing:.02em;color:var(--accent);text-transform:none;margin-bottom:12px}
+.page h1{font-size:32px;line-height:1.22;margin:0 0 22px;font-weight:800;letter-spacing:-.015em}
+.page h2.sub{font-size:21px;margin:32px 0 10px;font-weight:800;color:var(--ink)}
+.page p{font-size:17.5px;margin:0 0 17px;color:var(--ink-2)}
+.page strong{color:var(--ink);font-weight:800}
+.page figure{margin:24px 0}
+.page img,.page video{width:100%;border-radius:14px;border:1px solid var(--line);display:block;box-shadow:0 6px 22px rgba(16,24,40,.07)}
+.page video{background:#000}
+.page figcaption{font-size:13.5px;color:var(--muted);text-align:center;margin-top:9px}
+.term{color:var(--accent-ink);background:var(--accent-soft);border:0;border-bottom:1.5px solid var(--accent-line);
+ font:inherit;font-weight:700;cursor:pointer;padding:0 4px;border-radius:5px}
+.term:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-.term{color:var(--brand-ink);background:var(--brand-soft);border:0;border-bottom:1.5px dashed var(--brand);
-  font:inherit;cursor:pointer;padding:0 3px;border-radius:4px}
-.term:hover{background:var(--brand);color:#fff}
-
-.more{margin:22px 0;border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden}
-.more>summary{cursor:pointer;padding:13px 16px;font-weight:800;font-size:15px;list-style:none;
-  display:flex;align-items:center;gap:8px;background:var(--brand-soft);color:var(--brand-ink)}
+.more{margin:24px 0;border:1px solid var(--line);border-radius:13px;background:var(--panel);overflow:hidden;box-shadow:0 2px 10px rgba(16,24,40,.04)}
+.more>summary{cursor:pointer;padding:14px 16px;font-weight:800;font-size:15px;list-style:none;display:flex;align-items:center;gap:10px;color:var(--accent-ink)}
 .more>summary::-webkit-details-marker{display:none}
-.more>summary::before{content:'▾';transition:transform .2s;font-size:13px}
-.more:not([open])>summary::before{transform:rotate(90deg)}
-.more-body{padding:6px 16px 14px}
-.more-body p{font-size:15.5px}
+.more>summary .chev{display:inline-flex;transition:transform .2s;color:var(--accent)}
+.more[open]>summary .chev{transform:rotate(90deg)}
+[dir=rtl] .more>summary .chev{transform:rotate(180deg)}
+[dir=rtl] .more[open]>summary .chev{transform:rotate(90deg)}
+.more-body{padding:2px 16px 14px}
+.more-body p{font-size:16px}
 
-.quiz{margin:26px 0;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:18px 18px 16px;
-  box-shadow:0 4px 16px rgba(20,30,55,.05)}
-.qhead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.qbadge{background:var(--brand);color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px}
+.quiz{margin:28px 0;border:1px solid var(--line);border-radius:15px;background:var(--panel);padding:20px;box-shadow:0 4px 18px rgba(16,24,40,.06)}
+.qhead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.qbadge{background:var(--accent-soft);color:var(--accent-ink);font-size:12px;font-weight:800;padding:4px 11px;border-radius:999px}
 .qtype{font-size:12.5px;color:var(--muted);font-weight:600}
-.qtext{font-size:17px;font-weight:700;margin-bottom:14px}
-.opts{display:flex;flex-direction:column;gap:8px}
-.opt{display:flex;align-items:center;gap:11px;text-align:start;border:1.5px solid var(--line);background:var(--bg);
-  border-radius:11px;padding:11px 13px;cursor:pointer;font:inherit;font-size:15.5px;transition:border-color .15s,background .15s}
-.opt:hover:not(:disabled){border-color:var(--brand)}
-.opt.sel{border-color:var(--brand);background:var(--brand-soft)}
+.qtext{font-size:18px;font-weight:800;margin-bottom:16px;color:var(--ink)}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{display:flex;align-items:center;gap:12px;text-align:start;border:1.5px solid var(--line);background:var(--panel);border-radius:12px;
+ padding:13px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink-2);transition:.15s}
+.opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-softer)}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
 .opt:disabled{cursor:default}
-.opt .radio{width:19px;height:19px;border-radius:50%;border:2px solid var(--muted);flex:none;position:relative}
-.opt .radio.on::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--brand)}
-.opt .box{width:19px;height:19px;border-radius:5px;border:2px solid var(--muted);flex:none;display:grid;place-items:center;
-  font-size:13px;font-weight:900;color:var(--brand);line-height:1}
+.opt .radio,.opt .box{width:20px;height:20px;border:2px solid #c2cad6;flex:none;position:relative}
+.opt .radio{border-radius:50%}.opt .box{border-radius:6px}
+.opt .radio.on{border-color:var(--accent)} .opt .radio.on::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--accent)}
+.opt .box.on{border-color:var(--accent);background:var(--accent)} .opt .box.on::after{content:'';position:absolute;inset:0;background:no-repeat center/13px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-11'/%3E%3C/svg%3E")}
+.opt .mk{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center}
+.opt .mk.ok{background:var(--ok);color:#fff}.opt .mk.no{background:var(--no);color:#fff}
+.opt .mk .ri{width:14px;height:14px;stroke-width:2.4}
 .opt .otext{flex:1}
-.opt.correct{border-color:var(--ok);background:var(--ok-soft)}
-.opt.wrong{border-color:var(--no);background:var(--no-soft)}
-.tf{display:flex;gap:10px}
-.tf-btn{flex:1;border:1.5px solid var(--line);background:var(--bg);border-radius:11px;padding:12px;cursor:pointer;
-  font:inherit;font-weight:800;font-size:16px;transition:border-color .15s,background .15s}
-.tf-btn:hover:not(:disabled){border-color:var(--brand)}
-.tf-btn.sel{border-color:var(--brand);background:var(--brand-soft)}
+.opt.correct{border-color:var(--ok);background:var(--ok-soft);color:var(--ink)}
+.opt.wrong{border-color:var(--no);background:var(--no-soft);color:var(--ink)}
+.tf{display:flex;gap:11px}
+.tf-btn{flex:1;border:1.5px solid var(--line);background:var(--panel);border-radius:12px;padding:14px;cursor:pointer;font:inherit;font-weight:800;font-size:16px;color:var(--ink-2);transition:.15s}
+.tf-btn:hover:not(:disabled){border-color:var(--accent);background:var(--accent-softer)}
+.tf-btn.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
 .tf-btn.correct{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
 .tf-btn.wrong{border-color:var(--no);background:var(--no-soft);color:var(--no)}
-.check{margin-top:14px;background:var(--brand);color:#fff;border:0;border-radius:999px;padding:10px 22px;
-  font:inherit;font-weight:800;font-size:14.5px;cursor:pointer}
-.check:hover{background:var(--brand-ink)}
+.check{margin-top:16px;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:11px 24px;font:inherit;font-weight:800;font-size:14.5px;cursor:pointer;transition:.15s}
+.check:hover{background:var(--accent-ink)}
 .check.flash{background:var(--no)}
-.fb{margin-top:14px;padding:12px 14px;border-radius:10px;font-weight:800;font-size:15px}
-.fb.ok{background:var(--ok-soft);color:var(--ok)}
-.fb.no{background:var(--no-soft);color:var(--no)}
-.fb .ex{font-weight:500;color:var(--ink);margin-top:6px;font-size:14.5px}
+.fb{margin-top:16px;padding:14px;border-radius:11px;display:flex;gap:11px;align-items:flex-start}
+.fb.ok{background:var(--ok-soft)}.fb.no{background:var(--no-soft)}
+.fb .fic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;flex:none;color:#fff}
+.fb.ok .fic{background:var(--ok)}.fb.no .fic{background:var(--no)}
+.fb .fic .ri{width:16px;height:16px;stroke-width:2.4}
+.fb b{font-size:15px}.fb.ok b{color:var(--ok)}.fb.no b{color:var(--no)}
+.fb .ex{color:var(--ink-2);margin-top:4px;font-size:14.5px;font-weight:500}
 
-.pagenav{max-width:760px;margin:0 auto;padding:0 40px 60px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.nav{border:1.5px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:11px 22px;
-  font:inherit;font-weight:800;font-size:15px;cursor:pointer}
-.nav:hover{border-color:var(--brand)}
-.nav.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
-.nav.primary:hover{background:var(--brand-ink)}
+.pagenav{max-width:760px;margin:0 auto;padding:0 44px 70px;display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%}
+.nav{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:11px 20px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;transition:.15s}
+.nav:hover{border-color:var(--accent);color:var(--accent-ink)}
+.nav .ri{width:16px;height:16px}
+.nav.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nav.primary:hover{background:var(--accent-ink)}
+.nav.primary .ri{stroke:#fff}
 
-.results{text-align:center}
-.results h1{font-size:28px;margin:0 0 24px;font-weight:900}
-.score-ring{width:180px;height:180px;border-radius:50%;margin:0 auto 20px;display:grid;place-items:center;
-  background:conic-gradient(var(--brand) 0,var(--brand) 100%);position:relative}
-.score-ring.pass{background:var(--ok)}
-.score-ring.fail{background:var(--muted)}
-.score-ring::before{content:'';position:absolute;inset:14px;border-radius:50%;background:var(--bg)}
-.score-ring .pct{position:relative;font-size:44px;font-weight:900}
-.score-ring .sub{position:relative;font-size:13.5px;color:var(--muted)}
-.verdict{font-size:18px;font-weight:800;margin-bottom:24px}
+/* cover */
+.cover{text-align:center;padding-top:70px}
+.cv-logo{width:84px;height:84px;object-fit:contain;margin:0 auto 26px;display:block;border-radius:18px}
+.cover h1{font-size:40px;line-height:1.18;margin:0 0 14px;font-weight:800;letter-spacing:-.02em}
+.cv-sub{font-size:19px;color:var(--muted);margin:0 0 22px;font-weight:500}
+.cv-meta{display:flex;gap:8px;justify-content:center;align-items:center;color:var(--muted);font-size:14px;font-weight:600;margin-bottom:32px;flex-wrap:wrap}
+.cv-meta .dot{opacity:.5}
+.cv-start{display:inline-flex;align-items:center;gap:9px;background:var(--accent);color:#fff;border:0;border-radius:12px;padding:15px 34px;font:inherit;font-weight:800;font-size:17px;cursor:pointer;box-shadow:0 10px 26px rgba(29,78,216,.28);transition:.15s}
+.cv-start:hover{background:var(--accent-ink);transform:translateY(-1px)}
+.cv-start .ri{stroke:#fff;width:18px;height:18px}
+.cv-author{margin-top:34px;font-size:14px;color:var(--muted);font-weight:600}
+
+/* results */
+.results{text-align:center;padding-top:40px}
+.results h1{font-size:30px;margin:0 0 28px;font-weight:800}
+.ring{width:190px;height:190px;border-radius:50%;margin:0 auto 22px;display:grid;place-items:center;background:conic-gradient(var(--accent) var(--deg),var(--line) 0)}
+.ring.pass{background:conic-gradient(var(--ok) var(--deg),var(--line) 0)}
+.ring.fail{background:conic-gradient(var(--muted) var(--deg),var(--line) 0)}
+.ring-in{width:150px;height:150px;border-radius:50%;background:var(--bg);display:grid;place-items:center}
+.ring .pct{font-size:46px;font-weight:800;line-height:1}
+.ring .pl{font-size:13.5px;color:var(--muted);margin-top:4px}
+.verdict{font-size:18px;font-weight:800;margin-bottom:26px}
 .verdict.pass{color:var(--ok)}.verdict.fail{color:var(--muted)}
-.qsum{list-style:none;padding:0;max-width:520px;margin:0 auto 24px;text-align:start}
-.qsum li{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-bottom:1px solid var(--line);font-size:15px}
-.r-ok{color:var(--ok);font-weight:900}.r-no{color:var(--no);font-weight:900}.r-un{color:var(--muted);font-weight:900}
-.retake{background:var(--brand);color:#fff;border:0;border-radius:999px;padding:12px 26px;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
-.retake:hover{background:var(--brand-ink)}
+.qsum{list-style:none;padding:0;max-width:540px;margin:0 auto 26px;text-align:start}
+.qsum li{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;border-bottom:1px solid var(--line);font-size:15px;color:var(--ink-2)}
+.qsum .r-ok,.qsum .r-no{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none;color:#fff}
+.qsum .r-ok{background:var(--ok)}.qsum .r-no{background:var(--no)}
+.qsum .r-ok .ri,.qsum .r-no .ri{width:13px;height:13px;stroke-width:2.6}
+.qsum .r-un{color:var(--muted);font-weight:800;width:22px;text-align:center;flex:none}
+.retake{background:var(--accent);color:#fff;border:0;border-radius:11px;padding:13px 28px;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
+.retake:hover{background:var(--accent-ink)}
 .noquiz{color:var(--muted);font-size:16px}
 
-.popover{position:absolute;z-index:100;max-width:300px;background:var(--sidebar);color:var(--sidebar-ink);
-  border-radius:11px;padding:11px 14px;box-shadow:0 12px 30px rgba(0,0,0,.3);font-size:14px;line-height:1.5}
+.popover{position:absolute;z-index:100;max-width:300px;background:var(--sidebar);color:var(--sidebar-ink);border-radius:11px;padding:12px 14px;box-shadow:0 14px 34px rgba(0,0,0,.32);font-size:14px;line-height:1.5}
 .popover strong{display:block;margin-bottom:4px;color:#fff}
 .popover span{color:var(--sidebar-muted)}
-
-.gmodal{position:fixed;inset:0;background:rgba(8,14,26,.55);display:grid;place-items:center;z-index:200;padding:20px}
-.gsheet{background:var(--panel);border-radius:16px;max-width:560px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden}
-.gsheet header{display:flex;align-items:center;padding:15px 20px;border-bottom:1px solid var(--line)}
-.gsheet header h2{margin:0;font-size:18px;flex:1}
-.gsheet header button{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:7px 15px;font:inherit;font-weight:700;cursor:pointer}
-.gbody{overflow:auto;padding:10px 20px 20px}
-.gbody .grow{padding:12px 0;border-bottom:1px solid var(--line)}
-.gbody dt{font-weight:800;font-size:16px;margin-bottom:3px;color:var(--brand-ink)}
+.scrim{position:fixed;inset:0;background:rgba(8,12,20,.4);z-index:140}
+.gmodal{position:fixed;inset:0;background:rgba(8,12,20,.5);display:grid;place-items:center;z-index:200;padding:20px}
+.gsheet{background:var(--panel);border-radius:16px;max-width:560px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow-lg)}
+.gsheet header{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+.gsheet header h2{margin:0;font-size:18px;flex:1;font-weight:800}
+.gclose{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:7px;cursor:pointer;color:var(--ink)}
+.gbody{overflow:auto;padding:8px 20px 20px}
+.gbody .grow{padding:13px 0;border-bottom:1px solid var(--line)}
+.gbody .grow:last-child{border-bottom:none}
+.gbody dt{font-weight:800;font-size:16px;margin-bottom:3px;color:var(--accent-ink)}
 .gbody dd{margin:0;color:var(--muted);font-size:15px}
 
-@media (max-width:820px){
-  .reader{grid-template-columns:1fr}
-  .sidebar{position:fixed;inset-inline-start:0;top:0;bottom:0;width:280px;transform:translateX(-105%);transition:transform .25s;z-index:150}
-  [dir=rtl] .sidebar{transform:translateX(105%)}
-  .sidebar.open{transform:translateX(0)!important;box-shadow:0 0 40px rgba(0,0,0,.4)}
-  .menu-toggle{display:inline-flex;align-items:center;gap:6px;margin:14px 16px 0;background:var(--panel);
-    border:1px solid var(--line);border-radius:999px;padding:9px 16px;font:inherit;font-weight:800;cursor:pointer}
-  .page,.results{padding:22px 20px 60px}
-  .pagenav{padding:0 20px 50px}
-  .page h1{font-size:24px}
+@media (max-width:860px){
+ .reader{grid-template-columns:1fr}
+ .sidebar{position:fixed;inset-inline-start:0;top:0;bottom:0;width:290px;transform:translateX(-105%);transition:transform .25s;z-index:150}
+ [dir=rtl] .sidebar{transform:translateX(105%)}
+ .sidebar.open{transform:translateX(0)!important;box-shadow:0 0 50px rgba(0,0,0,.5)}
+ .menu-toggle{display:inline-flex}
+ .page,.results,.cover{padding:24px 20px 70px}.pagenav{padding:0 20px 60px}
+ .page h1{font-size:26px}.cover h1{font-size:31px}
 }
 `;
 
 /* ============================================================
-   בניית מסמך הקורא (תצוגה + ייצוא)
+   בניית מסמך הקורא (תצוגה + ייצוא) + עזרי צבע/פונט
    ============================================================ */
 function escHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function hx2rgb(h){ h=(h||'').replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join(''); const n=parseInt(h,16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function rgb2hx(a){ return '#'+a.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join(''); }
+function mixHex(hex,target,amt){ const a=hx2rgb(hex),b=hx2rgb(target); return rgb2hx([a[0]+(b[0]-a[0])*amt,a[1]+(b[1]-a[1])*amt,a[2]+(b[2]-a[2])*amt]); }
+function isValidHex(h){ return /^#?[0-9a-fA-F]{3}$|^#?[0-9a-fA-F]{6}$/.test(h||''); }
+function accentVars(hex){
+  const a = isValidHex(hex) ? (hex[0]==='#'?hex:'#'+hex) : '#1d4ed8';
+  return { accent:a, ink:mixHex(a,'#000',0.14), deep:mixHex(a,'#000',0.34), soft:mixHex(a,'#fff',0.90), softer:mixHex(a,'#fff',0.955), line:mixHex(a,'#fff',0.78) };
+}
 
 function buildReaderDoc(model, opts){
-  opts = opts || {};
-  const cfg = { mode: opts.mode || 'standalone' };
-  const assets = opts.assets || {};
-  const data = '<script>window.__BOOK__=' + JSON.stringify(model) +
-               ';window.__CFG__=' + JSON.stringify(cfg) +
-               ';window.__ASSETS__=' + JSON.stringify(assets) + ';<\/script>';
-  const run = '<script>(' + READER_MAIN.toString() + ')();<\/script>';
-  return '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">' +
-    '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-    '<title>' + escHtml(model.title || 'ספר לימוד דיגיטלי') + '</title>' +
-    '<style>' + READER_CSS + '</style></head><body>' + data + run + '</body></html>';
+  opts = opts||{};
+  const cfg = { mode: opts.mode||'standalone' };
+  const assets = opts.assets||{};
+  const font = FONT_MAP[model.font] || FONT_MAP['Assistant'];
+  const av = accentVars(model.accent);
+  const fontHref = 'https://fonts.googleapis.com/css2?family='+font.google+'&display=swap';
+  const fontLink = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'+
+    '<link rel="stylesheet" media="print" onload="this.media=\'all\'" href="'+fontHref+'"><noscript><link rel="stylesheet" href="'+fontHref+'"></noscript>';
+  const dynStyle = ':root{--font:'+font.stack+';--accent:'+av.accent+';--accent-ink:'+av.ink+';--accent-deep:'+av.deep+';--accent-soft:'+av.soft+';--accent-softer:'+av.softer+';--accent-line:'+av.line+';--shadow-lg:0 20px 50px rgba(16,24,40,.2)}';
+  const data = '<script>window.__BOOK__='+JSON.stringify(model)+';window.__CFG__='+JSON.stringify(cfg)+';window.__ASSETS__='+JSON.stringify(assets)+';<\/script>';
+  const run = '<script>('+READER_MAIN.toString()+')();<\/script>';
+  return '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">'+
+    '<title>'+escHtml(model.title||'ספר לימוד דיגיטלי')+'</title>'+fontLink+'<style>'+READER_CSS+'</style><style>'+dynStyle+'</style></head><body>'+data+run+'</body></html>';
 }
 
 /* ============================================================
    מצב האפליקציה
    ============================================================ */
-const state = {
-  assets: {},      // basename -> {file, url}
-  assetsChosen: false,
-  model: null
-};
+const state = { assets:{}, assetsChosen:false, model:null };
+const $ = s=>document.querySelector(s);
+const srcEl=$('#src'), pvEl=$('#pv'), pvEmpty=$('#pvEmpty');
 
-const $ = sel => document.querySelector(sel);
-const srcEl = $('#src');
-const pvEl = $('#pv');
-const pvEmpty = $('#pvEmpty');
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),1900); }
 
-function toast(msg){
-  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 1800);
-}
-
-/* ---------- רינדור התצוגה ---------- */
-let renderTimer = null;
-function scheduleRender(){ clearTimeout(renderTimer); renderTimer = setTimeout(renderAll, 250); }
-
-function currentAssetMap(){
-  const m = {};
-  for (const k in state.assets) m[k] = state.assets[k].url;
-  return m;
-}
+let renderTimer=null;
+function scheduleRender(){ clearTimeout(renderTimer); renderTimer=setTimeout(renderAll,250); }
+function currentAssetMap(){ const m={}; for(const k in state.assets) m[k]=state.assets[k].url; return m; }
 
 function renderAll(){
-  const text = srcEl.value;
-  const hasText = text.trim().length > 0;
-  const model = parseBook(text);
-  state.model = model;
+  const text=srcEl.value, hasText=text.trim().length>0;
+  const model=parseBook(text); state.model=model;
 
-  // תצוגה מקדימה
-  if (hasText && model.pages.length){
-    pvEmpty.style.display = 'none';
-    pvEl.style.display = 'block';
-    pvEl.srcdoc = buildReaderDoc(model, { mode:'preview', assets: currentAssetMap() });
-  } else {
-    pvEl.style.display = 'none';
-    pvEmpty.style.display = 'grid';
-  }
+  if(hasText && model.pages.length){ pvEmpty.style.display='none'; pvEl.style.display='block'; pvEl.srcdoc=buildReaderDoc(model,{mode:'preview',assets:currentAssetMap()}); }
+  else { pvEl.style.display='none'; pvEmpty.style.display='grid'; }
 
-  // אזהרות
-  const wb = $('#warns');
-  if (model.warnings && model.warnings.length){
-    wb.classList.add('show');
-    const uniq = [...new Set(model.warnings)];
-    wb.innerHTML = '<strong>⚠️ ' + uniq.length + ' הערות פרסור:</strong><ul>' +
-      uniq.slice(0,20).map(w=>'<li>'+escHtml(w)+'</li>').join('') +
-      (uniq.length>20 ? '<li>ועוד '+(uniq.length-20)+'…</li>' : '') + '</ul>';
-  } else { wb.classList.remove('show'); wb.innerHTML=''; }
+  const wb=$('#warns'), ok=$('#okbox');
+  const uniq=[...new Set(model.warnings||[])];
+  if(uniq.length){ wb.classList.add('show'); ok.style.display='none';
+    wb.innerHTML='<strong>⚠️ '+uniq.length+' הערות פרסור:</strong><ul>'+uniq.slice(0,20).map(w=>'<li>'+escHtml(w)+'</li>').join('')+(uniq.length>20?'<li>ועוד '+(uniq.length-20)+'…</li>':'')+'</ul>'; }
+  else { wb.classList.remove('show'); wb.innerHTML=''; ok.style.display=hasText?'flex':'none'; }
 
-  // פרטי ספר
-  $('#fTitle').value = model.title || '';
-  $('#fPass').value = model.pass;
+  $('#fTitle').value=model.title||''; $('#fPass').value=model.pass;
+  $('#fSubtitle').value=model.subtitle||''; $('#fAuthor').value=model.author||'';
+  if(model.font && FONT_MAP[model.font]) $('#fontSel').value=model.font;
+  syncAccentUI(model.accent||'#1d4ed8');
+  syncLogoUI(model);
 
-  // מבנה עמודים
-  renderStruct(model);
-  // מדיה
-  renderAssetStatus(model);
+  renderStruct(model); renderAssetStatus(model);
 
-  // כפתורים
-  const ready = hasText && model.pages.length>0;
-  $('#btnDownload').disabled = !hasText;
-  $('#btnSite').disabled = !ready;
-  $('#btnScorm').disabled = !ready;
+  const ready=hasText && model.pages.length>0;
+  $('#btnDownload').disabled=!hasText; $('#btnSite').disabled=!ready; $('#btnScorm').disabled=!ready;
 }
 
 function renderStruct(model){
-  $('#pageCount').textContent = model.pages.length ? '(' + model.pages.length + ')' : '';
-  const list = $('#structList');
-  if (!model.pages.length){ list.innerHTML = '<div class="hint">אין עמודים עדיין.</div>'; return; }
-  list.innerHTML = model.pages.map((p,i)=>{
-    let nq=0; (function w(b){ (b||[]).forEach(x=>{ if(x.type==='quiz')nq++; else if(x.type==='more')w(x.blocks); }); })(p.blocks);
-    const tag = nq ? nq+' שאלות' : 'תוכן';
-    return '<div class="pageItem"><span class="idx">'+(i+1)+'</span>'+
-      '<span class="nm" title="'+escHtml(p.title)+'">'+escHtml(p.title||('עמוד '+(i+1)))+'</span>'+
-      '<span class="tag">'+tag+'</span>'+
-      '<button class="btn sm" data-up="'+i+'" '+(i===0?'disabled':'')+'>↑</button>'+
-      '<button class="btn sm" data-down="'+i+'" '+(i===model.pages.length-1?'disabled':'')+'>↓</button></div>';
+  $('#pageCount').textContent=model.pages.length?'('+model.pages.length+')':'';
+  const list=$('#structList');
+  if(!model.pages.length){ list.innerHTML='<div class="hint">אין עמודים עדיין.</div>'; return; }
+  list.innerHTML=model.pages.map((p,i)=>{ let nq=0; (function w(b){ (b||[]).forEach(x=>{ if(x.type==='quiz')nq++; else if(x.type==='more')w(x.blocks); }); })(p.blocks);
+    return '<div class="pageItem"><span class="idx">'+(i+1)+'</span><span class="nm" title="'+escHtml(p.title)+'">'+escHtml(p.title||('עמוד '+(i+1)))+'</span><span class="tag">'+(nq?nq+' שאלות':'תוכן')+'</span>'+
+      '<button class="btn sm ghost" data-up="'+i+'" '+(i===0?'disabled':'')+'>↑</button><button class="btn sm ghost" data-down="'+i+'" '+(i===model.pages.length-1?'disabled':'')+'>↓</button></div>';
   }).join('');
   list.querySelectorAll('[data-up]').forEach(b=>b.addEventListener('click',()=>movePage(+b.dataset.up,-1)));
-  list.querySelectorAll('[data-down]').forEach(b=>b.addEventListener('click',()=>movePage(+b.dataset.down,+1)));
+  list.querySelectorAll('[data-down]').forEach(b=>b.addEventListener('click',()=>movePage(+b.dataset.down,1)));
 }
 
-/* הזזת עמוד מבוססת-טקסט (הטקסט הוא מקור האמת) */
 function splitPages(text){
-  const raw = text.replace(/\r\n?/g,'\n');
-  const lines = raw.split('\n');
-  const isStart = s => /^#\s+/.test(s) && !/^##/.test(s);
-  let firstPage = lines.findIndex(isStart);
-  if (firstPage < 0) return { preamble:raw, chunks:[] };
-  const preamble = lines.slice(0, firstPage).join('\n');
-  const chunks = [];
-  let i = firstPage;
-  while (i < lines.length){
-    if (isStart(lines[i])){
-      let j = i+1; while (j < lines.length && !isStart(lines[j])) j++;
-      chunks.push(lines.slice(i,j).join('\n'));
-      i = j;
-    } else i++;
-  }
-  return { preamble, chunks };
+  const lines=text.replace(/\r\n?/g,'\n').split('\n');
+  const isStart=s=>/^#\s+/.test(s)&&!/^##/.test(s);
+  const fp=lines.findIndex(isStart);
+  if(fp<0) return {preamble:text.replace(/\r\n?/g,'\n'),chunks:[]};
+  const preamble=lines.slice(0,fp).join('\n'); const chunks=[]; let i=fp;
+  while(i<lines.length){ if(isStart(lines[i])){ let j=i+1; while(j<lines.length&&!isStart(lines[j]))j++; chunks.push(lines.slice(i,j).join('\n')); i=j; } else i++; }
+  return {preamble,chunks};
 }
-function movePage(idx, dir){
-  const { preamble, chunks } = splitPages(srcEl.value);
-  const j = idx + dir;
-  if (j < 0 || j >= chunks.length) return;
-  const tmp = chunks[idx]; chunks[idx] = chunks[j]; chunks[j] = tmp;
-  const joined = (preamble.trim() ? preamble.replace(/\n+$/,'') + '\n\n' : '') +
-    chunks.map(c=>c.replace(/\n+$/,'')).join('\n\n') + '\n';
-  srcEl.value = joined;
-  renderAll();
-  toast('סדר העמודים עודכן');
+function movePage(idx,dir){
+  const {preamble,chunks}=splitPages(srcEl.value); const j=idx+dir; if(j<0||j>=chunks.length) return;
+  const t=chunks[idx]; chunks[idx]=chunks[j]; chunks[j]=t;
+  srcEl.value=(preamble.trim()?preamble.replace(/\n+$/,'')+'\n\n':'')+chunks.map(c=>c.replace(/\n+$/,'')).join('\n\n')+'\n';
+  renderAll(); toast('סדר העמודים עודכן');
 }
 
 function renderAssetStatus(model){
-  const summary = $('#assetsSummary');
-  const listEl = $('#assetList');
-  const chosen = Object.keys(state.assets).length;
-  if (!state.assetsChosen){ summary.textContent = 'לא נבחרה תיקיית מדיה.'; }
-  else { summary.textContent = chosen + ' קבצים נטענו מהתיקייה.'; }
+  const chosen=Object.keys(state.assets).length;
+  $('#assetsSummary').textContent = state.assetsChosen ? (chosen+' קבצים נטענו מהתיקייה.') : 'לא נבחרה תיקיית מדיה.';
+  const refs=[...new Set((model.mediaRefs||[]).map(baseName))];
+  if(model.logo) refs.push(baseName(model.logo)); if(model.cover) refs.push(baseName(model.cover));
+  const uniq=[...new Set(refs)];
+  let html='';
+  uniq.forEach(r=>{ const have=!!state.assets[r]; html+='<div>'+(have?'<span class="ok">✓</span> ':'<span class="miss">✗ חסר</span> ')+escHtml(r)+'</div>'; });
+  const used=new Set(uniq);
+  Object.keys(state.assets).forEach(k=>{ if(!used.has(k)) html+='<div class="hint">• '+escHtml(k)+' (לא בשימוש)</div>'; });
+  $('#assetList').innerHTML=html;
+}
 
-  const refs = [...new Set((model.mediaRefs||[]).map(baseName))];
-  if (!refs.length && !chosen){ listEl.innerHTML = ''; return; }
-  let html = '';
-  refs.forEach(r=>{
-    const have = !!state.assets[r];
-    html += '<div>'+(have?'<span class="ok">✓</span> ':'<span class="miss">✗ חסר</span> ')+escHtml(r)+'</div>';
-  });
-  // קבצים שנטענו אך אינם בשימוש
-  const used = new Set(refs);
-  Object.keys(state.assets).forEach(k=>{ if (!used.has(k)) html += '<div class="hint">• '+escHtml(k)+' (לא בשימוש)</div>'; });
-  listEl.innerHTML = html;
+/* ---------- מטא-דאטה: כתיבה/מחיקה בטקסט ---------- */
+function metaRegion(lines){ const fp=lines.findIndex(s=>/^#\s+/.test(s)&&!/^##/.test(s)); const gp=lines.findIndex(s=>/^\[glossary\]/.test(s.trim())); let end=lines.length; if(fp>=0)end=Math.min(end,fp); if(gp>=0)end=Math.min(end,gp); return end; }
+function setMeta(key,val){
+  const lines=srcEl.value.replace(/\r\n?/g,'\n').split('\n');
+  const re=new RegExp('^'+key+':','i'); const end=metaRegion(lines);
+  let idx=-1; for(let i=0;i<end;i++){ if(re.test(lines[i].trim())){ idx=i; break; } }
+  if(String(val).trim()===''){ if(idx>=0) lines.splice(idx,1); }
+  else { const nl=key+': '+val; if(idx>=0) lines[idx]=nl; else { let last=-1; for(let i=0;i<end;i++){ if(/^[A-Z]+:/i.test(lines[i].trim())) last=i; } lines.splice(last+1,0,nl); } }
+  srcEl.value=lines.join('\n'); scheduleRender();
+}
+
+/* ---------- מיתוג UI ---------- */
+function buildSwatches(){
+  const wrap=$('#swatches'); wrap.innerHTML='';
+  ACCENT_PRESETS.forEach(p=>{ const b=document.createElement('button'); b.className='sw'; b.style.background=p.hex; b.title=p.name; b.dataset.hex=p.hex;
+    b.addEventListener('click',()=>{ setMeta('ACCENT',p.hex); }); wrap.appendChild(b); });
+}
+function syncAccentUI(hex){
+  const norm=(hex||'').toLowerCase();
+  document.querySelectorAll('#swatches .sw').forEach(s=>s.classList.toggle('active',(s.dataset.hex||'').toLowerCase()===norm));
+  if(isValidHex(norm)) $('#accentPick').value = norm[0]==='#'?norm:'#'+norm;
+}
+function syncLogoUI(model){
+  const box=$('#logoBox'), rm=$('#btnLogoRemove');
+  const bn=model.logo?baseName(model.logo):''; const a=bn?state.assets[bn]:null;
+  if(a){ box.innerHTML='<img src="'+a.url+'" alt="">'; rm.style.display='inline-flex'; }
+  else { box.innerHTML='<svg class="ic" viewBox="0 0 24 24"><path d="M4 16l5-6 4 4 3-3 4 5"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>'; rm.style.display=model.logo?'inline-flex':'none'; }
 }
 
 /* ---------- טעינת קבצים ---------- */
-$('#fileText').addEventListener('change', e=>{
-  const f = e.target.files[0]; if (!f) return;
-  const r = new FileReader();
-  r.onload = ()=>{ srcEl.value = r.result; renderAll(); toast('הטקסט נטען'); };
-  r.readAsText(f, 'utf-8');
+$('#fileText').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{ srcEl.value=r.result; renderAll(); toast('הטקסט נטען'); }; r.readAsText(f,'utf-8'); });
+$('#fileAssets').addEventListener('change',e=>{
+  for(const k in state.assets){ try{URL.revokeObjectURL(state.assets[k].url);}catch(_){}}
+  state.assets={};
+  [...e.target.files].forEach(f=>{ const bn=baseName(f.webkitRelativePath||f.name); const ext=(bn.split('.').pop()||'').toLowerCase(); if(IMAGE_EXT.includes(ext)||VIDEO_EXT.includes(ext)) state.assets[bn]={file:f,url:URL.createObjectURL(f)}; });
+  state.assetsChosen=true; renderAll(); toast(Object.keys(state.assets).length+' קבצי מדיה נטענו');
 });
-
-$('#fileAssets').addEventListener('change', e=>{
-  // שחרור URLs ישנים
-  for (const k in state.assets){ try{ URL.revokeObjectURL(state.assets[k].url); }catch(_){} }
-  state.assets = {};
-  const files = [...e.target.files];
-  files.forEach(f=>{
-    const bn = baseName(f.webkitRelativePath || f.name);
-    const ext = (bn.split('.').pop()||'').toLowerCase();
-    if (IMAGE_EXT.includes(ext) || VIDEO_EXT.includes(ext)){
-      state.assets[bn] = { file:f, url: URL.createObjectURL(f) };
-    }
-  });
-  state.assetsChosen = true;
-  renderAll();
-  toast(Object.keys(state.assets).length + ' קבצי מדיה נטענו');
+$('#fileLogo').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f)return; const bn=baseName(f.name);
+  state.assets[bn]={file:f,url:URL.createObjectURL(f)}; state.assetsChosen=true;
+  setMeta('LOGO','assets/'+bn); toast('הלוגו נוסף');
 });
+$('#btnLogoRemove').addEventListener('click',()=>{ setMeta('LOGO',''); toast('הלוגו הוסר'); });
 
-/* ---------- עריכת פרטי ספר בטופס -> טקסט ---------- */
-$('#fTitle').addEventListener('input', e=>{ setMeta('TITLE', e.target.value); });
-$('#fPass').addEventListener('input', e=>{ setMeta('PASS', e.target.value); });
-function setMeta(key, val){
-  const lines = srcEl.value.replace(/\r\n?/g,'\n').split('\n');
-  const re = new RegExp('^'+key+':','i');
-  let idx = -1;
-  const firstPage = lines.findIndex(s=>/^#\s+/.test(s) && !/^##/.test(s));
-  const limit = firstPage<0 ? lines.length : firstPage;
-  for (let i=0;i<limit;i++){ if (re.test(lines[i].trim())){ idx=i; break; } }
-  const newLine = key + ': ' + val;
-  if (idx>=0) lines[idx] = newLine;
-  else lines.unshift(newLine);
-  srcEl.value = lines.join('\n');
-  scheduleRender();
-}
-
-/* ---------- עריכה בטקסטאריה ---------- */
-srcEl.addEventListener('input', scheduleRender);
+/* ---------- טופס פרטים/מיתוג -> טקסט ---------- */
+$('#fTitle').addEventListener('input',e=>setMeta('TITLE',e.target.value));
+$('#fPass').addEventListener('input',e=>setMeta('PASS',e.target.value));
+$('#fSubtitle').addEventListener('input',e=>setMeta('SUBTITLE',e.target.value));
+$('#fAuthor').addEventListener('input',e=>setMeta('AUTHOR',e.target.value));
+$('#fontSel').addEventListener('change',e=>setMeta('FONT',e.target.value));
+$('#accentPick').addEventListener('input',e=>setMeta('ACCENT',e.target.value));
+srcEl.addEventListener('input',scheduleRender);
 
 /* ---------- הורדת טקסט ---------- */
-$('#btnDownload').addEventListener('click', ()=>{
-  const name = (state.model && state.model.title ? state.model.title : 'textbook').replace(/[\\/:*?"<>|]/g,'_');
-  downloadBlob(new Blob([srcEl.value], {type:'text/plain;charset=utf-8'}), name + '.txt');
-  toast('הטקסט הורד');
-});
+$('#btnDownload').addEventListener('click',()=>{ const name=(state.model&&state.model.title?state.model.title:'textbook').replace(/[\\/:*?"<>|]/g,'_'); downloadBlob(new Blob([srcEl.value],{type:'text/plain;charset=utf-8'}),name+'.txt'); toast('הטקסט נשמר'); });
 
-/* ---------- רענון ידני ---------- */
-$('#btnReload').addEventListener('click', renderAll);
+/* ---------- רענון / פתיחה בכרטיסייה ---------- */
+$('#btnReload').addEventListener('click',renderAll);
+$('#btnOpenTab').addEventListener('click',()=>{ const model=parseBook(srcEl.value); if(!model.pages.length){ toast('אין תוכן'); return; } const html=buildReaderDoc(model,{mode:'preview',assets:currentAssetMap()}); const w=window.open(); if(w){ w.document.open(); w.document.write(html); w.document.close(); } else toast('החלון נחסם על ידי הדפדפן'); });
 
 /* ---------- פרומפט ---------- */
-$('#promptText').textContent = PROMPT_TEXT;
-$('#btnPrompt').addEventListener('click', ()=>$('#promptModal').classList.add('show'));
-$('#btnClosePrompt').addEventListener('click', ()=>$('#promptModal').classList.remove('show'));
-$('#promptModal').addEventListener('click', e=>{ if (e.target.id==='promptModal') e.currentTarget.classList.remove('show'); });
-$('#btnCopyPrompt').addEventListener('click', async ()=>{
-  try { await navigator.clipboard.writeText(PROMPT_TEXT); toast('הפרומפט הועתק ללוח'); }
-  catch(_){ const ta=document.createElement('textarea'); ta.value=PROMPT_TEXT; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('הפרומפט הועתק'); }
-});
+$('#promptText').textContent=PROMPT_TEXT;
+$('#btnCopyPrompt').addEventListener('click',async()=>{ try{ await navigator.clipboard.writeText(PROMPT_TEXT); toast('הפרומפט הועתק ללוח'); }catch(_){ const ta=document.createElement('textarea'); ta.value=PROMPT_TEXT; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('הפרומפט הועתק'); } });
 
 /* ---------- טעינת דוגמה ---------- */
-$('#btnExample').addEventListener('click', ()=>{
-  for (const k in state.assets){ try{ URL.revokeObjectURL(state.assets[k].url); }catch(_){} }
-  state.assets = {};
-  const blob = new Blob([EXAMPLE_SVG], { type:'image/svg+xml' });
-  state.assets['water_cycle.svg'] = { file: blob, url: URL.createObjectURL(blob) };
-  state.assetsChosen = true;
-  srcEl.value = EXAMPLE_TEXT;
-  renderAll();
+$('#btnExample').addEventListener('click',()=>{
+  for(const k in state.assets){ try{URL.revokeObjectURL(state.assets[k].url);}catch(_){}}
+  state.assets={};
+  const svg=new Blob([EXAMPLE_SVG],{type:'image/svg+xml'}); state.assets['water_cycle.svg']={file:svg,url:URL.createObjectURL(svg)};
+  const logo=new Blob([EXAMPLE_LOGO],{type:'image/svg+xml'}); state.assets['logo.svg']={file:logo,url:URL.createObjectURL(logo)};
+  state.assetsChosen=true; srcEl.value=EXAMPLE_TEXT; renderAll();
   toast('ספר הדוגמה נטען — נסו לנווט, ללחוץ על מונחים ולענות על השאלות');
 });
 
 /* ---------- מצב כהה ---------- */
-$('#btnTheme').addEventListener('click', ()=>{
-  const cur = document.documentElement.getAttribute('data-theme');
-  const next = cur==='dark' ? '' : 'dark';
-  if (next) document.documentElement.setAttribute('data-theme',next);
-  else document.documentElement.removeAttribute('data-theme');
-  $('#btnTheme').textContent = next==='dark' ? '☀️' : '🌙';
+$('#btnTheme').addEventListener('click',()=>{
+  const cur=document.documentElement.getAttribute('data-theme'); const next=cur==='dark'?'':'dark';
+  if(next) document.documentElement.setAttribute('data-theme',next); else document.documentElement.removeAttribute('data-theme');
+  $('#themeIcon').innerHTML = next==='dark' ? '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>' : '<path d="M21 12.8A8 8 0 1 1 11.2 3a6 6 0 0 0 9.8 9.8z"/>';
 });
 
 /* ---------- טאבים ---------- */
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.tabpane').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    document.querySelector('.tabpane[data-pane="'+t.dataset.tab+'"]').classList.add('active');
-  });
-});
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tabpane').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active'); document.querySelector('.tabpane[data-pane="'+t.dataset.tab+'"]').classList.add('active');
+}));
 
 /* ============================================================
-   ZIP (STORE, ללא דחיסה) + CRC32 — עצמאי, ללא תלות חיצונית
+   ZIP (STORE) + CRC32
    ============================================================ */
-const CRC_TABLE = (()=>{ const t=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++){ c = (c&1)? (0xEDB88320 ^ (c>>>1)) : (c>>>1); } t[n]=c>>>0; } return t; })();
-function crc32(u8){ let c=0xFFFFFFFF; for(let i=0;i<u8.length;i++){ c = CRC_TABLE[(c ^ u8[i]) & 0xFF] ^ (c>>>8); } return (c ^ 0xFFFFFFFF)>>>0; }
-function strToU8(str){ return new TextEncoder().encode(str); }
-
+const CRC_TABLE=(()=>{ const t=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); t[n]=c>>>0; } return t; })();
+function crc32(u8){ let c=0xFFFFFFFF; for(let i=0;i<u8.length;i++) c=CRC_TABLE[(c^u8[i])&0xFF]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function strToU8(s){ return new TextEncoder().encode(s); }
 function makeZip(files){
-  // files: [{name, data:Uint8Array}]
-  const enc = new TextEncoder();
-  const chunks = [];
-  const central = [];
-  let offset = 0;
-  const dosTime = 0, dosDate = 0x21; // 1980-01-01
-
-  files.forEach(f=>{
-    const nameU8 = enc.encode(f.name);
-    const data = f.data;
-    const crc = crc32(data);
-    // local header
-    const lh = new Uint8Array(30 + nameU8.length);
-    const dv = new DataView(lh.buffer);
-    dv.setUint32(0, 0x04034b50, true);
-    dv.setUint16(4, 20, true);       // version
-    dv.setUint16(6, 0x0800, true);   // flags: UTF-8 filenames
-    dv.setUint16(8, 0, true);        // method: store
-    dv.setUint16(10, dosTime, true);
-    dv.setUint16(12, dosDate, true);
-    dv.setUint32(14, crc, true);
-    dv.setUint32(18, data.length, true);
-    dv.setUint32(22, data.length, true);
-    dv.setUint16(26, nameU8.length, true);
-    dv.setUint16(28, 0, true);
-    lh.set(nameU8, 30);
-    chunks.push(lh, data);
-
-    // central dir entry
-    const ch = new Uint8Array(46 + nameU8.length);
-    const cv = new DataView(ch.buffer);
-    cv.setUint32(0, 0x02014b50, true);
-    cv.setUint16(4, 20, true);
-    cv.setUint16(6, 20, true);
-    cv.setUint16(8, 0x0800, true);
-    cv.setUint16(10, 0, true);
-    cv.setUint16(12, dosTime, true);
-    cv.setUint16(14, dosDate, true);
-    cv.setUint32(16, crc, true);
-    cv.setUint32(20, data.length, true);
-    cv.setUint32(24, data.length, true);
-    cv.setUint16(28, nameU8.length, true);
-    cv.setUint16(30, 0, true);
-    cv.setUint16(32, 0, true);
-    cv.setUint16(34, 0, true);
-    cv.setUint16(36, 0, true);
-    cv.setUint32(38, 0, true);
-    cv.setUint32(42, offset, true);
-    ch.set(nameU8, 46);
-    central.push(ch);
-
-    offset += lh.length + data.length;
-  });
-
-  const centralSize = central.reduce((s,c)=>s+c.length,0);
-  const centralOffset = offset;
-  const eocd = new Uint8Array(22);
-  const ev = new DataView(eocd.buffer);
-  ev.setUint32(0, 0x06054b50, true);
-  ev.setUint16(8, files.length, true);
-  ev.setUint16(10, files.length, true);
-  ev.setUint32(12, centralSize, true);
-  ev.setUint32(16, centralOffset, true);
-
-  const all = [...chunks, ...central, eocd];
-  const total = all.reduce((s,c)=>s+c.length,0);
-  const out = new Uint8Array(total);
-  let p = 0;
-  all.forEach(c=>{ out.set(c, p); p += c.length; });
-  return out;
+  const enc=new TextEncoder(); const chunks=[],central=[]; let offset=0; const dt=0,dd=0x21;
+  files.forEach(f=>{ const nm=enc.encode(f.name),data=f.data,crc=crc32(data);
+    const lh=new Uint8Array(30+nm.length),dv=new DataView(lh.buffer);
+    dv.setUint32(0,0x04034b50,true);dv.setUint16(4,20,true);dv.setUint16(6,0x0800,true);dv.setUint16(8,0,true);dv.setUint16(10,dt,true);dv.setUint16(12,dd,true);
+    dv.setUint32(14,crc,true);dv.setUint32(18,data.length,true);dv.setUint32(22,data.length,true);dv.setUint16(26,nm.length,true);dv.setUint16(28,0,true);lh.set(nm,30);
+    chunks.push(lh,data);
+    const ch=new Uint8Array(46+nm.length),cv=new DataView(ch.buffer);
+    cv.setUint32(0,0x02014b50,true);cv.setUint16(4,20,true);cv.setUint16(6,20,true);cv.setUint16(8,0x0800,true);cv.setUint16(10,0,true);cv.setUint16(12,dt,true);cv.setUint16(14,dd,true);
+    cv.setUint32(16,crc,true);cv.setUint32(20,data.length,true);cv.setUint32(24,data.length,true);cv.setUint16(28,nm.length,true);cv.setUint32(42,offset,true);ch.set(nm,46);
+    central.push(ch); offset+=lh.length+data.length; });
+  const cs=central.reduce((s,c)=>s+c.length,0),co=offset;
+  const eo=new Uint8Array(22),ev=new DataView(eo.buffer);
+  ev.setUint32(0,0x06054b50,true);ev.setUint16(8,files.length,true);ev.setUint16(10,files.length,true);ev.setUint32(12,cs,true);ev.setUint32(16,co,true);
+  const all=[...chunks,...central,eo]; const total=all.reduce((s,c)=>s+c.length,0); const out=new Uint8Array(total); let p=0; all.forEach(c=>{ out.set(c,p); p+=c.length; }); return out;
 }
+function downloadBlob(blob,filename){ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
 
-function downloadBlob(blob, filename){
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
-}
-
-/* ---------- איסוף קבצי מדיה בשימוש ---------- */
 async function gatherAssetFiles(model){
-  const refs = [...new Set((model.mediaRefs||[]).map(baseName))];
-  const out = [];
-  const missing = [];
-  for (const r of refs){
-    const a = state.assets[r];
-    if (!a){ missing.push(r); continue; }
-    const buf = new Uint8Array(await a.file.arrayBuffer());
-    out.push({ name:'assets/'+r, data:buf });
-  }
-  return { out, missing };
+  const refs=[...new Set((model.mediaRefs||[]).map(baseName))];
+  if(model.logo) refs.push(baseName(model.logo)); if(model.cover) refs.push(baseName(model.cover));
+  const uniq=[...new Set(refs)]; const out=[],missing=[];
+  for(const r of uniq){ const a=state.assets[r]; if(!a){ missing.push(r); continue; } out.push({name:'assets/'+r,data:new Uint8Array(await a.file.arrayBuffer())}); }
+  return {out,missing};
 }
-
-function safeName(model, suffix){
-  return (model.title || 'textbook').replace(/[\\/:*?"<>|]/g,'_').slice(0,60) + suffix;
-}
+function safeName(model,suffix){ return (model.title||'textbook').replace(/[\\/:*?"<>|]/g,'_').slice(0,60)+suffix; }
 
 /* ---------- ייצוא אתר עצמאי ---------- */
-$('#btnSite').addEventListener('click', async ()=>{
-  const model = parseBook(srcEl.value);
-  if (!model.pages.length){ toast('אין תוכן לייצוא'); return; }
-  const btn = $('#btnSite'); btn.disabled = true; btn.textContent = '⏳ מייצא...';
-  try {
-    const { out, missing } = await gatherAssetFiles(model);
-    const html = buildReaderDoc(model, { mode:'standalone', assets:{} });
-    const files = [{ name:'index.html', data: strToU8(html) }, ...out];
-    const zip = makeZip(files);
-    downloadBlob(new Blob([zip], {type:'application/zip'}), safeName(model,'_site.zip'));
-    toast(missing.length ? 'יוצא (⚠️ '+missing.length+' קבצי מדיה חסרים)' : 'האתר יוצא בהצלחה');
-  } catch(err){ console.error(err); toast('שגיאה בייצוא'); }
-  finally { btn.disabled = false; btn.textContent = '🌐 ייצוא אתר עצמאי'; }
+$('#btnSite').addEventListener('click',async()=>{
+  const model=parseBook(srcEl.value); if(!model.pages.length){ toast('אין תוכן לייצוא'); return; }
+  const btn=$('#btnSite'),o=btn.innerHTML; btn.disabled=true; btn.textContent='מייצא…';
+  try{ const {out,missing}=await gatherAssetFiles(model); const html=buildReaderDoc(model,{mode:'standalone',assets:{}});
+    downloadBlob(new Blob([makeZip([{name:'index.html',data:strToU8(html)},...out])],{type:'application/zip'}),safeName(model,'_site.zip'));
+    toast(missing.length?'יוצא (⚠️ '+missing.length+' קבצי מדיה חסרים)':'האתר יוצא בהצלחה'); }
+  catch(err){ console.error(err); toast('שגיאה בייצוא'); }
+  finally{ btn.disabled=false; btn.innerHTML=o; }
 });
 
 /* ---------- ייצוא SCORM 1.2 ---------- */
-function buildManifest(model, assetNames){
-  const title = escHtml(model.title || 'ספר לימוד דיגיטלי');
-  const fileEntries = ['<file href="index.html"/>']
-    .concat(assetNames.map(n=>'<file href="'+escHtml(n)+'"/>')).join('\n      ');
-  return '<?xml version="1.0" encoding="UTF-8"?>\n' +
-'<manifest identifier="TBG_MANIFEST_'+Date.now()+'" version="1.0"\n' +
-'  xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"\n' +
-'  xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"\n' +
-'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n' +
-'  xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">\n' +
-'  <metadata>\n    <schema>ADL SCORM</schema>\n    <schemaversion>1.2</schemaversion>\n  </metadata>\n' +
-'  <organizations default="ORG">\n    <organization identifier="ORG">\n      <title>'+title+'</title>\n' +
-'      <item identifier="ITEM1" identifierref="RES1" isvisible="true">\n        <title>'+title+'</title>\n' +
-'        <adlcp:masteryscore>'+(typeof model.pass==='number'?model.pass:70)+'</adlcp:masteryscore>\n      </item>\n' +
-'    </organization>\n  </organizations>\n' +
-'  <resources>\n    <resource identifier="RES1" type="webcontent" adlcp:scormtype="sco" href="index.html">\n      ' +
-      fileEntries + '\n    </resource>\n  </resources>\n</manifest>\n';
+function buildManifest(model,assetNames){
+  const title=escHtml(model.title||'ספר לימוד דיגיטלי');
+  const files=['<file href="index.html"/>'].concat(assetNames.map(n=>'<file href="'+escHtml(n)+'"/>')).join('\n      ');
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<manifest identifier="TBG_MANIFEST_'+Date.now()+'" version="1.0"\n'+
+'  xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"\n  xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"\n  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'+
+'  xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">\n'+
+'  <metadata><schema>ADL SCORM</schema><schemaversion>1.2</schemaversion></metadata>\n'+
+'  <organizations default="ORG">\n    <organization identifier="ORG">\n      <title>'+title+'</title>\n'+
+'      <item identifier="ITEM1" identifierref="RES1" isvisible="true">\n        <title>'+title+'</title>\n        <adlcp:masteryscore>'+(typeof model.pass==='number'?model.pass:70)+'</adlcp:masteryscore>\n      </item>\n'+
+'    </organization>\n  </organizations>\n  <resources>\n    <resource identifier="RES1" type="webcontent" adlcp:scormtype="sco" href="index.html">\n      '+files+'\n    </resource>\n  </resources>\n</manifest>\n';
 }
-
-$('#btnScorm').addEventListener('click', async ()=>{
-  const model = parseBook(srcEl.value);
-  if (!model.pages.length){ toast('אין תוכן לייצוא'); return; }
-  const btn = $('#btnScorm'); btn.disabled = true; btn.textContent = '⏳ מייצא...';
-  try {
-    const { out, missing } = await gatherAssetFiles(model);
-    const html = buildReaderDoc(model, { mode:'scorm', assets:{} });
-    const assetNames = out.map(f=>f.name);
-    const manifest = buildManifest(model, assetNames);
-    const files = [
-      { name:'index.html', data: strToU8(html) },
-      { name:'imsmanifest.xml', data: strToU8(manifest) },
-      ...out
-    ];
-    const zip = makeZip(files);
-    downloadBlob(new Blob([zip], {type:'application/zip'}), safeName(model,'_scorm.zip'));
-    toast(missing.length ? 'SCORM יוצא (⚠️ '+missing.length+' קבצים חסרים)' : 'חבילת SCORM יוצאה');
-  } catch(err){ console.error(err); toast('שגיאה בייצוא'); }
-  finally { btn.disabled = false; btn.textContent = '🎓 ייצוא SCORM'; }
+$('#btnScorm').addEventListener('click',async()=>{
+  const model=parseBook(srcEl.value); if(!model.pages.length){ toast('אין תוכן לייצוא'); return; }
+  const btn=$('#btnScorm'),o=btn.innerHTML; btn.disabled=true; btn.textContent='מייצא…';
+  try{ const {out,missing}=await gatherAssetFiles(model); const html=buildReaderDoc(model,{mode:'scorm',assets:{}});
+    const manifest=buildManifest(model,out.map(f=>f.name));
+    downloadBlob(new Blob([makeZip([{name:'index.html',data:strToU8(html)},{name:'imsmanifest.xml',data:strToU8(manifest)},...out])],{type:'application/zip'}),safeName(model,'_scorm.zip'));
+    toast(missing.length?'SCORM יוצא (⚠️ '+missing.length+' חסרים)':'חבילת SCORM יוצאה'); }
+  catch(err){ console.error(err); toast('שגיאה בייצוא'); }
+  finally{ btn.disabled=false; btn.innerHTML=o; }
 });
 
 /* ---------- אתחול ---------- */
+buildSwatches();
 renderAll();
 </script>
 </body>
