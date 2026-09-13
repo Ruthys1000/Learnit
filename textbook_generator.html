@@ -214,6 +214,36 @@
     padding:11px 20px;border-radius:10px;font-weight:700;font-size:13px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:60}
   .toast.show{opacity:1;transform:translateX(50%) translateY(-4px)}
 
+  /* ---------- Dropdown menu ---------- */
+  .menu{position:relative;display:inline-flex}
+  .caret{width:13px;height:13px;margin-inline-start:1px;opacity:.85}
+  .menu-list{position:absolute;top:calc(100% + 6px);inset-inline-end:0;min-width:210px;background:var(--panel);
+    border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow-lg);padding:5px;z-index:40;
+    display:none;flex-direction:column;gap:2px}
+  .menu.open .menu-list{display:flex}
+  .menu-list button{border:0;background:transparent;color:var(--ink);font-family:inherit;font-weight:700;font-size:12.5px;
+    text-align:start;padding:8px 10px;border-radius:8px;cursor:pointer;display:flex;align-items:flex-start;gap:9px;white-space:nowrap;width:100%}
+  .menu-list button:hover{background:var(--accent-soft);color:var(--accent-ink)}
+  .menu-list button:disabled{opacity:.45;cursor:not-allowed}
+  .menu-list button:disabled:hover{background:transparent;color:var(--ink)}
+  .menu-list button .ic{color:var(--muted);margin-top:1px}
+  .menu-list button:hover .ic{color:var(--accent-ink)}
+  .menu-list .mtxt{display:flex;flex-direction:column;gap:1px}
+  .menu-list .mdesc{font-weight:500;font-size:11px;color:var(--muted)}
+  .menu-list button:hover .mdesc{color:var(--accent-ink);opacity:.85}
+
+  /* ---------- Advanced (collapsible) ---------- */
+  details.adv{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden}
+  details.adv>summary{list-style:none;cursor:pointer;padding:13px 14px;font-size:13px;font-weight:800;
+    display:flex;align-items:center;gap:8px;color:var(--ink)}
+  details.adv>summary::-webkit-details-marker{display:none}
+  details.adv>summary .ic{color:var(--accent)}
+  details.adv>summary .chev{margin-inline-start:auto;transition:transform .2s;color:var(--muted);width:16px;height:16px}
+  details.adv[open]>summary .chev{transform:rotate(180deg)}
+  details.adv .adv-body{padding:0 14px 14px;display:flex;flex-direction:column;gap:14px}
+  details.adv .adv-body .subhead{font-size:12px;font-weight:800;color:var(--muted);display:flex;align-items:center;gap:6px}
+  details.adv .adv-body .subhead .ic{color:var(--accent)}
+
   @media (max-width:860px){
     .main{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(0,1fr)}
     .side{border-inline-end:none;border-bottom:1px solid var(--line)}
@@ -228,17 +258,19 @@
       <div class="txt"><b>מחולל לומדות</b><span>עורך ספרי לימוד דיגיטליים</span></div>
     </div>
     <div class="divider"></div>
-    <button class="btn accent" id="btnPromptTop"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק פרומפט ל-AI</button>
-    <button class="btn" id="btnExample"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L18.7 9l-4.9 1.8L12 15.7 10.2 10.8 5.3 9l4.9-1.1z"/><path d="M18 15l.7 1.8L20.5 17l-1.8.7L18 19.5 17.3 17.7 15.5 17l1.8-.2z"/></svg>טען דוגמה</button>
-    <div class="divider"></div>
-    <label class="btn ghost filebtn"><svg class="ic" viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/></svg>קובץ טקסט<input type="file" id="fileText" accept=".txt,.md,text/plain" /></label>
-    <label class="btn ghost filebtn"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></svg>תיקיית מדיה<input type="file" id="fileAssets" webkitdirectory directory multiple /></label>
+    <label class="btn ghost filebtn" title="ייבוא קובץ טקסט קיים"><svg class="ic" viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/></svg>קובץ טקסט<input type="file" id="fileText" accept=".txt,.md,text/plain" /></label>
+    <label class="btn ghost filebtn" title="טעינת תמונות/וידאו ללומדה"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></svg>תיקיית מדיה<input type="file" id="fileAssets" webkitdirectory directory multiple /></label>
     <div class="grow"></div>
-    <button class="btn" id="btnDownload" disabled><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 11l5 4 5-4"/><path d="M5 21h14"/></svg>שמור טקסט</button>
-    <button class="btn primary" id="btnSite" disabled><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg>אתר עצמאי</button>
-    <button class="btn primary" id="btnScorm" disabled><svg class="ic" viewBox="0 0 24 24"><path d="M22 9L12 5 2 9l10 4 10-4z"/><path d="M6 11v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg>SCORM</button>
-    <div class="divider"></div>
+    <button class="btn ghost" id="btnDownload" disabled title="שמירת קובץ הטקסט למחשב"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 11l5 4 5-4"/><path d="M5 21h14"/></svg>שמור טקסט</button>
     <button class="btn" id="btnPreviewToggle" title="הצג/הסתר תצוגה מקדימה"><svg class="ic" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>תצוגה מקדימה</button>
+    <div class="menu">
+      <button class="btn primary" id="btnExport" disabled title="ייצוא הלומדה"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>ייצוא<svg class="ic caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="menu-list">
+        <button id="btnSite"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg><span class="mtxt">אתר עצמאי<span class="mdesc">קובץ HTML שרץ בכל דפדפן</span></span></button>
+        <button id="btnScorm"><svg class="ic" viewBox="0 0 24 24"><path d="M22 9L12 5 2 9l10 4 10-4z"/><path d="M6 11v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg><span class="mtxt">חבילת SCORM<span class="mdesc">להעלאה ל-Moodle ומערכות LMS</span></span></button>
+      </div>
+    </div>
+    <div class="divider"></div>
     <button class="btn icon ghost" id="btnTheme" title="מצב כהה/בהיר"><svg class="ic" viewBox="0 0 24 24" id="themeIcon"><path d="M21 12.8A8 8 0 1 1 11.2 3a6 6 0 0 0 9.8 9.8z"/></svg></button>
   </div>
 
@@ -277,9 +309,14 @@
           <button type="button" class="btn sm" data-k="term" title="מונח מילון">‏{{מונח}}</button>
           <button type="button" class="btn sm" data-k="img" title="תמונה / וידאו">מדיה</button>
           <button type="button" class="btn sm" data-k="more" title="קטע מתקפל">[more]</button>
-          <button type="button" class="btn sm" data-k="single" title="שאלה — בחירה יחידה">שאלה יחידה</button>
-          <button type="button" class="btn sm" data-k="multi" title="שאלה — בחירה מרובה">שאלה מרובה</button>
-          <button type="button" class="btn sm" data-k="tf" title="שאלה — אמת/שקר">אמת/שקר</button>
+          <div class="menu">
+            <button type="button" class="btn sm" id="btnAddQuiz" title="הוספת שאלה">＋ שאלה<svg class="ic caret sm" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="menu-list">
+              <button type="button" data-k="single"><span class="mtxt">בחירה יחידה<span class="mdesc">תשובה נכונה אחת</span></span></button>
+              <button type="button" data-k="multi"><span class="mtxt">בחירה מרובה<span class="mdesc">כמה תשובות נכונות</span></span></button>
+              <button type="button" data-k="tf"><span class="mtxt">אמת / שקר<span class="mdesc">קביעה נכונה או שגויה</span></span></button>
+            </div>
+          </div>
         </div>
         <div class="warnbox" id="warns"></div>
         <div class="okbox" id="okbox" style="display:none"><svg class="ic sm" viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg><span>הטקסט תקין — כל האלמנטים פורסרו בהצלחה.</span></div>
@@ -308,7 +345,7 @@
 
       <!-- BRANDING -->
       <div class="tabpane" data-pane="brand">
-        <div class="hint">כל בחירות המיתוג נשמרות בתוך הטקסט (SUBTITLE / AUTHOR / ACCENT / ACCENT2 / FONT / SIZE / SURFACE / LOGO) וזורמות אל התוצר המיוצא.</div>
+        <div class="hint">שני דברים בלבד נחוצים למראה מותאם: <b>לוגו</b> ו<b>צבע מותג</b>. שאר ההגדרות נמצאות תחת "הגדרות מתקדמות".</div>
         <div class="card">
           <h3><svg class="ic" viewBox="0 0 24 24"><path d="M4 16l5-6 4 4 3-3 4 5"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>לוגו</h3>
           <div class="logoPrev">
@@ -327,42 +364,47 @@
             <span class="hint">צבע מותאם אישית — לחצו לבחירה</span>
           </div>
         </div>
-        <div class="card">
-          <h3><svg class="ic" viewBox="0 0 24 24"><path d="M4 20h5l1.5-4h5L18 20h2M8 14h8L12 4z"/></svg>רקע הקורא</h3>
-          <div class="segchoice" id="surfaceSel">
-            <button type="button" data-v="light" class="active">בהיר</button>
-            <button type="button" data-v="warm">חם</button>
-            <button type="button" data-v="slate">צונן</button>
-          </div>
-        </div>
-        <div class="card">
-          <h3><svg class="ic" viewBox="0 0 24 24"><path d="M6 4h12M9 4v16M7 20h4"/><path d="M15 9h5M17 9v11M15.5 20h3"/></svg>פונט וגודל טקסט</h3>
-          <div class="row">
-            <div class="field"><label>פונט</label><select id="fontSel">
-              <option value="Assistant">Assistant — ברירת מחדל</option>
-              <option value="Heebo">Heebo</option>
-              <option value="Rubik">Rubik</option>
-              <option value="Noto Sans Hebrew">Noto Sans Hebrew</option>
-            </select></div>
-            <div class="field"><label>גודל טקסט בתוכן</label><select id="sizeSel">
-              <option value="compact">קומפקטי</option>
-              <option value="normal">רגיל (מומלץ)</option>
-              <option value="large">גדול</option>
-            </select></div>
-          </div>
-          <div class="field" style="margin-top:10px"><label>טעינת פונט בתוצר המיוצא</label>
-            <div class="segchoice" id="fontModeSel">
-              <button type="button" data-v="google" class="active">Google Fonts</button>
-              <button type="button" data-v="system">מערכת · אופליין</button>
+        <details class="adv">
+          <summary><svg class="ic" viewBox="0 0 24 24"><path d="M10.3 3.3a2 2 0 0 1 3.4 0l.5.9a2 2 0 0 0 2 1l1-.1a2 2 0 0 1 1.7 3l-.5.9a2 2 0 0 0 0 2.2l.5.9a2 2 0 0 1-1.7 3l-1-.1a2 2 0 0 0-2 1l-.5.9a2 2 0 0 1-3.4 0l-.5-.9a2 2 0 0 0-2-1l-1 .1a2 2 0 0 1-1.7-3l.5-.9a2 2 0 0 0 0-2.2l-.5-.9a2 2 0 0 1 1.7-3l1 .1a2 2 0 0 0 2-1z"/><circle cx="12" cy="12" r="2.5"/></svg>הגדרות מתקדמות<svg class="ic chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="adv-body">
+            <div>
+              <div class="subhead"><svg class="ic sm" viewBox="0 0 24 24"><path d="M4 20h5l1.5-4h5L18 20h2M8 14h8L12 4z"/></svg>רקע הקורא</div>
+              <div class="segchoice" id="surfaceSel">
+                <button type="button" data-v="light" class="active">בהיר</button>
+                <button type="button" data-v="warm">חם</button>
+                <button type="button" data-v="slate">צונן</button>
+              </div>
+            </div>
+            <div>
+              <div class="subhead"><svg class="ic sm" viewBox="0 0 24 24"><path d="M6 4h12M9 4v16M7 20h4"/><path d="M15 9h5M17 9v11M15.5 20h3"/></svg>פונט וגודל טקסט</div>
+              <div class="row">
+                <div class="field"><label>פונט</label><select id="fontSel">
+                  <option value="Assistant">Assistant — ברירת מחדל</option>
+                  <option value="Heebo">Heebo</option>
+                  <option value="Rubik">Rubik</option>
+                  <option value="Noto Sans Hebrew">Noto Sans Hebrew</option>
+                </select></div>
+                <div class="field"><label>גודל טקסט בתוכן</label><select id="sizeSel">
+                  <option value="compact">קומפקטי</option>
+                  <option value="normal">רגיל (מומלץ)</option>
+                  <option value="large">גדול</option>
+                </select></div>
+              </div>
+              <div class="field" style="margin-top:10px"><label>טעינת פונט בתוצר המיוצא</label>
+                <div class="segchoice" id="fontModeSel">
+                  <button type="button" data-v="google" class="active">Google Fonts</button>
+                  <button type="button" data-v="system">מערכת · אופליין</button>
+                </div>
+              </div>
+              <div class="hint" style="margin-top:8px">הלומד/ת יוכל/תוכל גם לכוונן את הגודל בעצמו/ה בתוך הקורא (A− / A+). במצב <b>מערכת</b> התוצר לא טוען פונטים מהאינטרנט — מתאים לאירוח סגור/אופליין.</div>
+            </div>
+            <div>
+              <div class="subhead"><svg class="ic sm" viewBox="0 0 24 24"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg>כותרת משנה ומחבר (לדף השער)</div>
+              <div class="field" style="margin-bottom:10px"><label>כותרת משנה (SUBTITLE)</label><input id="fSubtitle" type="text" placeholder="למשל: יחידת לימוד אינטראקטיבית" /></div>
+              <div class="field"><label>מחבר / ארגון (AUTHOR)</label><input id="fAuthor" type="text" placeholder="למשל: המרכז ללימודי סביבה" /></div>
             </div>
           </div>
-          <div class="hint" style="margin-top:8px">הלומד/ת יוכל/תוכל גם לכוונן את הגודל בעצמו/ה בתוך הקורא (A− / A+). במצב <b>מערכת</b> התוצר לא טוען פונטים מהאינטרנט — מתאים לאירוח סגור/אופליין.</div>
-        </div>
-        <div class="card">
-          <h3><svg class="ic" viewBox="0 0 24 24"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg>כותרת משנה ומחבר (לדף השער)</h3>
-          <div class="field" style="margin-bottom:10px"><label>כותרת משנה (SUBTITLE)</label><input id="fSubtitle" type="text" placeholder="למשל: יחידת לימוד אינטראקטיבית" /></div>
-          <div class="field"><label>מחבר / ארגון (AUTHOR)</label><input id="fAuthor" type="text" placeholder="למשל: המרכז ללימודי סביבה" /></div>
-        </div>
+        </details>
       </div>
 
       <!-- GUIDE -->
@@ -409,7 +451,6 @@
           <div class="lede">הדביקו תוכן בלשונית <b>"מקור"</b> כדי לראות את הלומדה מתעדכנת. עדיין אין תוכן? התחילו מ<b>"טען דוגמה מלאה"</b>.</div>
           <div class="cta-row">
             <button class="btn primary" id="ctaExample"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L18.7 9l-4.9 1.8L12 15.7 10.2 10.8 5.3 9l4.9-1.1z"/></svg>טען דוגמה מלאה</button>
-            <button class="btn accent" id="ctaPrompt"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק פרומפט ל-AI</button>
           </div>
         </div>
       </div>
@@ -1423,7 +1464,8 @@ function renderAll(){
   renderStruct(model); renderAssetStatus(model);
 
   const ready=hasText && model.pages.length>0;
-  $('#btnDownload').disabled=!hasText; $('#btnSite').disabled=!ready; $('#btnScorm').disabled=!ready;
+  $('#btnDownload').disabled=!hasText; $('#btnExport').disabled=!ready;
+  $('#btnSite').disabled=!ready; $('#btnScorm').disabled=!ready;
 }
 
 function renderStruct(model){
@@ -1644,8 +1686,6 @@ $('#btnOpenTab').addEventListener('click',()=>{ const model=parseBook(srcEl.valu
 $('#promptText').textContent=PROMPT_TEXT;
 async function copyPrompt(){ try{ await navigator.clipboard.writeText(PROMPT_TEXT); toast('הפרומפט הועתק ללוח — הדביקו ב-ChatGPT / Claude'); }catch(_){ const ta=document.createElement('textarea'); ta.value=PROMPT_TEXT; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('הפרומפט הועתק'); } }
 $('#btnCopyPrompt').addEventListener('click',copyPrompt);
-$('#btnPromptTop').addEventListener('click',copyPrompt);
-$('#ctaPrompt').addEventListener('click',copyPrompt);
 $('#obPrompt').addEventListener('click',copyPrompt);
 $('#obGuide').addEventListener('click',()=>activateTab('guide'));
 
@@ -1669,7 +1709,6 @@ function loadExample(){
   state.assetsChosen=true; srcEl.value=EXAMPLE_TEXT; setPreview(true); renderAll();
   toast('ספר הדוגמה נטען — נסו לנווט, ללחוץ על מונחים ולענות על השאלות');
 }
-$('#btnExample').addEventListener('click',loadExample);
 $('#ctaExample').addEventListener('click',loadExample);
 $('#obExample').addEventListener('click',loadExample);
 
@@ -1686,6 +1725,24 @@ function activateTab(name){
   document.querySelectorAll('.tabpane').forEach(x=>x.classList.toggle('active',x.dataset.pane===name));
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>activateTab(t.dataset.tab)));
+
+/* ---------- תפריטים נפתחים (ייצוא / הוספת שאלה) ---------- */
+function setupMenu(btnId){
+  const btn=$('#'+btnId); if(!btn) return;
+  const menu=btn.closest('.menu'); if(!menu) return;
+  btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    if(btn.disabled) return;
+    const open=menu.classList.contains('open');
+    document.querySelectorAll('.menu.open').forEach(m=>m.classList.remove('open'));
+    if(!open) menu.classList.add('open');
+  });
+  menu.querySelectorAll('.menu-list button').forEach(b=>b.addEventListener('click',()=>menu.classList.remove('open')));
+}
+setupMenu('btnExport');
+setupMenu('btnAddQuiz');
+document.addEventListener('click',()=>document.querySelectorAll('.menu.open').forEach(m=>m.classList.remove('open')));
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.menu.open').forEach(m=>m.classList.remove('open')); });
 
 /* ============================================================
    ZIP (STORE) + CRC32
