@@ -142,7 +142,13 @@
   .step .b{flex:1}
   .step .b b{display:block;font-size:13.5px;margin-bottom:3px}
   .step .b p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.6}
-  .promptbox{position:relative;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel-2);overflow:hidden}
+  .step .b ul{margin:4px 0 0;padding-inline-start:18px;font-size:12.5px;color:var(--muted);line-height:1.7}
+  .step .b ul code{background:var(--accent-soft);color:var(--accent-ink);padding:0 4px;border-radius:4px;font-size:11.5px}
+  .guide-intro{font-size:12.5px;color:var(--muted);line-height:1.6;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:10px;padding:10px 12px}
+  .phase{display:flex;align-items:center;gap:9px;margin:0 0 6px}
+  .phase .badge{background:var(--accent);color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;flex:none}
+  .phase b{font-size:13.5px}
+  .promptbox{position:relative;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel-2);overflow:hidden;margin-bottom:12px}
   .promptbox .phead{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
   .promptbox .phead b{flex:1;font-size:12.5px}
   .promptbox pre{margin:0;max-height:280px;overflow:auto;padding:12px 14px;white-space:pre-wrap;
@@ -154,12 +160,21 @@
   .pvbar .lbl{font-weight:700;font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:7px}
   .pvdot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
   iframe#pv{flex:1;width:100%;border:0;background:#fff}
-  .empty{flex:1;display:grid;place-items:center;color:var(--muted);text-align:center;padding:24px}
-  .empty .glyph{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
-  .empty .glyph .ic{width:28px;height:28px}
-  .empty h4{margin:0 0 8px;font-size:17px;font-weight:800;color:var(--ink)}
-  .cta-row{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
-  .cta-row .btn{padding:10px 16px;font-size:13.5px}
+  .empty{flex:1;display:grid;place-items:center;color:var(--muted);text-align:center;padding:28px 24px;overflow:auto}
+  .welcome{max-width:640px;width:100%}
+  .empty .glyph{width:52px;height:52px;margin:0 auto 14px;border-radius:15px;background:linear-gradient(150deg,var(--accent),var(--accent-deep));color:#fff;display:grid;place-items:center;box-shadow:var(--shadow-sm)}
+  .empty .glyph .ic{width:26px;height:26px;stroke:#fff}
+  .empty h4{margin:0 0 8px;font-size:19px;font-weight:800;color:var(--ink)}
+  .empty .lede{max-width:480px;margin:0 auto 22px;font-size:13.5px;line-height:1.7}
+  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 auto 22px;text-align:start}
+  .flowstep{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 12px 12px;box-shadow:var(--shadow-sm)}
+  .flowstep .fn{width:24px;height:24px;border-radius:7px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:12.5px;margin-bottom:9px}
+  .flowstep b{display:block;font-size:13px;color:var(--ink);margin-bottom:3px}
+  .flowstep span{font-size:11.5px;color:var(--muted);line-height:1.5}
+  .cta-row{display:flex;gap:10px;justify-content:center;margin-top:4px;flex-wrap:wrap}
+  .cta-row .btn{padding:11px 18px;font-size:13.5px}
+  .empty .foot{max-width:420px;margin:16px auto 0;font-size:12.5px}
+  @media (max-width:560px){ .flow{grid-template-columns:1fr 1fr} }
 
   .toast{position:fixed;inset-inline-start:50%;bottom:24px;transform:translateX(50%);background:var(--ink);color:var(--bg);
     padding:11px 20px;border-radius:10px;font-weight:700;font-size:13px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:60}
@@ -284,19 +299,30 @@
 
       <!-- GUIDE -->
       <div class="tabpane" data-pane="guide">
-        <div class="promptbox">
-          <div class="phead"><svg class="ic sm" viewBox="0 0 24 24" style="color:var(--accent)"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg><b>הפרומפט המלא — הדביקו ב-ChatGPT / Claude</b><button class="btn sm primary" id="btnCopyPrompt"><svg class="ic sm" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק</button></div>
-          <pre id="promptText"></pre>
-        </div>
+        <div class="guide-intro">התהליך בקצרה: <b>יוצרים את התוכן עם AI חיצוני</b> (ChatGPT / Claude) — ואז <b>מרכיבים, מעצבים ומייצאים</b> כאן בכלי. שני השלבים למטה.</div>
+
         <div class="card">
-          <h3><svg class="ic" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4c0 2 2 2.5 2 4h4c0-1.5 2-2 2-4a4 4 0 0 0-4-4z"/><path d="M10 20h4"/></svg>איך לעבוד עם ה-AI (במיוחד לתוכן רחב)</h3>
+          <div class="phase"><span class="badge">שלב 1</span><b>יוצרים את התוכן עם AI חיצוני</b></div>
+          <div class="promptbox">
+            <div class="phead"><svg class="ic sm" viewBox="0 0 24 24" style="color:var(--accent)"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg><b>הפרומפט המלא — הדביקו ב-ChatGPT / Claude</b><button class="btn sm primary" id="btnCopyPrompt"><svg class="ic sm" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק</button></div>
+            <pre id="promptText"></pre>
+          </div>
           <div class="steps">
-            <div class="step"><div class="n"></div><div class="b"><b>ארגנו את חומר הגלם</b><p>אספו את כל התוכן שצריך לכסות — סיכומים, נקודות, מקורות. ככל שהחומר מסודר יותר, הספר יהיה טוב יותר.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>בקשו קודם מתאר (תוכן עניינים)</b><p>לפני כתיבת הספר המלא, בקשו מה-AI: "בנה לי מתאר — רשימת עמודים עם מטרת למידה לכל עמוד, בלי לכתוב עדיין את התוכן". אשרו או תקנו את המבנה. זה השלב החשוב ביותר לאיכות.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>הריצו את הפרומפט</b><p>העתיקו את הפרומפט (למטה), הדביקו יחד עם המתאר המאושר + חומר הגלם + רשימת קבצי המדיה, ובקשו לכתוב את הספר המלא בפורמט.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>אם התשובה נקטעת</b><p>לתוכן ארוך, ה-AI עלול לעצור באמצע. פשוט כתבו: "המשך בדיוק מהמקום שעצרת, באותו פורמט". חברו את החלקים לקובץ אחד.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>בדקו לפי צ'קליסט איכות</b><p>מטרת למידה ברורה בכל עמוד? שאלות מופיעות אחרי שרעיון הושלם (לא באמצע)? מונחים מקצועיים מסומנים ב-<code>{{...}}</code>? אין "קיר טקסט" — פסקאות קצרות, העמקות ב-[more]? יש עמוד סיכום?</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>טענו, לטשו וייצאו</b><p>הדביקו את הטקסט כאן, תקנו אזהרות פרסור, קבעו מיתוג (לשונית "מיתוג"), ואז ייצאו אתר עצמאי או SCORM.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>אספו את חומר הגלם</b><p>כל התוכן שצריך לכסות — סיכומים, נקודות, מקורות. ככל שהחומר מסודר יותר, כך הלומדה תצא טובה יותר.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>בקשו קודם מתאר</b><p>לפני התוכן המלא, בקשו: "בנה לי מתאר — רשימת עמודים עם מטרת למידה לכל עמוד, בלי לכתוב עדיין את התוכן". אשרו או תקנו. זה השלב הכי משפיע על האיכות.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>הריצו את הפרומפט</b><p>הדביקו את הפרומפט שלמעלה, יחד עם המתאר המאושר, חומר הגלם ורשימת שמות קבצי המדיה — ובקשו לכתוב את הספר המלא בפורמט.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>אם התשובה נקטעת</b><p>בתוכן ארוך ה-AI עלול לעצור. כתבו: "המשך בדיוק מהמקום שעצרת, באותו פורמט", וחברו את החלקים.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>בדקו לפי צ'קליסט איכות</b><ul><li>מטרת למידה ברורה בכל עמוד</li><li>שאלה מופיעה אחרי שרעיון הושלם — לא באמצע הסבר</li><li>מונחים מקצועיים מסומנים ב-<code>{{...}}</code></li><li>אין "קיר טקסט" — פסקאות קצרות, העמקות ב-<code>[more]</code></li><li>יש עמוד סיכום עם שאלות מסכמות</li></ul></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="phase"><span class="badge">שלב 2</span><b>מרכיבים ומייצאים בכלי</b></div>
+          <div class="steps">
+            <div class="step"><div class="n"></div><div class="b"><b>הדביקו בלשונית "מקור"</b><p>הדביקו את הטקסט שקיבלתם מה-AI — התצוגה שמימין תתעדכן מיד ותראה את הלומדה.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>תקנו אזהרות</b><p>אם יש הערות פרסור צהובות (מונח לא במילון, שאלה בלי תשובה נכונה) — תקנו אותן בטקסט.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>עצבו מיתוג</b><p>בלשונית "מיתוג": לוגו, צבע מותג, פונט, גודל טקסט ורקע. הכול נשמר בתוך הטקסט.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>ייצאו</b><p><b>אתר עצמאי</b> (ZIP לאירוח) או <b>SCORM</b> להעלאה ל-Moodle. רק לצפייה מהירה — "פתח בכרטיסייה", בלי הורדה.</p></div></div>
           </div>
         </div>
       </div>
@@ -311,15 +337,21 @@
       </div>
       <iframe id="pv" title="תצוגה מקדימה"></iframe>
       <div class="empty" id="pvEmpty">
-        <div>
+        <div class="welcome">
           <div class="glyph"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5.5A2 2 0 0 1 6 4h5v15H6a2 2 0 0 0-2 1.5zM20 5.5A2 2 0 0 0 18 4h-5v15h5a2 2 0 0 1 2 1.5z"/></svg></div>
-          <h4>מתחילים ליצור לומדה</h4>
-          <div class="hint" style="max-width:360px;margin:0 auto">שתי דרכים להתחיל — התנסות מהירה בדוגמה, או יצירת תוכן משלכם עם AI חיצוני.</div>
+          <h4>מחולל לומדות דיגיטליות</h4>
+          <div class="lede">הכלי הופך תוכן שנכתב בעזרת AI ל<b>ספר לימוד אינטראקטיבי</b> — עם שאלות הבנה, מילון מונחים ומדיה — ומייצא אותו כאתר עצמאי או כחבילת SCORM ל-Moodle. כך זה עובד:</div>
+          <div class="flow">
+            <div class="flowstep"><div class="fn">1</div><b>מעתיקים פרומפט</b><span>מעתיקים את הפרומפט ומדביקים ב-ChatGPT / Claude יחד עם התוכן שלכם.</span></div>
+            <div class="flowstep"><div class="fn">2</div><b>מדביקים לכאן</b><span>ה-AI מחזיר ספר בפורמט מובנה — מדביקים אותו בלשונית "מקור".</span></div>
+            <div class="flowstep"><div class="fn">3</div><b>מעצבים</b><span>קובעים לוגו, צבע ופונט בלשונית "מיתוג" (אופציונלי).</span></div>
+            <div class="flowstep"><div class="fn">4</div><b>מייצאים</b><span>מורידים אתר עצמאי, או חבילת SCORM להעלאה ל-Moodle.</span></div>
+          </div>
           <div class="cta-row">
             <button class="btn primary" id="ctaExample"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L18.7 9l-4.9 1.8L12 15.7 10.2 10.8 5.3 9l4.9-1.1z"/></svg>טען דוגמה מלאה</button>
             <button class="btn accent" id="ctaPrompt"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק פרומפט ל-AI</button>
           </div>
-          <div class="hint" style="max-width:380px;margin:14px auto 0">אחרי שה-AI יכתוב לכם ספר בפורמט — הדביקו אותו בלשונית <b>"מקור"</b>, ותראו אותו כאן מיד.</div>
+          <div class="hint foot">חדשים? התחילו מ<b>"טען דוגמה מלאה"</b> כדי לראות איך נראית התוצאה — ואז נסו ליצור משלכם. הסבר מלא בלשונית <b>"מדריך AI"</b>.</div>
         </div>
       </div>
     </div>
@@ -590,7 +622,7 @@ EXPLAIN: תרבות של דיווח מהיר וללא האשמה היא אחד �
 
 const EXAMPLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 250" font-family="Assistant,Arial,sans-serif"><rect width="640" height="250" fill="#eef3fb"/><text x="320" y="30" text-anchor="middle" font-size="18" font-weight="800" fill="#0f2350">שלושת עמודי אבטחת המידע</text><g><rect x="40" y="52" width="170" height="168" rx="16" fill="#fff" stroke="#dbe6ff"/><circle cx="125" cy="104" r="27" fill="#1d4ed8"/><rect x="113" y="100" width="24" height="18" rx="3" fill="#fff"/><path d="M117 100v-4a8 8 0 0 1 16 0v4" fill="none" stroke="#fff" stroke-width="3"/><text x="125" y="168" text-anchor="middle" font-size="17" font-weight="800" fill="#0f2350">סודיות</text><text x="125" y="192" text-anchor="middle" font-size="12.5" fill="#5b6779">רק מי שצריך — נחשף למידע</text></g><g><rect x="235" y="52" width="170" height="168" rx="16" fill="#fff" stroke="#dbe6ff"/><circle cx="320" cy="104" r="27" fill="#0d9488"/><path d="M320 84l14 5v9c0 9-6 14-14 17-8-3-14-8-14-17v-9z" fill="#fff"/><path d="M314 102l4 4 8-8" stroke="#0d9488" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="320" y="168" text-anchor="middle" font-size="17" font-weight="800" fill="#0f2350">שלמות</text><text x="320" y="192" text-anchor="middle" font-size="12.5" fill="#5b6779">המידע נשאר מדויק ואמין</text></g><g><rect x="430" y="52" width="170" height="168" rx="16" fill="#fff" stroke="#dbe6ff"/><circle cx="515" cy="104" r="27" fill="#7c3aed"/><circle cx="515" cy="104" r="15" fill="none" stroke="#fff" stroke-width="3"/><path d="M515 104v-9M515 104l7 4" stroke="#fff" stroke-width="3" stroke-linecap="round"/><text x="515" y="168" text-anchor="middle" font-size="17" font-weight="800" fill="#0f2350">זמינות</text><text x="515" y="192" text-anchor="middle" font-size="12.5" fill="#5b6779">המידע זמין כשצריך אותו</text></g></svg>`;
 
-const EXAMPLE_PHISH = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" font-family="Assistant,Arial,sans-serif" direction="rtl"><rect width="640" height="400" fill="#f4f7fc"/><text x="600" y="32" text-anchor="end" font-size="17" font-weight="800" fill="#0f2350">שלושה דגלים אדומים בהודעת דיוג</text><rect x="60" y="52" width="520" height="250" rx="14" fill="#fff" stroke="#e0e5ef"/><text x="560" y="88" text-anchor="end" font-size="13.5" fill="#334155">מאת: security@paypa1-support.com</text><rect x="300" y="70" width="272" height="28" rx="7" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 4"/><circle cx="290" cy="84" r="12" fill="#dc2626"/><text x="290" y="89" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">1</text><text x="560" y="132" text-anchor="end" font-size="16" font-weight="800" fill="#c62828">החשבון שלך יושעה תוך 24 שעות!</text><rect x="252" y="114" width="320" height="28" rx="7" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 4"/><circle cx="242" cy="128" r="12" fill="#dc2626"/><text x="242" y="133" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">2</text><text x="560" y="170" text-anchor="end" font-size="13.5" fill="#5b6779">לקוח יקר, זוהתה פעילות חריגה בחשבונך.</text><text x="560" y="192" text-anchor="end" font-size="13.5" fill="#5b6779">יש לאמת את הפרטים מיד כדי למנוע חסימה.</text><rect x="392" y="220" width="150" height="42" rx="9" fill="#1d4ed8"/><text x="467" y="247" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">אימות מיידי</text><rect x="384" y="212" width="166" height="58" rx="12" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 4"/><circle cx="374" cy="241" r="12" fill="#dc2626"/><text x="374" y="246" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">3</text><g font-size="13.5" fill="#334155"><circle cx="596" cy="330" r="11" fill="#dc2626"/><text x="596" y="335" text-anchor="middle" font-size="12.5" font-weight="800" fill="#fff">1</text><text x="574" y="335" text-anchor="end">כתובת שולח דומה אך מזויפת (paypa1 במקום paypal)</text><circle cx="596" cy="358" r="11" fill="#dc2626"/><text x="596" y="363" text-anchor="middle" font-size="12.5" font-weight="800" fill="#fff">2</text><text x="574" y="363" text-anchor="end">שורת נושא מאיימת שיוצרת דחיפות מלאכותית</text><circle cx="596" cy="386" r="11" fill="#dc2626"/><text x="596" y="391" text-anchor="middle" font-size="12.5" font-weight="800" fill="#fff">3</text><text x="574" y="391" text-anchor="end">כפתור/קישור המפנה לאתר מזויף</text></g></svg>`;
+const EXAMPLE_PHISH = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 430" font-family="Assistant,Arial,sans-serif"><rect width="640" height="430" fill="#f4f7fc"/><text x="570" y="34" text-anchor="end" font-size="17" font-weight="800" fill="#0f2350">שלושה דגלים אדומים בהודעת דיוג</text><rect x="70" y="52" width="500" height="248" rx="14" fill="#fff" stroke="#e0e5ef"/><line x1="70" y1="150" x2="570" y2="150" stroke="#eef1f6"/><text x="548" y="86" text-anchor="end" font-size="13" fill="#334155" direction="ltr">support@paypa1-support.com :מאת</text><rect x="300" y="70" width="256" height="26" rx="6" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="5 4"/><circle cx="288" cy="83" r="12" fill="#dc2626"/><text x="288" y="87.5" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">1</text><text x="548" y="126" text-anchor="end" font-size="15.5" font-weight="800" fill="#c62828">החשבון שלך ייחסם תוך 24 שעות!</text><rect x="284" y="110" width="272" height="26" rx="6" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="5 4"/><circle cx="272" cy="123" r="12" fill="#dc2626"/><text x="272" y="127.5" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">2</text><text x="548" y="182" text-anchor="end" font-size="13.5" fill="#5b6779">לקוח יקר, זוהתה פעילות חריגה בחשבונך.</text><text x="548" y="204" text-anchor="end" font-size="13.5" fill="#5b6779">יש לאמת את הפרטים באופן מיידי.</text><rect x="386" y="230" width="150" height="42" rx="9" fill="#1d4ed8"/><text x="461" y="257" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">אימות מיידי</text><rect x="378" y="222" width="166" height="58" rx="12" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="5 4"/><circle cx="368" cy="251" r="12" fill="#dc2626"/><text x="368" y="255.5" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">3</text><g font-size="13.5" fill="#334155"><circle cx="556" cy="332" r="11" fill="#dc2626"/><text x="556" y="336.5" text-anchor="middle" font-size="12.5" font-weight="800" fill="#fff">1</text><text x="532" y="337" text-anchor="end">כתובת שולח מזויפת שדומה למקורית</text><circle cx="556" cy="362" r="11" fill="#dc2626"/><text x="556" y="366.5" text-anchor="middle" font-size="12.5" font-weight="800" fill="#fff">2</text><text x="532" y="367" text-anchor="end">שורת נושא מאיימת שיוצרת דחיפות</text><circle cx="556" cy="392" r="11" fill="#dc2626"/><text x="556" y="396.5" text-anchor="middle" font-size="12.5" font-weight="800" fill="#fff">3</text><text x="532" y="397" text-anchor="end">כפתור המפנה לאתר מזויף</text></g></svg>`;
 
 const EXAMPLE_LOGO = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#1d4ed8"/><path d="M24 10l10 4v9c0 8-5 13-10 15-5-2-10-7-10-15v-9z" fill="#fff"/><path d="M19 24l4 4 7-8" stroke="#1d4ed8" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
