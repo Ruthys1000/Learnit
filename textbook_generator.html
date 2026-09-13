@@ -170,6 +170,8 @@
   .onboard .ob-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
   .onboard .ob-actions .btn{padding:10px 16px;font-size:13px}
   .onboard .ob-flow{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.01em}
+  .onboard .ob-link{margin-top:12px;background:transparent;border:0;color:var(--accent-ink);font-family:inherit;font-weight:700;font-size:12.5px;cursor:pointer}
+  .onboard .ob-link:hover{text-decoration:underline}
   /* paste label above the source box (empty state) */
   .pastelabel{display:flex;align-items:center;justify-content:center;gap:7px;margin:2px 0 -2px;
     font-size:12.5px;font-weight:800;color:var(--accent-ink)}
@@ -254,16 +256,16 @@
           <h3>מתחילים כאן — יוצרים לומדה</h3>
           <p>מזינים ל-AI את חומרי הלמידה שכבר יש לכם, וה-AI בונה מהם לומדה אינטראקטיבית — עם שאלות, מילון ומדיה. הכלי מרכיב ומייצא אתר עצמאי או חבילת SCORM.</p>
           <div class="ob-actions">
-            <button type="button" class="btn primary" id="obExample"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L18.7 9l-4.9 1.8L12 15.7 10.2 10.8 5.3 9l4.9-1.1z"/></svg>טען דוגמה מלאה</button>
-            <button type="button" class="btn accent" id="obPrompt"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק פרומפט ל-AI</button>
+            <button type="button" class="btn primary" id="obPrompt"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק פרומפט ל-AI</button>
           </div>
           <div class="ob-flow">העתקת פרומפט ל-AI  ←  הדבקת התוכן כאן  ←  מיתוג וייצוא</div>
+          <button type="button" class="ob-link" id="obExample">רוצים לראות דוגמה מוכנה? טען דוגמה מלאה</button>
         </div>
         <div class="hint" id="srcHint">הטקסט הוא מקור האמת. כל עריכה כאן מתעדכנת מיד בתצוגה. לשמירה — "שמור טקסט".</div>
         <div class="warnbox" id="warns"></div>
         <div class="okbox" id="okbox" style="display:none"><svg class="ic sm" viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg><span>הטקסט תקין — כל האלמנטים פורסרו בהצלחה.</span></div>
         <div class="pastelabel" id="pasteLabel"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg>הדביקו כאן את התוכן שקיבלתם מה-AI</div>
-        <textarea id="src" spellcheck="false" placeholder="הדביקו כאן (Ctrl+V) את התוכן שקיבלתם מה-AI — או לחצו 'טען דוגמה מלאה' כדי לראות דוגמה."></textarea>
+        <textarea id="src" spellcheck="false" placeholder="הדביקו כאן (Ctrl+V) את התוכן שקיבלתם מה-AI."></textarea>
       </div>
 
       <!-- STRUCTURE -->
