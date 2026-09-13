@@ -144,28 +144,6 @@
   .colorpick{display:flex;align-items:center;gap:8px}
   .colorpick input[type=color]{width:40px;height:34px;padding:2px;border-radius:8px;border:1px solid var(--line);background:var(--panel);cursor:pointer}
 
-  /* guide */
-  .steps{display:flex;flex-direction:column;gap:0;counter-reset:st}
-  .step{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line-2)}
-  .step:last-child{border-bottom:none}
-  .step .n{counter-increment:st;flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;
-    display:grid;place-items:center;font-weight:800;font-size:13px}
-  .step .n::before{content:counter(st)}
-  .step .b{flex:1}
-  .step .b b{display:block;font-size:13.5px;margin-bottom:3px}
-  .step .b p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.6}
-  .step .b ul{margin:4px 0 0;padding-inline-start:18px;font-size:12.5px;color:var(--muted);line-height:1.7}
-  .step .b ul code{background:var(--accent-soft);color:var(--accent-ink);padding:0 4px;border-radius:4px;font-size:11.5px}
-  .guide-intro{font-size:12.5px;color:var(--muted);line-height:1.6;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:10px;padding:10px 12px}
-  .phase{display:flex;align-items:center;gap:9px;margin:0 0 6px}
-  .phase .badge{background:var(--accent);color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;flex:none}
-  .phase b{font-size:13.5px}
-  .promptbox{position:relative;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel-2);overflow:hidden;margin-bottom:12px}
-  .promptbox .phead{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
-  .promptbox .phead b{flex:1;font-size:12.5px}
-  .promptbox pre{margin:0;max-height:280px;overflow:auto;padding:12px 14px;white-space:pre-wrap;
-    font-family:ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;font-size:11.5px;line-height:1.6;direction:rtl;unicode-bidi:plaintext}
-
   /* ---------- Preview ---------- */
   .previewWrap{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--bg)}
   .pvbar{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
@@ -183,39 +161,22 @@
   .pv-point{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:800;color:var(--accent-ink);
     background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:999px;padding:8px 15px}
   .pv-point .ic{width:16px;height:16px;color:var(--accent-ink)}
-  .welcome{max-width:640px;width:100%}
-  .empty .glyph{width:52px;height:52px;margin:0 auto 14px;border-radius:15px;background:linear-gradient(150deg,var(--accent),var(--accent-deep));color:#fff;display:grid;place-items:center;box-shadow:var(--shadow-sm)}
-  .empty .glyph .ic{width:26px;height:26px;stroke:#fff}
-  .empty h4{margin:0 0 8px;font-size:19px;font-weight:800;color:var(--ink)}
-  .empty .lede{max-width:480px;margin:0 auto 22px;font-size:13.5px;line-height:1.7}
-  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 auto 22px;text-align:start}
-  .flowstep{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 12px 12px;box-shadow:var(--shadow-sm)}
-  .flowstep .fn{width:24px;height:24px;border-radius:7px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:12.5px;margin-bottom:9px}
-  .flowstep b{display:block;font-size:13px;color:var(--ink);margin-bottom:3px}
-  .flowstep span{font-size:11.5px;color:var(--muted);line-height:1.5}
-  .cta-row{display:flex;gap:10px;justify-content:center;margin-top:4px;flex-wrap:wrap}
-  .cta-row .btn{padding:11px 18px;font-size:13.5px}
-  .empty .foot{max-width:420px;margin:16px auto 0;font-size:12.5px}
-  @media (max-width:560px){ .flow{grid-template-columns:1fr 1fr} }
 
   /* onboarding card inside the editor (empty state) */
-  .onboard{max-width:600px;margin:8px auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);
-    box-shadow:var(--shadow-sm);padding:26px 24px;text-align:center}
+  .onboard{max-width:560px;margin:4px auto 0;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);
+    box-shadow:var(--shadow-sm);padding:20px 22px;text-align:center}
   .onboard .ob-icon{width:48px;height:48px;margin:0 auto 12px;border-radius:14px;display:grid;place-items:center;
     background:linear-gradient(150deg,var(--accent),var(--accent-deep));color:#fff}
   .onboard .ob-icon .ic{width:24px;height:24px;stroke:#fff}
   .onboard h3{margin:0 0 6px;font-size:18px;font-weight:800}
-  .onboard>p{margin:0 auto 18px;max-width:44ch;font-size:13px;color:var(--muted);line-height:1.6}
-  .onboard .ob-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+  .onboard>p{margin:0 auto 16px;max-width:46ch;font-size:12.5px;color:var(--muted);line-height:1.55}
+  .onboard .ob-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
   .onboard .ob-actions .btn{padding:10px 16px;font-size:13px}
-  .onboard .ob-steps{counter-reset:ob;list-style:none;margin:0 auto;padding:0;max-width:46ch;text-align:start;display:flex;flex-direction:column;gap:9px}
-  .onboard .ob-steps li{counter-increment:ob;position:relative;padding-inline-start:34px;font-size:12.5px;color:var(--ink);line-height:1.55}
-  .onboard .ob-steps li::before{content:counter(ob);position:absolute;inset-inline-start:0;top:-1px;width:22px;height:22px;border-radius:50%;
-    background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-size:11.5px;font-weight:800}
-  .onboard .ob-link{margin-top:16px;background:transparent;border:0;color:var(--accent-ink);font-family:inherit;font-weight:700;font-size:12.5px;cursor:pointer}
-  .onboard .ob-link:hover{text-decoration:underline}
-  .welcome-min{max-width:420px}
-  .welcome-min .cta-row{margin-top:18px}
+  .onboard .ob-flow{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.01em}
+  /* paste label above the source box (empty state) */
+  .pastelabel{display:flex;align-items:center;justify-content:center;gap:7px;margin:2px 0 -2px;
+    font-size:12.5px;font-weight:800;color:var(--accent-ink)}
+  .pastelabel .ic{color:var(--accent-ink)}
 
   .toast{position:fixed;inset-inline-start:50%;bottom:24px;transform:translateX(50%);background:var(--ink);color:var(--bg);
     padding:11px 20px;border-radius:10px;font-weight:700;font-size:13px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:60}
@@ -287,7 +248,6 @@
         <button class="tab active" data-tab="src"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>מקור</button>
         <button class="tab" data-tab="struct"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="4" rx="1"/><rect x="4" y="10" width="16" height="4" rx="1"/><rect x="4" y="16" width="16" height="4" rx="1"/></svg>מבנה</button>
         <button class="tab" data-tab="brand"><svg class="ic" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="17" cy="14" r="2.5"/><path d="M12 22a10 10 0 1 1 10-10"/></svg>מיתוג</button>
-        <button class="tab" data-tab="guide"><svg class="ic" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4c0 2 2 2.5 2 4h4c0-1.5 2-2 2-4a4 4 0 0 0-4-4z"/><path d="M10 20h4M12 3v1"/></svg>מדריך AI</button>
       </div>
 
       <!-- SOURCE -->
@@ -300,12 +260,7 @@
             <button type="button" class="btn primary" id="obExample"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L18.7 9l-4.9 1.8L12 15.7 10.2 10.8 5.3 9l4.9-1.1z"/></svg>טען דוגמה מלאה</button>
             <button type="button" class="btn accent" id="obPrompt"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק פרומפט ל-AI</button>
           </div>
-          <ol class="ob-steps">
-            <li>מעתיקים את הפרומפט ומדביקים ב-ChatGPT / Claude — ה-AI יבקש מכם את חומרי הלמידה שלכם, ישאל כמה שאלות, ואז יבנה מהחומר את הלומדה.</li>
-            <li>מדביקים כאן את הטקסט שהתקבל — ואפשר להפעיל "תצוגה מקדימה" כדי לראות את הלומדה מתעדכנת.</li>
-            <li>מעצבים מיתוג ומייצאים — אתר עצמאי או SCORM ל-Moodle.</li>
-          </ol>
-          <button type="button" class="ob-link" id="obGuide">למדריך המלא ←</button>
+          <div class="ob-flow">העתקת פרומפט ל-AI  ←  הדבקת התוכן כאן  ←  מיתוג וייצוא</div>
         </div>
         <div class="hint" id="srcHint">הטקסט הוא מקור האמת. כל עריכה כאן מתעדכנת מיד בתצוגה. לשמירה — "שמור טקסט".</div>
         <div class="fmtbar" id="fmtbar">
@@ -314,7 +269,7 @@
           <button type="button" class="btn sm" data-k="bold" title="הדגשה"><b>B</b></button>
           <button type="button" class="btn sm" data-k="italic" title="נטוי"><i>I</i></button>
           <button type="button" class="btn sm" data-k="term" title="מונח מילון">‏{{מונח}}</button>
-          <button type="button" class="btn sm" data-k="img" title="תמונה / וידאו">מדיה</button>
+          <label class="btn sm filebtn" title="העלאת תמונה / וידאו והוספה במקום הסמן"><svg class="ic sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></svg>מדיה<input type="file" id="fileMediaInsert" accept="image/*,video/*" /></label>
           <button type="button" class="btn sm" data-k="more" title="קטע מתקפל">[more]</button>
           <div class="menu">
             <button type="button" class="btn sm" id="btnAddQuiz" title="הוספת שאלה">＋ שאלה<svg class="ic caret sm" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -327,7 +282,8 @@
         </div>
         <div class="warnbox" id="warns"></div>
         <div class="okbox" id="okbox" style="display:none"><svg class="ic sm" viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg><span>הטקסט תקין — כל האלמנטים פורסרו בהצלחה.</span></div>
-        <textarea id="src" spellcheck="false" placeholder="לחצו 'טען דוגמה' כדי להתחיל, או הדביקו כאן את תוכן הספר בפורמט המוגדר (ראו לשונית 'מדריך AI')."></textarea>
+        <div class="pastelabel" id="pasteLabel"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg>הדביקו כאן את התוכן שקיבלתם מה-AI</div>
+        <textarea id="src" spellcheck="false" placeholder="הדביקו כאן (Ctrl+V) את התוכן שקיבלתם מה-AI — או לחצו 'טען דוגמה מלאה' כדי לראות דוגמה."></textarea>
       </div>
 
       <!-- STRUCTURE -->
@@ -406,33 +362,6 @@
             </div>
           </div>
         </details>
-      </div>
-
-      <!-- GUIDE -->
-      <div class="tabpane" data-pane="guide">
-        <div class="guide-intro">שני שלבים: <b>כותבים את התוכן עם AI</b> (ChatGPT / Claude) — ואז <b>מרכיבים, מעצבים ומייצאים</b> כאן בכלי.</div>
-
-        <div class="card">
-          <div class="phase"><span class="badge">שלב 1</span><b>כותבים את התוכן עם AI</b></div>
-          <div class="promptbox">
-            <div class="phead"><svg class="ic sm" viewBox="0 0 24 24" style="color:var(--accent)"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg><b>הפרומפט המלא — הדביקו ב-ChatGPT / Claude</b><button class="btn sm primary" id="btnCopyPrompt"><svg class="ic sm" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק</button></div>
-            <pre id="promptText"></pre>
-          </div>
-          <div class="steps">
-            <div class="step"><div class="n"></div><div class="b"><b>מעתיקים ומדביקים</b><p>מעתיקים את הפרומפט שלמעלה ומדביקים ב-ChatGPT או Claude.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>מספקים את החומר ועונים לשאלות</b><p>ה-AI יבקש קודם את חומרי הלמידה שלכם (סיכומים, מאמרים, מצגות, מקורות) — מדביקים או מצרפים. אחר כך ישאל כמה שאלות קצרות: מטרה, קהל יעד, אורך, טון וקבצי מדיה.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>מקבלים את הלומדה</b><p>ה-AI בונה מהחומר שלכם את הלומדה המלאה בפורמט. מעתיקים את כל הטקסט שהתקבל.</p></div></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="phase"><span class="badge">שלב 2</span><b>מרכיבים ומייצאים בכלי</b></div>
-          <div class="steps">
-            <div class="step"><div class="n"></div><div class="b"><b>מדביקים ב"מקור"</b><p>מדביקים את הטקסט בלשונית "מקור". להצגת הלומדה תוך כדי — מפעילים "תצוגה מקדימה" בסרגל העליון.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>מתקנים אזהרות</b><p>אם יש הערות צהובות (מונח לא במילון, שאלה בלי תשובה נכונה) — לוחצים עליהן כדי לקפוץ למקום בטקסט ולתקן.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>מעצבים ומייצאים</b><p>בלשונית "מיתוג" קובעים לוגו, צבע ופונט. ואז מייצאים <b>אתר עצמאי</b> או <b>SCORM</b> ל-Moodle.</p></div></div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -555,7 +484,7 @@ Q: נוסח השאלה
 Q: נוסח הקביעה
 ANSWER: true
 [/quiz]
-(בבחירה יחידה — בדיוק כוכבית אחת. בבחירה מרובה — כוכבית לפני כל נכונה. ANSWER — רק true או false.)
+⚠️ חובה — סימון התשובה הנכונה: זהו החלק הקריטי ביותר. לפני התשובה הנכונה חייבת לבוא כוכבית אחת ( * ) צמודה לטקסט התשובה — בבחירה יחידה בדיוק כוכבית אחת בסך הכול, בבחירה מרובה כוכבית לפני כל תשובה נכונה. באמת/שקר: שורת ANSWER עם true או false בלבד. לעולם אל תשאיר שאלה בלי סימון של התשובה הנכונה, ואל תסמן אותה בדרך אחרת (בלי הדגשה/צבע/הערה "(נכון)"). התו שלפני כל תשובה יכול להיות "-" או "*" — הסימון של הנכונה הוא הכוכבית שאחריו. למשל: "- *התשובה הנכונה" או "* *התשובה הנכונה". (אפשר גם [x] לפני התשובה הנכונה במקום כוכבית.)
 
 8. אין להשתמש בשום תחביר אחר (בלי טבלאות, בלי קישורים, בלי HTML גולמי).
 
@@ -585,6 +514,18 @@ Q: מהו {{אידוי}}?
 - מים שקופאים לקרח
 EXPLAIN: אידוי הוא המעבר ממצב נוזלי לגזי בהשפעת חום.
 [/quiz]
+
+═══════════════════════════════════
+בדיקה עצמית לפני שליחה — חובה
+═══════════════════════════════════
+לפני שאתה שולח את הלומדה, עבור על כל השאלות ותקן לפי הרשימה הזו. אל תשלח עד שהכול תקין:
+✓ כל [quiz: single] — יש בדיוק תשובה נכונה אחת מסומנת בכוכבית ( * ) לפניה.
+✓ כל [quiz: multi] — יש לפחות תשובה נכונה אחת, וכוכבית ( * ) לפני כל תשובה נכונה.
+✓ כל [quiz: truefalse] — יש שורת ANSWER עם true או false.
+✓ כל מונח שסומן ב-{{...}} בטקסט מופיע גם בבלוק [glossary], מאויית בדיוק אותו הדבר.
+✓ כל קובץ מדיה שהוזכר לקוח מרשימת הקבצים שמסרתי — בלי להמציא שמות.
+✓ הפלט כתוב אך ורק בפורמט המוגדר, בלי טקסט מחוץ לפורמט.
+אם משהו לא עומד בבדיקה — תקן אותו, ורק אז שלח.
 
 ═══════════════════════════════════
 מתחילים
@@ -842,12 +783,21 @@ function parseBook(text){
       if (/^Q:/i.test(t)){ quiz.question = t.replace(/^Q:/i,'').trim(); continue; }
       if (/^EXPLAIN:/i.test(t)){ quiz.explain = t.replace(/^EXPLAIN:/i,'').trim(); continue; }
       if (/^ANSWER:/i.test(t)){ quiz.answer = (t.replace(/^ANSWER:/i,'').trim().toLowerCase()==='true'); continue; }
-      const mOpt = t.match(/^-\s*(\*?)\s*(.+)$/);
-      if (mOpt){ quiz.options.push({text:mOpt[2].trim(), correct:mOpt[1]==='*'}); continue; }
+      const mOpt = t.match(/^[-*+]\s+(.+)$/); // bullet may be -, * or +
+      if (mOpt){
+        let txt = mOpt[1].trim(); let correct = false;
+        if (/^\[\s*[xX✓✔]\s*\]/.test(txt))  { correct = true;  txt = txt.replace(/^\[\s*[xX✓✔]\s*\]\s*/,''); }
+        else if (/^\[\s*\]/.test(txt))       { correct = false; txt = txt.replace(/^\[\s*\]\s*/,''); }
+        else if (/^\*\s*/.test(txt))         { correct = true;  txt = txt.replace(/^\*+\s*/,''); }
+        else if (/^[✓✔]\s+/.test(txt))       { correct = true;  txt = txt.replace(/^[✓✔]\s+/,''); }
+        else if (/\s[✓✔]$/.test(txt))        { correct = true;  txt = txt.replace(/\s*[✓✔]$/,''); }
+        quiz.options.push({ text: txt.trim(), correct });
+        continue;
+      }
     }
     if (!quiz.question) warnings.push('שאלון ללא שורת Q:.');
-    if (qType==='single'){ const c=quiz.options.filter(o=>o.correct).length; if(c!==1) warnings.push('שאלת בחירה יחידה צריכה בדיוק תשובה נכונה אחת (נמצאו '+c+'): "'+quiz.question+'"'); }
-    else if (qType==='multi'){ const c=quiz.options.filter(o=>o.correct).length; if(c<1) warnings.push('שאלת בחירה מרובה ללא תשובה נכונה מסומנת: "'+quiz.question+'"'); }
+    if (qType==='single'){ const c=quiz.options.filter(o=>o.correct).length; if(c!==1) warnings.push('שאלת בחירה יחידה צריכה בדיוק תשובה נכונה אחת (נמצאו '+c+') — סמנו את הנכונה עם * לפניה: "'+quiz.question+'"'); }
+    else if (qType==='multi'){ const c=quiz.options.filter(o=>o.correct).length; if(c<1) warnings.push('שאלת בחירה מרובה ללא תשובה נכונה מסומנת — סמנו כל נכונה עם * לפניה: "'+quiz.question+'"'); }
     else if (qType==='truefalse'){ if(quiz.answer===null) warnings.push('שאלת אמת/שקר ללא ANSWER תקין: "'+quiz.question+'"'); }
     return quiz;
   }
@@ -1439,8 +1389,8 @@ function renderAll(){
   const model=parseBook(text); state.model=model;
 
   // מסך פתיחה בעורך כשריק; סרגל תחביר רק כשיש תוכן
-  const ob=$('#onboard'), sh=$('#srcHint'), fb=$('#fmtbar');
-  if(ob) ob.hidden=hasText; if(sh) sh.hidden=!hasText; if(fb) fb.hidden=!hasText;
+  const ob=$('#onboard'), sh=$('#srcHint'), fb=$('#fmtbar'), pl=$('#pasteLabel');
+  if(ob) ob.hidden=hasText; if(sh) sh.hidden=!hasText; if(fb) fb.hidden=!hasText; if(pl) pl.hidden=hasText;
 
   if(hasText && model.pages.length){ pvEmpty.style.display='none'; pvEl.style.display='block'; updatePreview(model); }
   else { pvEl.style.display='none'; pvEmpty.style.display='grid'; pvReady=false; pvSig=null; }
@@ -1630,6 +1580,21 @@ $('#fileLogo').addEventListener('change',e=>{
 });
 $('#btnLogoRemove').addEventListener('click',()=>{ setMeta('LOGO',''); toast('הלוגו הוסר'); });
 
+/* ---------- העלאת תמונה/וידאו והוספה במקום הסמן ---------- */
+$('#fileMediaInsert').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f){ return; }
+  const bn=baseName(f.name).replace(/[()\[\]]/g,'').replace(/\s+/g,'_');
+  state.assets[bn]={file:f,url:URL.createObjectURL(f)}; state.assetsChosen=true;
+  const cap='כיתוב', ref='![', mid=']('+'assets/'+bn+')';
+  const el=srcEl, start=el.selectionStart, val=el.value;
+  const pre=(start>0 && val[start-1]!=='\n') ? '\n\n' : '';
+  const ins=pre+ref+cap+mid+'\n\n';
+  el.value=val.slice(0,start)+ins+val.slice(el.selectionEnd);
+  const a=start+pre.length+ref.length; el.focus(); el.setSelectionRange(a,a+cap.length);
+  renderAll(); e.target.value='';
+  toast(/^(mp4|webm|mov)$/i.test((bn.split('.').pop()||''))?'הסרטון נוסף':'התמונה נוספה');
+});
+
 /* ---------- טופס פרטים/מיתוג -> טקסט ---------- */
 $('#fTitle').addEventListener('input',e=>setMeta('TITLE',e.target.value));
 $('#fPass').addEventListener('input',e=>setMeta('PASS',e.target.value));
@@ -1648,7 +1613,6 @@ const SNIPPETS = {
   bold:{wrap:['**','**'], ph:'טקסט מודגש'},
   italic:{wrap:['*','*'], ph:'טקסט נטוי'},
   term:{wrap:['{{','}}'], ph:'מונח'},
-  img:{block:true, text:'![כיתוב לתמונה](assets/שם_קובץ.jpg)\n\n'},
   more:{block:true, text:'[more: כותרת הקטע]\nתוכן שמוצג רק בלחיצה.\n[/more]\n\n'},
   single:{block:true, text:'[quiz: single]\nQ: נוסח השאלה\n- תשובה שגויה\n- *תשובה נכונה\n- תשובה שגויה\nEXPLAIN: משפט הסבר קצר שמלמד\n[/quiz]\n\n'},
   multi:{block:true, text:'[quiz: multi]\nQ: נוסח השאלה\n- *תשובה נכונה\n- תשובה שגויה\n- *תשובה נכונה\n[/quiz]\n\n'},
@@ -1678,11 +1642,8 @@ $('#btnReload').addEventListener('click',renderAll);
 $('#btnOpenTab').addEventListener('click',()=>{ const model=parseBook(srcEl.value); if(!model.pages.length){ toast('אין תוכן'); return; } const html=buildReaderDoc(model,{mode:'preview',assets:currentAssetMap()}); const w=window.open(); if(w){ w.document.open(); w.document.write(html); w.document.close(); } else toast('החלון נחסם על ידי הדפדפן'); });
 
 /* ---------- פרומפט ---------- */
-$('#promptText').textContent=PROMPT_TEXT;
 async function copyPrompt(){ try{ await navigator.clipboard.writeText(PROMPT_TEXT); toast('הפרומפט הועתק ללוח — הדביקו ב-ChatGPT / Claude'); }catch(_){ const ta=document.createElement('textarea'); ta.value=PROMPT_TEXT; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('הפרומפט הועתק'); } }
-$('#btnCopyPrompt').addEventListener('click',copyPrompt);
 $('#obPrompt').addEventListener('click',copyPrompt);
-$('#obGuide').addEventListener('click',()=>activateTab('guide'));
 
 /* ---------- תצוגה מקדימה: הצג/הסתר (ברירת מחדל — עורך רחב) ---------- */
 const VIEWKEY='tbg_show_preview';
