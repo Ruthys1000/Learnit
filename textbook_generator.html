@@ -4,9 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>מחולל לומדות דיגיטליות</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Heebo:wght@400;500;700;800&family=Rubik:wght@400;500;600;700;800&family=Noto+Sans+Hebrew:wght@400;500;700;800&display=swap">
 <style>
   :root{
     --bg:#f5f6f8; --panel:#ffffff; --panel-2:#fafbfc; --ink:#141a24; --muted:#697586;
@@ -17,7 +14,7 @@
     --shadow-md:0 4px 12px rgba(16,24,40,.08);
     --shadow-lg:0 18px 44px rgba(16,24,40,.14);
     --radius:12px; --radius-sm:9px;
-    --font:'Assistant',system-ui,'Segoe UI',Arial,sans-serif;
+    --font:system-ui,'Segoe UI','Noto Sans Hebrew',Arial,sans-serif;
   }
   :root[data-theme="dark"]{
     --bg:#0c1017; --panel:#141a24; --panel-2:#111722; --ink:#e8ecf3; --muted:#93a0b4;
@@ -176,6 +173,16 @@
   .pvdot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
   iframe#pv{flex:1;width:100%;border:0;background:#fff}
   .empty{flex:1;display:grid;place-items:center;color:var(--muted);text-align:center;padding:28px 24px;overflow:auto}
+  /* preview placeholder — reads as an output "screen", not a second action card */
+  .pv-placeholder{max-width:380px}
+  .pv-screen{width:104px;height:74px;margin:0 auto 18px;border:2px dashed var(--line);border-radius:14px;
+    display:grid;place-items:center;background:var(--panel-2)}
+  .pv-screen .ic{width:36px;height:36px;color:var(--muted);stroke-width:1.4}
+  .pv-placeholder h4{margin:0 0 8px;font-size:16px;font-weight:800;color:var(--ink)}
+  .pv-placeholder .lede{font-size:12.5px;line-height:1.65;color:var(--muted);margin:0 auto 18px;max-width:320px}
+  .pv-point{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:800;color:var(--accent-ink);
+    background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:999px;padding:8px 15px}
+  .pv-point .ic{width:16px;height:16px;color:var(--accent-ink)}
   .welcome{max-width:640px;width:100%}
   .empty .glyph{width:52px;height:52px;margin:0 auto 14px;border-radius:15px;background:linear-gradient(150deg,var(--accent),var(--accent-deep));color:#fff;display:grid;place-items:center;box-shadow:var(--shadow-sm)}
   .empty .glyph .ic{width:26px;height:26px;stroke:#fff}
@@ -287,14 +294,14 @@
       <div class="tabpane active" data-pane="src">
         <div class="onboard" id="onboard">
           <div class="ob-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5.5A2 2 0 0 1 6 4h5v15H6a2 2 0 0 0-2 1.5zM20 5.5A2 2 0 0 0 18 4h-5v15h5a2 2 0 0 1 2 1.5z"/></svg></div>
-          <h3>יוצרים לומדה חדשה</h3>
-          <p>הכלי הופך תוכן שנכתב בעזרת AI ללומדה אינטראקטיבית — עם שאלות, מילון ומדיה — ומייצא אתר עצמאי או חבילת SCORM.</p>
+          <h3>מתחילים כאן — יוצרים לומדה</h3>
+          <p>מזינים ל-AI את חומרי הלמידה שכבר יש לכם, וה-AI בונה מהם לומדה אינטראקטיבית — עם שאלות, מילון ומדיה. הכלי מרכיב ומייצא אתר עצמאי או חבילת SCORM.</p>
           <div class="ob-actions">
             <button type="button" class="btn primary" id="obExample"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L18.7 9l-4.9 1.8L12 15.7 10.2 10.8 5.3 9l4.9-1.1z"/></svg>טען דוגמה מלאה</button>
             <button type="button" class="btn accent" id="obPrompt"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתק פרומפט ל-AI</button>
           </div>
           <ol class="ob-steps">
-            <li>מעתיקים את הפרומפט ומדביקים ב-ChatGPT / Claude — ה-AI ישאל אתכם כמה שאלות, ואז יכתוב את הלומדה.</li>
+            <li>מעתיקים את הפרומפט ומדביקים ב-ChatGPT / Claude — ה-AI יבקש מכם את חומרי הלמידה שלכם, ישאל כמה שאלות, ואז יבנה מהחומר את הלומדה.</li>
             <li>מדביקים כאן את הטקסט שהתקבל — ואפשר להפעיל "תצוגה מקדימה" כדי לראות את הלומדה מתעדכנת.</li>
             <li>מעצבים מיתוג ומייצאים — אתר עצמאי או SCORM ל-Moodle.</li>
           </ol>
@@ -390,13 +397,7 @@
                   <option value="large">גדול</option>
                 </select></div>
               </div>
-              <div class="field" style="margin-top:10px"><label>טעינת פונט בתוצר המיוצא</label>
-                <div class="segchoice" id="fontModeSel">
-                  <button type="button" data-v="google" class="active">Google Fonts</button>
-                  <button type="button" data-v="system">מערכת · אופליין</button>
-                </div>
-              </div>
-              <div class="hint" style="margin-top:8px">הלומד/ת יוכל/תוכל גם לכוונן את הגודל בעצמו/ה בתוך הקורא (A− / A+). במצב <b>מערכת</b> התוצר לא טוען פונטים מהאינטרנט — מתאים לאירוח סגור/אופליין.</div>
+              <div class="hint" style="margin-top:8px">הלומד/ת יוכל/תוכל גם לכוונן את הגודל בעצמו/ה בתוך הקורא (A− / A+). התוצר המיוצא אינו טוען פונטים מהאינטרנט — מתאים לאירוח סגור/אופליין וב-Moodle.</div>
             </div>
             <div>
               <div class="subhead"><svg class="ic sm" viewBox="0 0 24 24"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg>כותרת משנה ומחבר (לדף השער)</div>
@@ -419,8 +420,8 @@
           </div>
           <div class="steps">
             <div class="step"><div class="n"></div><div class="b"><b>מעתיקים ומדביקים</b><p>מעתיקים את הפרומפט שלמעלה ומדביקים ב-ChatGPT או Claude.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>עונים לשאלות</b><p>ה-AI ישאל אתכם כמה שאלות קצרות — נושא, קהל יעד, אורך, טון, ואילו קבצי מדיה יש לכם. פשוט עונים.</p></div></div>
-            <div class="step"><div class="n"></div><div class="b"><b>מקבלים את הלומדה</b><p>ה-AI כותב את הלומדה המלאה בפורמט. מעתיקים את כל הטקסט שהתקבל.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>מספקים את החומר ועונים לשאלות</b><p>ה-AI יבקש קודם את חומרי הלמידה שלכם (סיכומים, מאמרים, מצגות, מקורות) — מדביקים או מצרפים. אחר כך ישאל כמה שאלות קצרות: מטרה, קהל יעד, אורך, טון וקבצי מדיה.</p></div></div>
+            <div class="step"><div class="n"></div><div class="b"><b>מקבלים את הלומדה</b><p>ה-AI בונה מהחומר שלכם את הלומדה המלאה בפורמט. מעתיקים את כל הטקסט שהתקבל.</p></div></div>
           </div>
         </div>
 
@@ -437,7 +438,7 @@
 
     <div class="previewWrap">
       <div class="pvbar">
-        <span class="lbl"><span class="pvdot"></span>תצוגה מקדימה — קורא הספר</span>
+        <span class="lbl"><span class="pvdot"></span>תצוגה מקדימה — כך רואה הלומד/ת</span>
         <div class="grow"></div>
         <button class="btn sm ghost" id="btnOpenTab"><svg class="ic sm" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg>פתח בכרטיסייה</button>
         <button class="btn sm ghost" id="btnReload"><svg class="ic sm" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-.9 4.5"/><path d="M20 4v5h-5"/></svg>רענן</button>
@@ -445,13 +446,11 @@
       </div>
       <iframe id="pv" title="תצוגה מקדימה"></iframe>
       <div class="empty" id="pvEmpty">
-        <div class="welcome welcome-min">
-          <div class="glyph"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5.5A2 2 0 0 1 6 4h5v15H6a2 2 0 0 0-2 1.5zM20 5.5A2 2 0 0 0 18 4h-5v15h5a2 2 0 0 1 2 1.5z"/></svg></div>
-          <h4>התצוגה המקדימה תופיע כאן</h4>
-          <div class="lede">הדביקו תוכן בלשונית <b>"מקור"</b> כדי לראות את הלומדה מתעדכנת. עדיין אין תוכן? התחילו מ<b>"טען דוגמה מלאה"</b>.</div>
-          <div class="cta-row">
-            <button class="btn primary" id="ctaExample"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L18.7 9l-4.9 1.8L12 15.7 10.2 10.8 5.3 9l4.9-1.1z"/></svg>טען דוגמה מלאה</button>
-          </div>
+        <div class="pv-placeholder">
+          <div class="pv-screen"><svg class="ic" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8.5 20h7M12 17v3"/></svg></div>
+          <h4>מסך התוצאה</h4>
+          <div class="lede">כאן תופיע הלומדה — בדיוק כפי שהלומד/ת יראה/תראה אותה. המסך יתמלא ברגע שיהיה תוכן.</div>
+          <div class="pv-point"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h13M12 6l6 6-6 6"/></svg>מתחילים בצד העריכה שמימין</div>
         </div>
       </div>
     </div>
@@ -465,20 +464,29 @@
 /* ============================================================
    הפרומפט המלא — משודרג לעיצוב פדגוגי ולתוכן רחב
    ============================================================ */
-const PROMPT_TEXT = `אתה מעצב/ת למידה (Instructional Designer) מנוסה. תפקידך לבנות לומדה אינטראקטיבית אפקטיבית: להחליט מה ללמד, באיזה סדר, מתי לבדוק הבנה ומתי להעמיק. בסוף התהליך תכתוב את כל הלומדה בפורמט המוגדר בלבד, בלי טקסט מחוץ לפורמט.
+const PROMPT_TEXT = `אתה מעצב/ת למידה (Instructional Designer) מנוסה. תפקידך להפוך את חומרי הלמידה שאני אספק לך ללומדה אינטראקטיבית אפקטיבית — להחליט מה ללמד מתוך החומר שלי, באיזה סדר, מתי לבדוק הבנה ומתי להעמיק. אתה בונה את הלומדה מהתוכן שלי, לא ממציא תוכן חדש. בסוף התהליך תכתוב את כל הלומדה בפורמט המוגדר בלבד, בלי טקסט מחוץ לפורמט.
 
 ═══════════════════════════════════
-איך נעבוד — קודם תשאל אותי, ורק אחר כך תכתוב
+שלב ראשון והכרחי — בקש ממני את חומרי הלמידה
 ═══════════════════════════════════
-אל תתחיל לכתוב את הלומדה מיד. קודם ראיין אותי בקצרה כדי להבין מה צריך: שאל כמה שאלות בכל פעם (לא הכול בבת אחת), חכה לתשובות, והמשך עד שיש לך תמונה ברורה. כדאי לכסות:
-• נושא הלומדה ומטרתה
+אל תתחיל לכתוב את הלומדה, ואל תמציא תוכן. הדבר הראשון שתעשה: בקש ממני להדביק או לצרף את החומרים שכבר יש לי — סיכומים, מאמרים, מצגות, דפי מקורות, הנחיות, או כל טקסט שאני רוצה שהלומדה תתבסס עליו. חכה שאמסור את החומר לפני שתמשיך.
+
+כללי עבודה עם החומר שלי:
+• בסס את הלומדה אך ורק על החומרים שמסרתי. מותר לך לארגן מחדש, לפשט, לקצר, להוסיף דוגמאות קרובות ולהוסיף פדגוגיה (שאלות, מילון, מבנה) — אך לא להוסיף עובדות או טענות שאינן בחומר.
+• אם החומר חלקי, דל או חסר לנושא מסוים — עצור ובקש ממני עוד חומר, במקום להשלים מהידע שלך.
+• אם אין לי חומר מוכן — הצע לי לנסח יחד את הנקודות המרכזיות, ואשר איתי כל נקודה לפני שתכתוב.
+
+═══════════════════════════════════
+שלב שני — ראיין אותי בקצרה
+═══════════════════════════════════
+אחרי שקיבלת את החומר, שאל כמה שאלות בכל פעם (לא הכול בבת אחת), חכה לתשובות, והמשך עד שיש לך תמונה ברורה. כדאי לכסות:
+• מטרת הלומדה — מה הלומד/ת אמור/ה לדעת או לעשות בסוף
 • קהל היעד (גיל / רקע / ידע קודם)
 • אורך רצוי (מספר עמודים משוער — ברירת מחדל: 15)
 • טון וסגנון (למשל ענייני, ידידותי, אקדמי)
-• חומר גלם — בקש ממני להדביק סיכומים / נקודות / מקורות לכיסוי (אם יש)
 • קבצי מדיה — שאל אילו קבצי תמונה/וידאו יש לי ומה השמות המדויקים (או שאין)
 
-כשיש לך מספיק מידע, הצג לי בשורות קצרות מתאר עמודים לאישור. אחרי שאאשר — כתוב את הלומדה המלאה בפורמט שלמטה, ורק אותה. (אם התשובה ארוכה ונקטעת — המשך מעצמך באותו פורמט.)
+כשיש לך מספיק מידע, הצג לי בשורות קצרות מתאר עמודים לאישור — מבוסס על החומר שלי. אחרי שאאשר — כתוב את הלומדה המלאה בפורמט שלמטה, ורק אותה. (אם התשובה ארוכה ונקטעת — המשך מעצמך באותו פורמט.)
 
 ═══════════════════════════════════
 עקרונות עיצוב הלמידה (חשובים לא פחות מהתחביר)
@@ -581,7 +589,7 @@ EXPLAIN: אידוי הוא המעבר ממצב נוזלי לגזי בהשפעת 
 ═══════════════════════════════════
 מתחילים
 ═══════════════════════════════════
-התחל עכשיו בשאלות אליי — אל תכתוב את הלומדה עד שאישרתי את המתאר. כשתכתוב, הקפד על הפורמט שלמעלה בלבד, והשתמש רק בשמות קבצי המדיה שמסרתי לך (בלי להמציא קבצים).`;
+התחל עכשיו — בקש ממני קודם כול את חומרי הלמידה שברשותי. אל תכתוב את הלומדה עד שקיבלת את החומר ואישרתי את המתאר. כשתכתוב, בסס את התוכן על החומר שלי בלבד (בלי להוסיף עובדות שאינן בו), הקפד על הפורמט שלמעלה בלבד, והשתמש רק בשמות קבצי המדיה שמסרתי לך (בלי להמציא קבצים).`;
 
 /* ============================================================
    ספר לדוגמה מובנה
@@ -754,10 +762,10 @@ const THEME_PRESETS = [
 ];
 
 const FONT_MAP = {
-  'Assistant':        {stack:"'Assistant',system-ui,'Segoe UI',Arial,sans-serif", google:'Assistant:wght@400;500;600;700;800'},
-  'Heebo':            {stack:"'Heebo',system-ui,Arial,sans-serif",                google:'Heebo:wght@400;500;700;800'},
-  'Rubik':            {stack:"'Rubik',system-ui,Arial,sans-serif",                google:'Rubik:wght@400;500;600;700;800'},
-  'Noto Sans Hebrew': {stack:"'Noto Sans Hebrew',system-ui,Arial,sans-serif",     google:'Noto+Sans+Hebrew:wght@400;500;700;800'}
+  'Assistant':        {stack:"'Assistant',system-ui,'Segoe UI',Arial,sans-serif"},
+  'Heebo':            {stack:"'Heebo',system-ui,Arial,sans-serif"},
+  'Rubik':            {stack:"'Rubik',system-ui,Arial,sans-serif"},
+  'Noto Sans Hebrew': {stack:"'Noto Sans Hebrew',system-ui,Arial,sans-serif"}
 };
 
 /* ============================================================
@@ -768,7 +776,7 @@ function parseBook(text){
   const raw = String(text||'').replace(/\r\n?/g,'\n');
   const lines = raw.split('\n');
   let i = 0;
-  const book = { title:'', subtitle:'', author:'', pass:70, accent:'', accent2:'', font:'', fontMode:'', size:'', surface:'', logo:'', cover:'', glossary:[], pages:[] };
+  const book = { title:'', subtitle:'', author:'', pass:70, accent:'', accent2:'', font:'', size:'', surface:'', logo:'', cover:'', glossary:[], pages:[] };
   let passSeen=false, titleSeen=false;
 
   const isPageStart = s => /^#\s+/.test(s) && !/^##/.test(s);
@@ -796,7 +804,6 @@ function parseBook(text){
     if (/^AUTHOR:/i.test(t)){ book.author = t.replace(/^AUTHOR:/i,'').trim(); i++; continue; }
     if (/^ACCENT2:/i.test(t)){ book.accent2 = t.replace(/^ACCENT2:/i,'').trim(); i++; continue; }
     if (/^ACCENT:/i.test(t)){ book.accent = t.replace(/^ACCENT:/i,'').trim(); i++; continue; }
-    if (/^FONTMODE:/i.test(t)){ book.fontMode = t.replace(/^FONTMODE:/i,'').trim().toLowerCase(); i++; continue; }
     if (/^FONT:/i.test(t)){ book.font = t.replace(/^FONT:/i,'').trim(); i++; continue; }
     if (/^SIZE:/i.test(t)){ book.size = t.replace(/^SIZE:/i,'').trim().toLowerCase(); i++; continue; }
     if (/^SURFACE:/i.test(t)){ book.surface = t.replace(/^SURFACE:/i,'').trim().toLowerCase(); i++; continue; }
@@ -1376,15 +1383,13 @@ function accentVars(hex){
   return { accent:a, ink:mixHex(a,'#000',0.14), deep:mixHex(a,'#000',0.34), soft:mixHex(a,'#fff',0.90), softer:mixHex(a,'#fff',0.955), line:mixHex(a,'#fff',0.78) };
 }
 
-const SYSTEM_FONT_STACK = "system-ui,'Segoe UI',Arial,'Noto Sans Hebrew','Assistant',sans-serif";
 function buildReaderDoc(model, opts){
   opts = opts||{};
   const cfg = { mode: opts.mode||'standalone' };
   if (typeof opts.initPage === 'number') cfg.initPage = opts.initPage;
   const assets = opts.assets||{};
-  const offlineFont = (model.fontMode||'').toLowerCase()==='system';
   const font = FONT_MAP[model.font] || FONT_MAP['Assistant'];
-  const fontStack = offlineFont ? SYSTEM_FONT_STACK : font.stack;
+  const fontStack = font.stack;
   const av = accentVars(model.accent);
   const accent2 = isValidHex(model.accent2) ? (model.accent2[0]==='#'?model.accent2:'#'+model.accent2) : av.deep;
   const SIZE_MAP = { compact:0.92, normal:1, large:1.12 };
@@ -1395,15 +1400,11 @@ function buildReaderDoc(model, opts){
     slate:{bg:'#eceff4',panel:'#ffffff',topbar:'rgba(236,239,244,.92)'}
   };
   const sf = SURFACES[model.surface] || SURFACES.light;
-  const fontHref = 'https://fonts.googleapis.com/css2?family='+font.google+'&display=swap';
-  const fontLink = offlineFont ? '' :
-    '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'+
-    '<link rel="stylesheet" media="print" onload="this.media=\'all\'" href="'+fontHref+'"><noscript><link rel="stylesheet" href="'+fontHref+'"></noscript>';
   const dynStyle = ':root{--font:'+fontStack+';--accent:'+av.accent+';--accent-ink:'+av.ink+';--accent-deep:'+av.deep+';--accent-soft:'+av.soft+';--accent-softer:'+av.softer+';--accent-line:'+av.line+';--accent2:'+accent2+';--fs-base:'+fs+';--bg:'+sf.bg+';--panel:'+sf.panel+';--topbar-bg:'+sf.topbar+';--shadow-lg:0 20px 50px rgba(16,24,40,.2)}';
   const data = '<script>window.__BOOK__='+JSON.stringify(model)+';window.__CFG__='+JSON.stringify(cfg)+';window.__ASSETS__='+JSON.stringify(assets)+';<\/script>';
   const run = '<script>('+READER_MAIN.toString()+')();<\/script>';
   return '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">'+
-    '<title>'+escHtml(model.title||'ספר לימוד דיגיטלי')+'</title>'+fontLink+'<style>'+READER_CSS+'</style><style>'+dynStyle+'</style></head><body>'+data+run+'</body></html>';
+    '<title>'+escHtml(model.title||'ספר לימוד דיגיטלי')+'</title><style>'+READER_CSS+'</style><style>'+dynStyle+'</style></head><body>'+data+run+'</body></html>';
 }
 
 /* ============================================================
@@ -1421,7 +1422,7 @@ function currentAssetMap(){ const m={}; for(const k in state.assets) m[k]=state.
 
 /* תצוגה מקדימה יציבה — עדכון חי בלי טעינה מחדש של המסגרת */
 let pvReady=false, pvSig=null, previewPage=-1;
-function chromeSig(m){ return [m.font||'',m.fontMode||'',m.accent||'',m.accent2||'',m.size||'',m.surface||'',m.logo||''].join('|'); }
+function chromeSig(m){ return [m.font||'',m.accent||'',m.accent2||'',m.size||'',m.surface||'',m.logo||''].join('|'); }
 function rebuildPreview(model,sig){ pvReady=false; pvSig=sig; pvEl.srcdoc=buildReaderDoc(model,{mode:'preview',assets:currentAssetMap(),initPage:previewPage}); }
 function updatePreview(model){
   const sig=chromeSig(model);
@@ -1457,7 +1458,6 @@ function renderAll(){
   if(model.font && FONT_MAP[model.font]) $('#fontSel').value=model.font;
   $('#sizeSel').value = ['compact','normal','large'].includes(model.size) ? model.size : 'normal';
   syncSurfaceUI(model.surface||'light');
-  syncFontModeUI(model.fontMode||'google');
   syncAccentUI(model.accent||'#1d4ed8');
   syncLogoUI(model);
 
@@ -1608,10 +1608,6 @@ function syncSurfaceUI(surface){
   const v=['light','warm','slate'].includes(surface)?surface:'light';
   document.querySelectorAll('#surfaceSel button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
 }
-function syncFontModeUI(mode){
-  const v=mode==='system'?'system':'google';
-  document.querySelectorAll('#fontModeSel button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
-}
 function syncLogoUI(model){
   const box=$('#logoBox'), rm=$('#btnLogoRemove');
   const bn=model.logo?baseName(model.logo):''; const a=bn?state.assets[bn]:null;
@@ -1643,7 +1639,6 @@ $('#fontSel').addEventListener('change',e=>setMeta('FONT',e.target.value));
 $('#sizeSel').addEventListener('change',e=>setMeta('SIZE',e.target.value));
 $('#accentPick').addEventListener('input',e=>{ setMeta('ACCENT2',''); setMeta('ACCENT',e.target.value); });
 document.querySelectorAll('#surfaceSel button').forEach(b=>b.addEventListener('click',()=>setMeta('SURFACE',b.dataset.v)));
-document.querySelectorAll('#fontModeSel button').forEach(b=>b.addEventListener('click',()=>setMeta('FONTMODE', b.dataset.v==='system'?'system':'')));
 srcEl.addEventListener('input',scheduleRender);
 
 /* ---------- סרגל הוספת תחביר ---------- */
@@ -1709,7 +1704,6 @@ function loadExample(){
   state.assetsChosen=true; srcEl.value=EXAMPLE_TEXT; setPreview(true); renderAll();
   toast('ספר הדוגמה נטען — נסו לנווט, ללחוץ על מונחים ולענות על השאלות');
 }
-$('#ctaExample').addEventListener('click',loadExample);
 $('#obExample').addEventListener('click',loadExample);
 
 /* ---------- מצב כהה ---------- */
