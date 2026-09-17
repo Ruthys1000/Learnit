@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>עורך ספר לימוד</title>
+<style>
+  :root{
+    --bg:#eef2f9; --panel:#ffffff; --ink:#16202e; --muted:#5b6779; --line:#dbe3ef;
+    --brand:#2563eb; --brand-soft:#e8f1ff; --brand-ink:#1d4ed8; --danger:#dc2626;
+    --shadow:0 16px 40px rgba(20,30,55,.12); --radius:16px;
+  }
+  :root[data-theme="dark"]{
+    --bg:#0d1320; --panel:#141c2b; --ink:#e9eefb; --muted:#9aa7bd; --line:#28344a;
+    --brand:#4f8cff; --brand-soft:#182339; --brand-ink:#8fb6ff; --danger:#f87171;
+    --shadow:0 16px 40px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font,'Heebo','Assistant',Arial,sans-serif);
+    line-height:1.5;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  .top{display:flex;align-items:center;gap:10px;padding:11px 18px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:16px}
+  .logo .m{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand),#7c3aed);color:#fff;font-size:18px}
+  .grow{flex:1}
+  .btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:8px 14px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:transform .12s,border-color .2s}
+  .btn:hover{transform:translateY(-1px);border-color:var(--brand)}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.icon{padding:8px;width:38px;height:38px;justify-content:center}
+  .btn.wide{width:100%;justify-content:center;margin-top:6px}
+  .btn.sm{padding:5px 9px;font-size:12px}
+  label.filebtn{position:relative;overflow:hidden}
+  label.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+  .main{flex:1;display:grid;grid-template-columns:520px 1fr;min-height:0}
+  .panel{overflow:auto;padding:16px;border-inline-end:1px solid var(--line);background:var(--bg)}
+  .previewWrap{display:flex;flex-direction:column;min-width:0;background:var(--bg)}
+  .pvbar{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .pvbar .lbl{font-weight:800;font-size:13px;color:var(--muted)}
+  .pvNow{font-weight:800;font-size:12px;color:var(--brand-ink);background:var(--brand-soft);border:1px solid var(--line);
+    border-radius:999px;padding:4px 11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pvNow:empty{display:none}
+  iframe#pv{flex:1;width:100%;border:0;background:#fff}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
+  .cardTitle{padding:12px 14px;font-weight:900;font-size:14px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .cardBody{padding:14px;display:grid;gap:11px}
+  .secTitle{font-weight:900;font-size:13px;color:var(--muted);margin:6px 2px 10px}
+  .hint{font-size:12px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 11px;margin-bottom:12px;line-height:1.6}
+
+  .field{display:grid;gap:5px}
+  .field label{font-size:12px;color:var(--muted);font-weight:800}
+  /* small section heading inside a settings card (e.g. the colors group) */
+  .secHead{font-size:13px;font-weight:900;color:var(--ink);margin:4px 0 2px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+  .field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 11px;color:var(--ink);background:var(--bg);outline:none;font-size:15px;font-family:inherit}
+  /* checkboxes/radios must NOT stretch to full width like text fields (RTL: keeps them snug beside their label) */
+  .field input[type=checkbox],.field input[type=radio]{width:auto;flex:0 0 auto;padding:0;margin:0;accent-color:var(--brand)}
+  .field textarea{min-height:92px;resize:vertical}
+  .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--brand)}
+
+  .pageCard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+  .pageHead{display:flex;align-items:center;gap:8px;padding:10px;border-bottom:1px solid var(--line)}
+  .pageNum{width:28px;height:28px;border-radius:8px;background:var(--brand-soft);color:var(--brand-ink);display:grid;place-items:center;font-weight:900;font-size:13px;flex:0 0 auto}
+  .pageTitle{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg);color:var(--ink);font-weight:800;font-size:14px;font-family:inherit;outline:none}
+  .pageMeta{flex:0 0 auto;font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap}
+  .pageCard:not(.collapsed) .pageMeta{color:var(--brand-ink)}
+  .pageTitle:focus{border-color:var(--brand)}
+  .ops{display:flex;gap:3px;flex:0 0 auto}
+  .grip{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:7px;color:var(--muted);cursor:grab;touch-action:none;border:1px solid var(--line);background:var(--panel)}
+  .grip:hover{color:var(--brand);border-color:var(--brand);background:var(--brand-soft)}
+  .grip:active{cursor:grabbing}
+  .blk.dragover,.pageCard.dragover{outline:2px dashed var(--brand);outline-offset:2px}
+  .blk[draggable],.pageCard.dragging{opacity:.6}
+  .opb{border:1px solid var(--line);background:var(--bg);border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:13px;display:grid;place-items:center;color:var(--ink)}
+  .opb:hover{border-color:var(--brand)}.opb.del:hover{border-color:var(--danger);color:var(--danger)}
+  .blocks{padding:10px;display:grid;gap:10px}
+  .empty{color:var(--muted);font-size:13px;text-align:center;padding:8px}
+  .blk{border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow:hidden}
+  /* brief highlight when jumping to a block from the live preview */
+  .blk.flash{animation:blkFlash 1.5s ease-out}
+  @keyframes blkFlash{0%{box-shadow:0 0 0 3px var(--brand)}60%{box-shadow:0 0 0 3px var(--brand)}100%{box-shadow:0 0 0 0 transparent}}
+  .blkTop{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .tsel{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--bg);color:var(--ink);font-weight:800;font-size:12px;font-family:inherit}
+  .blkFields{padding:10px;display:grid;gap:9px}
+  .addBlk{padding:0 10px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+  .chip{border:1px dashed var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  .chip:hover{border-color:var(--brand);border-style:solid}
+  .mkbar{display:flex;gap:5px}
+  .mkbar button{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:4px 9px;font-size:12px;font-weight:800;cursor:pointer;color:var(--ink);font-family:inherit}
+  .mkbar button:hover{background:var(--bg)}
+  /* rich-text editor (WYSIWYG) for text blocks */
+  .rte{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg)}
+  .rteBar{display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:6px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .rteBtn{border:1px solid var(--line);background:var(--bg);border-radius:7px;min-width:28px;height:28px;padding:0 6px;font-size:13px;font-weight:800;cursor:pointer;color:var(--ink);font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:3px;position:relative}
+  .rteBtn:hover{border-color:var(--brand)}
+  .rteBtn.active{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-ink)}
+  .rteColorLbl{overflow:hidden}
+  .rteColorLbl .bar{position:absolute;bottom:2px;inset-inline:4px;height:3px;border-radius:2px}
+  .rteColorLbl input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .rteSel{border:1px solid var(--line);background:var(--bg);border-radius:7px;height:28px;padding:0 4px;font-size:12px;font-weight:800;cursor:pointer;color:var(--ink);font-family:inherit}
+  .rteSep{width:1px;height:20px;background:var(--line);margin:0 3px}
+  /* base font-size MUST match the reader body/.tbText base (17px) so em-based inline sizes render the
+     same in the editor as in the preview/export — otherwise a chosen size "changes" between contexts */
+  .rteInput{min-height:92px;padding:10px 11px;font-size:17px;color:var(--ink);background:var(--bg);outline:none;line-height:1.65;font-family:var(--font,'Heebo','Assistant',Arial,sans-serif)}
+  .rteInput:focus{background:var(--panel)}
+  .rteInput:empty:before{content:attr(data-ph);color:var(--muted)}
+  .rteInput ul,.rteInput ol{padding-inline-start:22px;margin:4px 0}
+  .rteInput a{color:var(--brand-ink)}
+  /* alignment / side button rows + width slider */
+  .alnRow{display:flex;gap:6px;flex-wrap:wrap}
+  .opb.active,.alnBtn.active{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-ink)}
+  .alnBtn{min-width:auto;padding:0 12px;font-size:12px;font-weight:800}
+  .wSlider{width:100%;accent-color:var(--brand);cursor:pointer}
+  /* home-page section manager */
+  .hsList{display:grid;gap:6px;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--bg)}
+  .hsRow{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  .hsName{flex:1;font-weight:800;font-size:13px}
+  .hsVis{width:auto;padding:0 10px;font-size:11px;font-weight:800}
+  .hsCover{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:800;margin-top:8px;cursor:pointer}
+  .reorderHint{font-size:12px;color:var(--muted);font-weight:700}
+  /* quiz option editor */
+  .qOpts{display:grid;gap:8px}
+  .qOpt{display:flex;align-items:center;gap:6px}
+  .qOptText{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg);color:var(--ink);font-size:14px;font-family:inherit;outline:none}
+  .qOptText:focus{border-color:var(--brand)}
+  .qOptText[readonly]{background:var(--panel);color:var(--muted)}
+  .qCorrect{width:auto;padding:0 12px;font-size:11px;font-weight:800;white-space:nowrap;flex:0 0 auto}
+  .qCorrect.active{background:#16a34a;border-color:#16a34a;color:#fff}
+  /* table editor grid */
+  .tblEd{display:grid;gap:6px;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--bg);overflow-x:auto}
+  .tblEdRow{display:flex;gap:6px}
+  .tblEdCell{flex:1 1 90px;min-width:78px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:var(--panel);color:var(--ink);font-size:13px;font-family:inherit;outline:none}
+  .tblEdCell:focus{border-color:var(--brand)}
+  .tblEdCell.head{font-weight:900;background:var(--brand-soft);color:var(--brand-ink)}
+  .tblEdBar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+  /* per-cell wrapper: small icon button + the text input */
+  .tblEdCellWrap{flex:1 1 90px;min-width:78px;display:flex;align-items:stretch;gap:3px}
+  .tblEdCellWrap .tblEdCell{flex:1 1 auto;min-width:0}
+  .tblCellIcoBtn{flex:0 0 auto;width:26px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--muted);cursor:pointer;display:grid;place-items:center;padding:0}
+  .tblCellIcoBtn:hover{border-color:var(--brand);color:var(--brand)}
+  .tblCellIcoBtn.has{color:var(--brand-ink);border-color:var(--brand)}
+  .tblWidthRow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+  .tblWidthLbl{font-size:12px;color:var(--muted);font-weight:800}
+  .tblWidthIn{width:64px;border:1px solid var(--line);border-radius:8px;padding:5px 7px;background:var(--panel);color:var(--ink);font-size:12px;font-family:inherit;outline:none}
+  .tblWidthIn:focus{border-color:var(--brand)}
+  /* callout variant picker — color is shown via .cvarDot (defined near the icon-picker styles) */
+  /* visual add-block menu */
+  .addMenu>summary{list-style:none;display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+    border:1px dashed var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 13px;font-size:12px;font-weight:800}
+  .addMenu>summary::-webkit-details-marker{display:none}
+  .addMenu>summary:hover{border-color:var(--brand);border-style:solid}
+  .addMenu[open]>summary{border-style:solid;border-color:var(--brand);background:var(--brand-soft);color:var(--brand-ink)}
+  .addMenuPanel{margin-top:8px;border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:11px;display:grid;gap:11px}
+  .addGroup{display:grid;gap:6px}
+  .addGroupTitle{font-size:11px;font-weight:900;color:var(--muted);letter-spacing:.02em}
+  .addOpts{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:6px}
+  .addOpt{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--bg);border-radius:9px;
+    padding:8px 10px;font-size:12.5px;font-weight:800;color:var(--ink);cursor:pointer;font-family:inherit;text-align:start}
+  .addOpt:hover{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-ink)}
+  .addOpt .ic{color:var(--brand-ink);flex:0 0 auto}
+  .addOpt:hover .ic{color:inherit}
+
+  /* quick-jump bar */
+  .jumpBar{position:sticky;top:-16px;z-index:5;margin:-4px -4px 12px;padding:9px 4px;background:var(--bg);
+    display:flex;flex-wrap:wrap;gap:6px;align-items:center;border-bottom:1px solid var(--line)}
+  .jumpBar .lbl{font-size:12px;font-weight:800;color:var(--muted);margin-inline-end:2px}
+  .jumpChip{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;
+    min-width:30px;height:30px;padding:0 10px;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit}
+  .jumpChip:hover{border-color:var(--brand)}
+  .jumpChip.active{background:var(--brand);border-color:var(--brand);color:#fff}
+  /* accordion */
+  .pageHead{cursor:pointer}
+  .pageCaret{flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;color:var(--muted);
+    font-size:12px;transition:transform .18s}
+  .pageCard.collapsed .pageCaret{transform:rotate(-90deg)}
+  .pageCard.collapsed .blocks,.pageCard.collapsed .addBlk{display:none}
+  /* palette + size */
+  .palRow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .swatch{width:30px;height:30px;border-radius:9px;border:2px solid var(--line);cursor:pointer;padding:0}
+  .swatch.active{border-color:var(--ink);box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--brand)}
+  .swatch.pick{display:grid;place-items:center;background:var(--panel);position:relative;color:var(--muted)}
+  .cpick{width:0;height:0;opacity:0;position:absolute;inset:auto}
+  /* background-preset picker — each button previews the reader background, tinted from --brand */
+  .bgRow{display:flex;flex-wrap:wrap;gap:8px}
+  .bgvar{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);border-radius:11px;
+    padding:6px;background:var(--panel);cursor:pointer;font-family:inherit;width:64px}
+  .bgvar:hover{border-color:var(--brand)}
+  .bgvar.active{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}
+  .bgvarName{font-size:11px;font-weight:800;color:var(--muted)}
+  /* "same as book color" reset chip for the optional role-color rows */
+  .inheritBtn{border:1px dashed var(--line);border-radius:9px;background:var(--panel);color:var(--muted);cursor:pointer;
+    font-family:inherit;font-size:12px;font-weight:800;padding:6px 10px;min-height:30px}
+  .inheritBtn:hover{border-color:var(--brand);color:var(--brand)}
+  .inheritBtn.active{border-style:solid;border-color:var(--brand);color:var(--brand-ink);background:var(--brand-soft)}
+  /* icon-bank picker (inline grid for callouts, popover for table cells) */
+  .icoPick{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:9px;
+    background:var(--panel);color:var(--ink);cursor:pointer;padding:0;font-family:inherit;font-size:11px;font-weight:800}
+  .icoPick:hover{border-color:var(--brand);color:var(--brand)}
+  .icoPick.active{border-color:var(--brand);color:var(--brand-ink);background:var(--brand-soft);box-shadow:0 0 0 2px var(--brand-soft)}
+  .icoPickWide{grid-column:1/-1;width:auto;height:auto;padding:7px 10px}
+  /* icon-bank popover: scrollable grid so many icons fit without a huge inline block */
+  .icoPop{position:fixed;z-index:9999;display:grid;grid-template-columns:repeat(6,34px);gap:6px;padding:10px;
+    max-height:300px;overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+  /* the "choose icon" trigger button (shows current icon or "auto") */
+  .icoChooseBtn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;
+    background:var(--bg);color:var(--ink);cursor:pointer;font-family:inherit;font-size:13px;font-weight:800;padding:8px 12px}
+  .icoChooseBtn:hover{border-color:var(--brand)}
+  .icoChooseName{color:var(--ink)}
+  .icoChooseCaret{margin-inline-start:auto;color:var(--muted);display:inline-flex}
+  /* small colored dot in each callout-variant button, so the variant's color reads clearly + evenly */
+  .cvar{display:inline-flex;align-items:center;gap:7px}
+  .cvarDot{width:11px;height:11px;border-radius:50%;flex:0 0 auto;background:var(--cvardot,var(--muted))}
+  .cvar-tip .cvarDot{background:#2563eb}
+  .cvar-info .cvarDot{background:#0891b2}
+  .cvar-warning .cvarDot{background:#d97706}
+  .cvar-success .cvarDot{background:#16a34a}
+  .bgvar.active .bgvarName{color:var(--brand-ink)}
+  .bgvarSwatch{width:100%;height:34px;border-radius:7px;border:1px solid var(--line);background:var(--bg)}
+  .bg-soft .bgvarSwatch{background:linear-gradient(180deg,color-mix(in srgb,var(--brand) 22%,var(--bg)),var(--bg))}
+  .bg-glow .bgvarSwatch{background:radial-gradient(60px 28px at 50% -20%,color-mix(in srgb,var(--brand) 34%,var(--bg)),var(--bg))}
+  .bg-dots .bgvarSwatch{background-color:var(--bg);background-image:radial-gradient(color-mix(in srgb,var(--brand) 45%,transparent) 1.3px,transparent 1.5px);background-size:9px 9px}
+  .bg-grid .bgvarSwatch{background-color:var(--bg);background-image:linear-gradient(color-mix(in srgb,var(--brand) 28%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--brand) 28%,transparent) 1px,transparent 1px);background-size:10px 10px}
+  .ic{display:inline-block;vertical-align:middle;flex:0 0 auto}
+  .btn .ic,.opb .ic,.chip .ic,.upl .ic,.mkbar button .ic,.jumpChip .ic,.pageCaret .ic{color:inherit}
+  /* small upload button */
+  .upl{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:7px 10px;
+    font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:5px}
+  .upl:hover{border-color:var(--brand)}
+  .upl input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .uplNote{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+  .uplNote b{color:var(--ink)}
+  .saveStat{font-size:12px;font-weight:800;color:var(--muted);padding:0 6px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+  .saveStat.err{color:var(--danger)}
+  .folderInfo{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;color:var(--muted);
+    background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 11px;margin-top:8px}
+  .folderInfo b{color:var(--ink)}
+  .rowImgs{display:grid;gap:10px}
+  .rowImg{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:9px}
+  .rowImgHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .rowImgNum{width:22px;height:22px;border-radius:6px;background:var(--brand-soft);color:var(--brand-ink);
+    display:grid;place-items:center;font-weight:900;font-size:12px}
+  .toast{position:fixed;left:20px;bottom:20px;z-index:50;background:#111827;color:#fff;border-radius:12px;padding:11px 15px;font-size:13px;box-shadow:0 14px 34px rgba(0,0,0,.3);opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;max-width:min(420px,90vw)}
+  .toast.show{opacity:1;transform:translateY(0)}
+  /* persistent, actionable banner shown only while the autosave is failing */
+  .saveStat.err{cursor:pointer;text-decoration:underline}
+  .saveAlert{display:none;align-items:center;gap:12px;flex-wrap:wrap;padding:11px 18px;
+    background:#fdeaea;background:color-mix(in srgb,var(--danger) 12%,var(--panel));
+    border-bottom:1px solid var(--danger);color:var(--danger);font-size:13px;font-weight:800;line-height:1.5}
+  :root[data-theme="dark"] .saveAlert{background:#3a1620;background:color-mix(in srgb,var(--danger) 20%,var(--panel))}
+  .saveAlert.show{display:flex}
+  .saveAlert .grow{flex:1;min-width:140px}
+  .saveAlert .saBtn{border:1px solid var(--danger);background:var(--danger);color:#fff;border-radius:999px;
+    padding:7px 14px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;display:inline-flex;
+    align-items:center;gap:6px;white-space:nowrap}
+  .saveAlert .saBtn:hover{filter:brightness(1.06)}
+  /* first-run guided tour (coach marks) — self-contained, no libraries */
+  .tourOverlay{position:fixed;inset:0;z-index:1000}
+  .tourOverlay.centered{background:rgba(8,12,20,.55)}
+  .tourSpot{position:absolute;border-radius:12px;box-shadow:0 0 0 9999px rgba(8,12,20,.55);
+    border:2px solid var(--brand);pointer-events:none;transition:top .25s,left .25s,width .25s,height .25s}
+  .tourTip{position:absolute;width:340px;max-width:calc(100vw - 24px);background:var(--panel);color:var(--ink);
+    border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 16px 12px;z-index:1}
+  .tourTip .tTitle{font-weight:900;font-size:16px;margin-bottom:6px}
+  .tourTip .tText{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+  .tourTip .tBar{display:flex;align-items:center;gap:8px}
+  .tourTip .tCount{font-size:12px;font-weight:800;color:var(--muted)}
+  .tourTip .grow{flex:1}
+  .tBtn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;
+    padding:7px 14px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit}
+  .tBtn:hover{border-color:var(--brand)}
+  .tBtn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .tBtn.link{border:none;background:none;color:var(--muted);padding:7px 6px}
+  .tBtn.link:hover{color:var(--ink)}
+  @media(max-width:900px){.main{grid-template-columns:1fr}iframe#pv{min-height:60vh}}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="logo"><span class="m"><span data-eic="book" data-eic-size="18"></span></span> עורך ספר לימוד</div>
+    <button class="btn icon sm" id="undoBtn" onclick="undo()" title="ביטול (Ctrl+Z)" aria-label="ביטול" disabled></button>
+    <button class="btn icon sm" id="redoBtn" onclick="redo()" title="חזרה (Ctrl+Shift+Z)" aria-label="חזרה" disabled></button>
+    <div class="grow"></div>
+    <span id="saveStatus" class="saveStat ok" onclick="onSaveStatusClick()" title="נשמר אוטומטית בדפדפן">נשמר ✓</span>
+    <button class="btn primary" id="exportBtn" onclick="exportReader()"><span data-eic="download"></span> ייצוא textbook.html</button>
+    <button class="btn" onclick="exportScorm()" title="חבילת SCORM 1.2 ל-Moodle — עם ציון והתקדמות"><span data-eic="award"></span> ייצוא SCORM</button>
+    <button class="btn" onclick="saveProject()"><span data-eic="save"></span> שמירת פרויקט</button>
+    <label class="btn filebtn"><span data-eic="folder"></span> טעינת פרויקט / ספר<input type="file" accept=".json,.html,text/html,application/json" onchange="loadProject(event)"></label>
+    <button class="btn" onclick="resetBook()"><span data-eic="reset"></span> איפוס דוגמה</button>
+    <button class="btn icon" id="tourBtn" onclick="startTour()" title="הדרכה / סיור קצר" aria-label="הדרכה"><span data-eic="help"></span></button>
+    <button class="btn icon" id="edThemeBtn" onclick="toggleEditorTheme()" title="ערכת העורך"></button>
+  </div>
+
+  <div id="saveAlert" class="saveAlert" role="alert">
+    <span data-eic="info" data-eic-size="16"></span>
+    <span class="grow">השמירה האוטומטית בדפדפן נכשלה — קרוב לוודאי שהספר גדול מדי בגלל תמונות/וידאו מוטמעים. כדי לא לאבד את העבודה, שמרו את הפרויקט לקובץ עכשיו (וטענו אותו בחזרה בכניסה הבאה).</span>
+    <button class="saBtn" onclick="saveProject()"><span data-eic="save" data-eic-size="14"></span> שמירת פרויקט לקובץ</button>
+  </div>
+
+  <div class="main">
+    <aside class="panel">
+      <div class="hint"><span data-eic="info" data-eic-size="15"></span> <b>שיטת העבודה:</b> ריכזו את כל התמונות והסרטונים ב<b>תיקייה אחת</b> → לחצו «בחירת תיקיית חומרים» למטה → הפנו אליהם לפי <b>שם הקובץ</b> (למשל <code>שיעור1.png</code>) בעזרת ההשלמה האוטומטית, ותראו אותם מיד בתצוגה. בסיום: «ייצוא» ומעלים את <b>התיקייה כולה</b> ל-Moodle יחד עם הספר. (קובץ ה-HTML לבדו צריך את התיקייה לצידו כדי להציג תמונות.)<br><b>טיפ:</b> בבלוק «שאלה פתוחה» התלמידים כותבים תשובה חופשית, ובסיום הלומדה הם יכולים להוריד PDF עם כל התשובות שלהם.</div>
+      <div id="editor"></div>
+    </aside>
+    <section class="previewWrap">
+      <div class="pvbar">
+        <span class="lbl">תצוגה חיה</span>
+        <span class="pvNow" id="pvNow"></span>
+        <button class="btn sm" onclick="pvHome()"><span data-eic="home"></span> בית</button>
+        <button class="btn sm" onclick="pvIndex()"><span data-eic="list"></span> תוכן</button>
+        <button class="btn sm" onclick="pvDone()"><span data-eic="book2"></span> סיום</button>
+        <div class="grow"></div>
+        <button class="btn icon sm" id="pvThemeBtn" onclick="pvTheme()" title="ערכת הספר בתצוגה"></button>
+      </div>
+      <iframe id="pv" title="תצוגה מקדימה" allow="fullscreen"></iframe>
+    </section>
+  </div>
+  <div id="toast" class="toast"></div>
+
+<!-- ===== מקור הקורא (טקסט אינרטי) — משמש לתצוגה ולייצוא כאחד ===== -->
+<script type="text/plain" id="readerCss">
+  :root{
+    --bg:#eef2f9; --sheet:#ffffff; --ink:#16202e; --muted:#5b6779; --line:#dde5f0;
+    --brand:#2563eb; --brand-soft:#e8f1ff; --brand-ink:#1d4ed8;
+    --shadow:0 24px 60px rgba(20,30,55,.14); --radius:22px;
+    --book-w:1140px; --scroll-thumb:#9fb0c9;
+  }
+  :root[data-theme="dark"]{
+    --bg:#0d1320; --sheet:#151d2c; --ink:#e9eefb; --muted:#9aa7bd; --line:#28344a;
+    --brand:#4f8cff; --brand-soft:#182339; --brand-ink:#8fb6ff;
+    --shadow:0 24px 60px rgba(0,0,0,.5);
+    --scroll-thumb:#5a6b86;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  /* the off-canvas nav drawer is parked past the right edge; clip horizontal overflow so it
+     never adds a sideways scroll / clips the page on narrow screens (clip keeps sticky header + vertical scroll) */
+  html,body{overflow-x:hidden;overflow-x:clip}
+  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.65;
+    font-family:var(--font,'Heebo','Assistant',Arial,sans-serif);
+    display:flex;flex-direction:column;min-height:100vh;transition:background .25s,color .25s}
+  /* per-book background personalization — all tinted from the book's brand colour so each lesson
+     keeps its own identity while looking distinct. clean = the original flat look (default). */
+  :root[data-bg="clean"] body{background:var(--bg)}
+  :root[data-bg="soft"] body{background:linear-gradient(180deg,color-mix(in srgb,var(--brand) 9%,var(--bg)),var(--bg) 62%) fixed}
+  :root[data-bg="glow"] body{background:radial-gradient(1200px 520px at 50% -10%,color-mix(in srgb,var(--brand) 15%,var(--bg)),var(--bg) 68%) fixed}
+  :root[data-bg="dots"] body{background-color:var(--bg);
+    background-image:radial-gradient(color-mix(in srgb,var(--brand) 24%,transparent) 1.4px,transparent 1.6px);
+    background-size:22px 22px;background-position:center}
+  :root[data-bg="grid"] body{background-color:var(--bg);
+    background-image:linear-gradient(color-mix(in srgb,var(--brand) 13%,transparent) 1px,transparent 1px),
+      linear-gradient(90deg,color-mix(in srgb,var(--brand) 13%,transparent) 1px,transparent 1px);
+    background-size:27px 27px;background-position:center}
+  .topbar{position:sticky;top:0;z-index:20;background:var(--sheet);
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:14px;padding:12px 22px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:900;letter-spacing:-.02em;
+    cursor:pointer;border:0;background:none;color:inherit;font-size:17px;font-family:inherit}
+  .brand .mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--brand),#7c3aed);color:#fff;font-size:19px;flex:0 0 auto}
+  .brand small{display:block;font-weight:700;color:var(--muted);font-size:12px;margin-top:1px}
+  .spacer{flex:1}
+  .navbtn{border:1px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:999px;
+    padding:8px 15px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;display:inline-flex;
+    align-items:center;gap:7px;transition:transform .12s,border-color .2s}
+  .navbtn:hover{transform:translateY(-1px);border-color:var(--brand)}
+  .navbtn.icon{padding:8px;width:40px;height:40px;justify-content:center}
+  .progress{height:3px;background:var(--line)}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),#7c3aed);
+    transition:width .3s}
+  .stage{flex:1;display:flex;justify-content:center;align-items:flex-start;padding:26px 20px 40px}
+  .sheet{width:min(var(--book-w),100%);height:min(84vh,940px);background:var(--sheet);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+  .sheetHead{padding:26px 34px 18px;border-bottom:1px solid var(--line)}
+  .sheetHead .eyebrow{color:var(--brand-ink);font-weight:900;font-size:13px;letter-spacing:.02em}
+  .sheetHead h1{margin:6px 0 0;font-size:30px;letter-spacing:-.03em;line-height:1.15}
+  /* direction:ltr moves the scrollbar to the right edge in RTL; inner wrapper restores RTL text */
+  .sheetBody{flex:1;overflow-y:auto;overflow-x:hidden;padding:26px 34px 30px;scroll-behavior:smooth;
+    direction:ltr;scrollbar-width:thin;scrollbar-color:var(--scroll-thumb) transparent}
+  .sheetBody > .sheetInner{direction:rtl}
+  .sheetBody::-webkit-scrollbar{width:12px}
+  .sheetBody::-webkit-scrollbar-thumb{background:var(--scroll-thumb);border-radius:20px;border:3px solid var(--sheet);background-clip:padding-box}
+  .sheetBody::-webkit-scrollbar-thumb:hover{background:var(--brand);background-clip:padding-box}
+  .sheetFoot{border-top:1px solid var(--line);padding:14px 24px;display:flex;align-items:center;
+    justify-content:space-between;gap:12px;background:var(--bg)}
+  .counter{color:var(--muted);font-weight:800;font-size:13px}
+  .btn{border:1px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:999px;
+    padding:10px 20px;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit;display:inline-flex;
+    align-items:center;gap:8px;min-height:44px;transition:transform .12s,border-color .2s,opacity .2s}
+  .btn:hover{transform:translateY(-1px);border-color:var(--brand)}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 12px 26px rgba(37,99,235,.28)}
+  .btn:disabled{opacity:.38;cursor:not-allowed;transform:none}
+  .tbSub{font-size:20px;margin:26px 0 8px;letter-spacing:-.02em;color:var(--ink)}
+  .tbSub:first-child{margin-top:0}
+  .tbText{margin:0 0 15px;font-size:17px;color:var(--ink)}
+  .tbText a,.tbLink{color:var(--brand-ink);font-weight:800;text-decoration:none;border-bottom:2px solid var(--brand-soft)}
+  .tbText a:hover{border-color:var(--brand)}
+  .tbText ul,.tbText ol{margin:0 0 15px;padding-inline-start:26px}
+  .tbText li{margin:4px 0;font-size:17px}
+  .tbText ul{list-style:disc}.tbText ol{list-style:decimal}
+  /* rich-text inline formatting (color/size/underline/highlight) authored in the editor */
+  .tbText u{text-decoration:underline}
+  .tbText s,.tbText strike{text-decoration:line-through}
+  .tbText mark{border-radius:4px;padding:.02em .14em}
+  .tbText span{line-height:inherit}
+  figure{margin:18px 0}
+  .tbImg{max-width:100%;height:auto;border-radius:16px;display:block;box-shadow:0 12px 30px rgba(20,30,55,.14);border:1px solid var(--line);cursor:zoom-in}
+  /* row of 1–3 images */
+  .tbImgRow{display:grid;grid-template-columns:repeat(var(--cols,1),1fr);gap:14px;margin:18px 0;align-items:start}
+  .tbImgRow .tbRowCell{margin:0}
+  .tbImgRow .tbImg{width:100%;object-fit:cover}
+  @media(max-width:640px){.tbImgRow{grid-template-columns:1fr}}
+  /* image beside text (collapses to stacked on mobile) */
+  .tbSplit{display:flex;gap:22px;align-items:center;margin:18px 0;flex-wrap:wrap}
+  .tbSplit .tbSplitImg{flex:0 0 var(--imgw,45%);max-width:var(--imgw,45%);margin:0}
+  .tbSplit .tbSplitImg .tbImg{width:100%}
+  .tbSplit .tbSplitText{flex:1 1 240px;min-width:0}
+  .tbSplit .tbSplitText>*:first-child{margin-top:0}
+  .tbSplit .tbSplitText>*:last-child{margin-bottom:0}
+  .tbSplit[data-side="left"]{flex-direction:row-reverse}
+  @media(max-width:640px){.tbSplit,.tbSplit[data-side="left"]{flex-direction:column}.tbSplit .tbSplitImg{flex-basis:auto;max-width:100%;width:100%}}
+  /* knowledge-check (self-check question) */
+  .tbQuiz{border:1px solid var(--line);border-radius:16px;background:var(--bg);padding:18px 20px;margin:18px 0}
+  .tbQuizQ{font-weight:800;font-size:17px;margin-bottom:10px}
+  .tbQuizQ strong{font-weight:900}
+  .tbQuizHint{font-size:13px;color:var(--muted);margin-bottom:10px}
+  .tbOpenHint{font-size:15px;color:var(--muted);margin-bottom:12px;line-height:1.55}
+  .tbQuizOpts{display:grid;gap:9px;margin-bottom:14px}
+  .tbQuizOpt{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:var(--sheet);cursor:pointer;font-size:16px;transition:border-color .15s,background .15s}
+  .tbQuizOpt:hover{border-color:var(--brand)}
+  .tbQuizOpt input{margin-top:3px;accent-color:var(--brand);flex:0 0 auto;width:18px;height:18px;cursor:pointer}
+  .tbQuizOpt.ok{border-color:#16a34a;background:rgba(22,163,74,.12)}
+  .tbQuizOpt.bad{border-color:#dc2626;background:rgba(220,38,38,.10)}
+  .tbQuizBar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .tbQuizCheck{border:1px solid var(--brand);background:var(--brand);color:#fff;border-radius:999px;padding:10px 22px;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit;min-height:44px}
+  .tbQuizCheck:hover{filter:brightness(1.05)}
+  .tbQuizFb{font-weight:900;font-size:14px}
+  .tbQuizFb.ok{color:#16a34a}.tbQuizFb.bad{color:#dc2626}.tbQuizFb.warn{color:var(--muted)}
+  .tbQuizExplain{margin-top:14px;padding:12px 14px;border-inline-start:3px solid var(--brand);background:var(--brand-soft);border-radius:10px;font-size:15px;color:var(--ink)}
+  .tbQuiz input:disabled{opacity:1}
+  .tbQuizCheck:disabled{opacity:.5;cursor:default}
+  /* callout / note box */
+  .tbCallout{--cc:var(--brand);--ccbg:color-mix(in srgb,var(--brand) 11%,var(--sheet));
+    display:flex;gap:13px;align-items:flex-start;border:1px solid var(--line);border-inline-start:4px solid var(--cc);
+    background:var(--ccbg);border-radius:14px;padding:15px 17px;margin:18px 0}
+  .tbCallout-tip{--cc:#2563eb;--ccbg:color-mix(in srgb,#2563eb 11%,var(--sheet))}
+  .tbCallout-info{--cc:#0891b2;--ccbg:color-mix(in srgb,#0891b2 11%,var(--sheet))}
+  .tbCallout-warning{--cc:#d97706;--ccbg:color-mix(in srgb,#d97706 13%,var(--sheet))}
+  .tbCallout-success{--cc:#16a34a;--ccbg:color-mix(in srgb,#16a34a 12%,var(--sheet))}
+  :root[data-theme="dark"] .tbCallout-tip{--cc:#7ea8ff}
+  :root[data-theme="dark"] .tbCallout-info{--cc:#4bc6de}
+  :root[data-theme="dark"] .tbCallout-warning{--cc:#f0b247}
+  :root[data-theme="dark"] .tbCallout-success{--cc:#57d07f}
+  .tbCalloutIco{flex:0 0 auto;color:var(--cc);margin-top:1px}
+  .tbCalloutBody{margin:0}
+  .tbCalloutBody>*:first-child{margin-top:0}.tbCalloutBody>*:last-child{margin-bottom:0}
+  /* accordion (expandable "read more") */
+  .tbAcc{border:1px solid var(--line);border-radius:14px;background:var(--sheet);margin:18px 0;overflow:hidden}
+  .tbAccSum{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:14px 17px;font-weight:800;font-size:16.5px;color:var(--ink);user-select:none;transition:background .15s}
+  .tbAccSum::-webkit-details-marker{display:none}
+  .tbAccSum:hover{background:var(--bg)}
+  .tbAccMark{color:var(--brand-ink);transition:transform .22s;flex:0 0 auto}
+  .tbAcc[open] .tbAccMark{transform:rotate(-90deg)}
+  .tbAccBody{padding:2px 17px 16px}
+  .tbAccBody>*:first-child{margin-top:0}.tbAccBody>*:last-child{margin-bottom:0}
+  /* table */
+  .tbTableWrap{margin:18px 0;overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+  .tbTable{border-collapse:collapse;width:100%;font-size:16px}
+  .tbTable th,.tbTable td{border:1px solid var(--line);padding:10px 14px;text-align:start;vertical-align:top}
+  .tbTable thead th{background:var(--brand-soft);color:var(--brand-ink);font-weight:900}
+  .tbTable tbody tr:nth-child(even){background:color-mix(in srgb,var(--ink) 4%,var(--sheet))}
+  /* optional per-cell icon (from the icon bank) sitting inline before the cell text */
+  .tbCellWrap{display:inline-flex;align-items:center;gap:7px}
+  .tbCellIco{flex:0 0 auto;vertical-align:middle}
+  /* editor preview only: hover cue that a block is clickable to jump to its editor (harmless on export — class never emitted there) */
+  .tbEditHook:hover>*{outline:2px dashed var(--brand);outline-offset:4px;border-radius:8px;cursor:pointer}
+  /* section divider */
+  .tbDivider{border:0;height:1px;background:linear-gradient(90deg,transparent,var(--line) 20%,var(--line) 80%,transparent);margin:26px 0}
+  /* open (free-text) question */
+  .tbOpen{border:1px solid var(--line);border-inline-start:4px solid var(--brand);border-radius:16px;background:var(--bg);padding:18px 20px;margin:18px 0}
+  .tbOpenQ{font-weight:800;font-size:17px;margin-bottom:10px}
+  .tbOpenInput{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--sheet);color:var(--ink);
+    font-family:inherit;font-size:16px;line-height:1.6;resize:vertical;min-height:96px;outline:none}
+  .tbOpenInput:focus{border-color:var(--brand)}
+  /* reflection answers sheet (save-as-PDF) */
+  .tbAnswers{position:fixed;inset:0;z-index:62;background:rgba(8,12,20,.6);display:none;overflow:auto;padding:24px}
+  .tbAnswers.open{display:block}
+  .tbAnsSheet{max-width:820px;margin:0 auto;background:var(--sheet);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .tbAnsTools{display:flex;gap:10px;justify-content:flex-end;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:0}
+  .tbAnsDoc{padding:30px 34px 38px}
+  .tbAnsTitle{margin:0;font-size:26px;letter-spacing:-.02em}
+  .tbAnsSub{color:var(--muted);font-weight:800;margin-top:2px}
+  .tbAnsMeta{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:16px 0 22px;padding-bottom:14px;border-bottom:1px solid var(--line);font-weight:800;color:var(--muted)}
+  .tbAnsMeta .tbAnsName{border:0;border-bottom:1.5px solid var(--line);background:transparent;color:var(--ink);font-family:inherit;font-size:15px;font-weight:800;padding:2px 6px;min-width:180px;outline:none}
+  .tbAnsMeta .tbAnsName:focus{border-color:var(--brand)}
+  .tbAnsItem{margin:0 0 20px}
+  .tbAnsQ{display:flex;gap:10px;align-items:flex-start;font-weight:800;font-size:17px;margin-bottom:8px}
+  .tbAnsNum{flex:0 0 auto;width:26px;height:26px;border-radius:8px;background:var(--brand-soft);color:var(--brand-ink);display:grid;place-items:center;font-size:13px;font-weight:900}
+  .tbAnsA{white-space:pre-wrap;font-size:16px;line-height:1.7;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--bg)}
+  .tbAnsEmpty{color:var(--muted)}
+  @media print{
+    html.tbPrintMode body>*{display:none!important}
+    html.tbPrintMode #tbAnswers{display:block!important;position:static!important;background:#fff!important;padding:0!important;overflow:visible!important}
+    html.tbPrintMode #tbAnswers .tbAnsSheet{max-width:none;margin:0;border:0;border-radius:0;box-shadow:none;background:#fff}
+    html.tbPrintMode #tbAnswers .tbAnsTools{display:none!important}
+    html.tbPrintMode #tbAnswers .tbAnsA{background:#fff}
+  }
+  /* progress: viewed-page check in the sidebar + score on the done screen */
+  .tbSideDone{margin-inline-start:auto;color:#16a34a;font-weight:900;font-size:15px;opacity:0;transition:opacity .2s}
+  .tbSideItem.done .tbSideDone{opacity:1}
+  .doneScore{font-size:17px;font-weight:800;color:var(--ink);background:var(--brand-soft);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin:0 0 20px}
+  .doneScore b{color:var(--brand-ink)}
+  /* lightbox */
+  .tbLightbox{position:fixed;inset:0;z-index:60;background:rgba(8,12,20,.86);display:none;
+    align-items:center;justify-content:center;padding:28px;cursor:zoom-out}
+  .tbLightbox.open{display:flex}
+  .tbLightbox figure{margin:0;max-width:96vw;max-height:94vh;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .tbLightbox img{max-width:96vw;max-height:86vh;width:auto;height:auto;border-radius:14px;
+    box-shadow:0 30px 80px rgba(0,0,0,.6);background:var(--sheet)}
+  .tbLightbox figcaption{color:#e9eefb;font-size:15px}
+  .tbLightbox .lbClose{position:fixed;top:16px;inset-inline-end:16px;border:0;border-radius:12px;
+    background:rgba(255,255,255,.14);color:#fff;width:44px;height:44px;cursor:pointer;display:grid;place-items:center}
+  .tbLightbox .lbClose:hover{background:rgba(255,255,255,.28)}
+  .tbVideoWrap{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--line)}
+  .tbVideoFrame{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#000}
+  /* centered play badge so a video is recognizable at a glance (fades once playing) */
+  .tbPlayBadge{position:absolute;inset:0;z-index:1;display:grid;place-items:center;pointer-events:none;transition:opacity .2s}
+  .tbPlayBadge .pc{width:72px;height:72px;border-radius:50%;background:rgba(0,0,0,.55);display:grid;place-items:center;
+    box-shadow:0 8px 24px rgba(0,0,0,.45);border:2px solid rgba(255,255,255,.85)}
+  .tbPlayBadge .pc .ic{color:#fff;margin-inline-start:4px}
+  .tbVideoWrap.tb-playing .tbPlayBadge{opacity:0}
+  .tbFsBtn{position:absolute;top:10px;inset-inline-end:10px;z-index:2;border:0;border-radius:10px;
+    background:rgba(0,0,0,.55);color:#fff;font-size:16px;width:38px;height:38px;cursor:pointer;
+    display:grid;place-items:center;transition:background .2s}
+  .tbFsBtn:hover{background:rgba(0,0,0,.8)}
+  .tbVideoOpen{display:inline-flex;align-items:center;gap:7px;margin-top:9px;font-size:13.5px;font-weight:800;
+    color:var(--brand-ink);text-decoration:none;border-bottom:2px solid var(--brand-soft)}
+  .tbVideoOpen:hover{border-color:var(--brand)}
+  figcaption{color:var(--muted);font-size:13.5px;margin-top:8px;text-align:center}
+  .tbPlaceholder{border:2px dashed var(--line);border-radius:16px;background:var(--bg);
+    min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    color:var(--muted);font-weight:800;font-size:32px}
+  .tbPlaceholder span{font-size:14px;font-weight:700;direction:ltr;font-family:monospace;
+    background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:4px 10px}
+  a.tbLink{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-bottom-width:1px;
+    background:var(--brand-soft);color:var(--brand-ink);border-radius:12px;padding:11px 18px;margin:6px 0}
+  a.tbLink:hover{border-color:var(--brand)}
+  .home{width:min(var(--book-w),100%);background:var(--sheet);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden}
+  .homeCover{height:230px;background:linear-gradient(135deg,var(--brand),#7c3aed);position:relative;overflow:hidden}
+  .homeCover img{width:100%;height:100%;object-fit:cover;display:block}
+  /* subtle gradient over the cover so overlaid text/edges stay legible on any image */
+  .homeCoverTint{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(180deg,rgba(8,12,20,0) 45%,rgba(8,12,20,.28))}
+  .homeCover img{position:relative}
+  .homeBody{padding:34px 40px 40px}
+  .homeBody h1{margin:0 0 6px;font-size:38px;letter-spacing:-.04em;line-height:1.1}
+  .homeBody .sub{color:var(--muted);font-size:18px;margin:0 0 18px}
+  .homeBody .intro{font-size:17px;margin:0 0 26px;max-width:none}
+  .toc{display:grid;gap:10px;margin-top:8px}
+  .tocItem{display:flex;align-items:center;gap:14px;border:1px solid var(--line);background:var(--bg);
+    border-radius:14px;padding:14px 16px;cursor:pointer;text-align:right;font-family:inherit;color:inherit;
+    font-size:16px;font-weight:700;transition:transform .12s,border-color .2s}
+  .tocItem:hover{transform:translateX(-3px);border-color:var(--brand)}
+  .tocNum{width:34px;height:34px;border-radius:10px;background:var(--brand-soft);color:var(--brand-ink);
+    display:grid;place-items:center;font-weight:900;flex:0 0 auto}
+  .tocLbl{flex:1}
+  /* viewed-page tick on the table of contents */
+  .tocDone{margin-inline-start:auto;color:#16a34a;opacity:0;transform:scale(.7);transition:opacity .2s,transform .2s;flex:0 0 auto}
+  .tocItem.done{border-color:color-mix(in srgb,#16a34a 45%,var(--line))}
+  .tocItem.done .tocDone{opacity:1;transform:none}
+  .tocItem.done .tocNum{background:#16a34a;color:#fff}
+  /* home / index meta strip: pages · questions · reading time */
+  .homeMeta{display:flex;flex-wrap:wrap;gap:10px 18px;margin:0 0 22px;padding:12px 16px;
+    border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+  .indexWrap .homeMeta{margin-bottom:20px}
+  .homeMetaItem{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:800;color:var(--muted)}
+  .homeMetaItem .ic{color:var(--brand-ink)}
+  .indexWrap{width:min(var(--book-w),100%);background:var(--sheet);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:32px 38px 38px}
+  .indexWrap h1{margin:0 0 20px;font-size:30px;letter-spacing:-.03em}
+  /* ----- side navigation drawer ----- */
+  .navbtn.menu{margin-inline-end:2px}
+  .tbBackdrop{position:fixed;inset:0;background:rgba(10,16,28,.42);z-index:30;opacity:0;pointer-events:none;
+    transition:opacity .25s}
+  .tbBackdrop.open{opacity:1;pointer-events:auto}
+  /* drawer anchored to the right (RTL start side); hidden off the right edge, slides in on .open */
+  .tbSidebar{position:fixed;top:0;right:0;height:100%;width:300px;max-width:86vw;z-index:31;
+    background:var(--sheet);border-left:1px solid var(--line);box-shadow:var(--shadow);
+    display:flex;flex-direction:column;transform:translateX(110%);transition:transform .28s ease}
+  .tbSidebar.open{transform:translateX(0)}
+  .tbSideHead{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line);font-weight:900}
+  .tbSideHead .close{margin-inline-start:auto;border:1px solid var(--line);background:var(--sheet);color:var(--ink);
+    border-radius:9px;width:34px;height:34px;cursor:pointer;font-size:16px}
+  .tbSideList{flex:1;overflow-y:auto;padding:12px;display:grid;gap:6px;align-content:start}
+  .tbSideItem{display:flex;align-items:center;gap:11px;border:1px solid transparent;background:transparent;
+    border-radius:11px;padding:10px 12px;cursor:pointer;text-align:right;font-family:inherit;color:inherit;
+    font-size:15px;font-weight:700;transition:background .15s,border-color .15s}
+  .tbSideItem:hover{background:var(--bg);border-color:var(--line)}
+  .tbSideItem.active{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-ink)}
+  .tbSideItem .n{width:28px;height:28px;flex:0 0 auto;border-radius:8px;background:var(--brand-soft);
+    color:var(--brand-ink);display:grid;place-items:center;font-weight:900;font-size:13px}
+  .tbSideItem.active .n{background:var(--brand);color:#fff}
+  .tbSideHome{border-top:1px solid var(--line);padding:12px}
+  .tbSideTitle{display:inline-flex;align-items:center;gap:8px}
+  /* ----- inline icons ----- */
+  .ic{display:inline-block;vertical-align:middle;flex:0 0 auto}
+  .brand .mark .ic{color:#fff}
+  .navbtn .ic,#themeBtn .ic,.btn .ic{color:inherit}
+  .tbSideItem .n .ic{color:inherit}
+  /* ----- completion screen ----- */
+  .doneWrap{width:min(var(--book-w),100%);background:var(--sheet);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);padding:48px 40px 46px;text-align:center;
+    display:flex;flex-direction:column;align-items:center;gap:8px}
+  .doneBadge{position:relative;width:88px;height:88px;border-radius:50%;display:grid;place-items:center;color:var(--brand-ink);
+    background:var(--brand-soft);border:1px solid var(--line);margin-bottom:8px}
+  .doneBadgeRing{position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--brand)}
+  .doneWrap h1{margin:0;font-size:30px;letter-spacing:-.03em}
+  .doneMsg{color:var(--muted);font-size:17px;max-width:560px;line-height:1.7;margin:2px 0 22px}
+  .doneActions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  .tbConfetti{position:fixed;inset:0;z-index:55;pointer-events:none}
+  /* motion: block entrance stagger + completion badge pop (disabled for reduced-motion) */
+  @media(prefers-reduced-motion:no-preference){
+    .sheetInner>*,.homeBody>*,.doneWrap>*{animation:tbRise .42s cubic-bezier(.2,.7,.3,1) both}
+    .sheetInner>*:nth-child(2),.homeBody>*:nth-child(2),.doneWrap>*:nth-child(2){animation-delay:.05s}
+    .sheetInner>*:nth-child(3),.homeBody>*:nth-child(3),.doneWrap>*:nth-child(3){animation-delay:.1s}
+    .sheetInner>*:nth-child(4),.homeBody>*:nth-child(4),.doneWrap>*:nth-child(4){animation-delay:.15s}
+    .sheetInner>*:nth-child(n+5),.homeBody>*:nth-child(n+5),.doneWrap>*:nth-child(n+5){animation-delay:.2s}
+    @keyframes tbRise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+    .doneBadge{animation:tbPop .5s cubic-bezier(.2,1.5,.4,1) both}
+    @keyframes tbPop{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:none}}
+    .doneBadgeRing{animation:tbRingPulse 1.8s ease-out infinite}
+    @keyframes tbRingPulse{0%{transform:scale(1);opacity:.7}70%{transform:scale(1.35);opacity:0}100%{opacity:0}}
+  }
+  @media(max-width:640px){
+    .sheetHead,.sheetBody{padding-inline:20px}.homeBody{padding:24px}.indexWrap{padding:22px}
+    .sheet{height:min(78vh,760px)}.brand small{display:none}
+  }
+</script>
+
+<script type="text/plain" id="readerBody">
+<header class="topbar">
+  <button class="navbtn icon menu" onclick="toggleSidebar()" title="תפריט עמודים" aria-label="תפריט עמודים"><span data-ic="menu"></span></button>
+  <button class="brand" onclick="goHome()">
+    <span class="mark"><span data-ic="book" data-ic-size="20"></span></span>
+    <span id="brandText">ספר לימוד<small></small></span>
+  </button>
+  <div class="spacer"></div>
+  <button class="navbtn" onclick="goHome()"><span data-ic="home"></span> בית</button>
+  <button class="navbtn" onclick="goIndex()"><span data-ic="list"></span> תוכן</button>
+  <button class="navbtn icon" id="themeBtn" onclick="toggleTheme()" title="מצב כהה/בהיר"></button>
+</header>
+<div class="progress"><i id="progressBar"></i></div>
+<div class="tbBackdrop" id="tbBackdrop" onclick="toggleSidebar(false)"></div>
+<aside class="tbSidebar" id="tbSidebar" aria-label="ניווט עמודים">
+  <div class="tbSideHead"><span class="tbSideTitle"><span data-ic="list"></span> עמודי הספר</span><button class="close" onclick="toggleSidebar(false)" aria-label="סגירה"><span data-ic="x" data-ic-size="16"></span></button></div>
+  <div class="tbSideList" id="tbSideList"></div>
+</aside>
+<main id="view" class="stage"></main>
+</script>
+
+<script type="text/plain" id="readerEngine">
+function esc(v=""){return String(v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function attr(v=""){return esc(v).replace(/'/g,"&#39;")}
+/* resolve a media reference: absolute/data/blob URLs pass through; a bare filename is mapped to a
+   preview object-URL when a materials folder is loaded (window.__TB_MEDIA__), else kept as the
+   relative filename — which is exactly what the exported book needs (files sit next to it). */
+function resolveSrc(name){var s=String(name||"");if(!s||/^(data:|https?:|blob:|\/\/|\/)/i.test(s))return s;var m=window.__TB_MEDIA__;return m&&Object.prototype.hasOwnProperty.call(m,s)?m[s]:s}
+function rich(t=""){
+  /* pull links out of the RAW text first so their URLs are escaped exactly once */
+  const links=[];
+  let raw=String(t).replace(/\[([^\]\n]+)\]\(([^)\n]+)\)/g,(m,txt,u)=>{const i=links.length;links.push({txt,url:u});return "@@L"+i+"@@"});
+  let s=esc(raw);
+  s=s.replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>");
+  s=s.replace(/@@L(\d+)@@/g,(m,i)=>{const L=links[+i]||{};const txtHtml=esc(L.txt||"").replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>");return `<a href="${attr(L.url||"")}" target="_blank" rel="noopener">${txtHtml}</a>`});
+  const lines=s.split("\n"),out=[],isUL=l=>/^\s*[-*]\s+/.test(l),isOL=l=>/^\s*\d+[.)]\s+/.test(l);
+  let i=0;
+  while(i<lines.length){
+    if(isUL(lines[i])){const it=[];while(i<lines.length&&isUL(lines[i])){it.push("<li>"+lines[i].replace(/^\s*[-*]\s+/,"")+"</li>");i++}out.push("<ul>"+it.join("")+"</ul>")}
+    else if(isOL(lines[i])){const it=[];while(i<lines.length&&isOL(lines[i])){it.push("<li>"+lines[i].replace(/^\s*\d+[.)]\s+/,"")+"</li>");i++}out.push("<ol>"+it.join("")+"</ol>")}
+    else{const buf=[];while(i<lines.length&&!isUL(lines[i])&&!isOL(lines[i])){buf.push(lines[i]);i++}out.push(buf.join("<br>"))}
+  }
+  return out.join("");
+}
+/* whitelist-sanitize author-created rich HTML (text blocks). Keeps only inline formatting tags and a
+   short list of safe style props; strips scripts/handlers/unknown tags. Runs at render time so the
+   exported book displays the same clean HTML with no external dependencies. */
+function sanitizeRich(html){
+  var tpl=document.createElement("template");tpl.innerHTML=String(html==null?"":html);
+  var ALLOWED={B:1,STRONG:1,I:1,EM:1,U:1,S:1,STRIKE:1,SPAN:1,A:1,UL:1,OL:1,LI:1,BR:1,MARK:1,DIV:1,P:1};
+  var STYLE_OK=/^(color|background-color|font-size|font-weight|font-style|text-decoration|text-align)$/;
+  function cleanStyle(s){var out=[];String(s||"").split(";").forEach(function(d){var i=d.indexOf(":");if(i<0)return;var p=d.slice(0,i).trim().toLowerCase(),v=d.slice(i+1).trim();if(STYLE_OK.test(p)&&!/url\(|expression|javascript:/i.test(v))out.push(p+":"+v)});return out.join(";")}
+  (function walk(node){
+    var c=node.firstChild;
+    while(c){
+      var next=c.nextSibling;
+      if(c.nodeType===1){
+        var tag=c.tagName;
+        if(!ALLOWED[tag]){while(c.firstChild)node.insertBefore(c.firstChild,c);node.removeChild(c)}
+        else{
+          Array.prototype.slice.call(c.attributes).forEach(function(a){
+            var n=a.name.toLowerCase();
+            if(tag==="A"&&n==="href"){if(/^\s*javascript:/i.test(a.value))c.removeAttribute(a.name)}
+            else if(n==="style"){var cs=cleanStyle(a.value);if(cs)c.setAttribute("style",cs);else c.removeAttribute("style")}
+            else c.removeAttribute(a.name);
+          });
+          if(tag==="A"){c.setAttribute("target","_blank");c.setAttribute("rel","noopener")}
+          walk(c);
+        }
+      }else if(c.nodeType===8){node.removeChild(c)}
+      c=next;
+    }
+  })(tpl.content);
+  return tpl.innerHTML;
+}
+function alignStyle(a){return (a&&a!=="right")?"text-align:"+({center:"center",left:"left",justify:"justify"}[a]||"right"):""}
+const pages=()=>Array.isArray(BOOK.pages)?BOOK.pages:[];
+/* inline Lucide-style line icons (self-contained, no external requests) */
+const ICONS={
+  menu:'<line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/>',
+  home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  list:'<line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>',
+  moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+  book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  maximize:'<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>',
+  x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  chevronR:'<path d="m9 18 6-6-6-6"/>',
+  chevronL:'<path d="m15 18-6-6 6-6"/>',
+  play:'<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>',
+  image:'<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+  film:'<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  award:'<path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/><circle cx="12" cy="8" r="6"/>',
+  restart:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>'
+};
+function ic(name,size){return '<svg class="ic" width="'+(size||18)+'" height="'+(size||18)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[name]||"")+'</svg>'}
+function imgError(el){const name=el.getAttribute("data-name")||"";const d=document.createElement("div");d.className="tbPlaceholder";d.innerHTML=ic("image",34)+"<span>"+esc(name)+"</span>";el.replaceWith(d)}
+function tbFs(btn){const w=btn.closest(".tbVideoWrap")||btn.parentElement;const el=w.querySelector(".tbVideoFrame")||w;const t=el.requestFullscreen?el:w;(t.requestFullscreen||t.webkitRequestFullscreen||function(){}).call(t)}
+/* knowledge-check: grade the selection in place (self-contained, no server) */
+function tbQuizCheck(btn){
+  var box=btn.closest(".tbQuiz");if(!box)return;
+  var mode=box.getAttribute("data-mode");
+  var inputs=Array.prototype.slice.call(box.querySelectorAll(".tbQuizOpt input"));
+  var fb=box.querySelector(".tbQuizFb");
+  var chosen=inputs.filter(function(i){return i.checked});
+  if(!chosen.length){if(fb){fb.textContent="בחרו תשובה";fb.className="tbQuizFb warn"}return}
+  inputs.forEach(function(i){i.closest(".tbQuizOpt").classList.remove("ok","bad")});
+  var correct;
+  if(mode==="multi"){correct=inputs.every(function(i){return (i.checked?1:0)===Number(i.getAttribute("data-correct"))})}
+  else{correct=chosen.length===1&&chosen[0].getAttribute("data-correct")==="1"}
+  /* reveal the correct answers + explanation only once right; on a wrong try, flag the wrong picks and invite a retry */
+  if(correct){inputs.forEach(function(i){if(i.getAttribute("data-correct")==="1")i.closest(".tbQuizOpt").classList.add("ok")})}
+  else{inputs.forEach(function(i){if(i.checked&&i.getAttribute("data-correct")!=="1")i.closest(".tbQuizOpt").classList.add("bad")})}
+  if(fb){fb.textContent=correct?"נכון! כל הכבוד":"לא מדויק — נסו שוב";fb.className="tbQuizFb "+(correct?"ok":"bad")}
+  var ex=box.querySelector(".tbQuizExplain");if(ex)ex.hidden=!correct;
+  if(correct)TB_TRACK.markQuiz(box.getAttribute("data-qid"));
+}
+/* image lightbox (enlarge on click) — works for single images and image rows */
+function lbClose(){var lb=document.getElementById("tbLightbox");if(lb){lb.classList.remove("open");var im=lb.querySelector("img");if(im)im.src=""}}
+function lbOpen(src,cap){var lb=document.getElementById("tbLightbox");if(!lb){lb=document.createElement("div");lb.id="tbLightbox";lb.className="tbLightbox";lb.innerHTML='<button class="lbClose" type="button" aria-label="סגירה">'+ic("x",20)+'</button><figure><img alt=""><figcaption></figcaption></figure>';document.body.appendChild(lb);lb.addEventListener("click",function(e){if(e.target===lb||e.target.closest(".lbClose"))lbClose()})}var img=lb.querySelector("img"),fc=lb.querySelector("figcaption");img.src=src;img.alt=cap||"";fc.textContent=cap||"";fc.style.display=cap?"":"none";lb.classList.add("open")}
+/* classify a video source: direct file → native <video>; YouTube/Vimeo → normalized embed; else raw iframe */
+function videoEmbed(src){
+  let s=String(src||"").trim();
+  if(!s)return null;
+  /* pasted full embed code → pull out the iframe's src */
+  const ifr=s.match(/<iframe[^>]*\ssrc\s*=\s*["']([^"']+)["']/i);
+  if(ifr)s=ifr[1].trim();
+  if(/^data:video\//i.test(s)||/\.(mp4|webm|ogg|ogv|mov|m4v)(\?|#|$)/i.test(s))return {kind:"file",src:s};
+  let m=s.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|v\/)|youtu\.be\/)([\w-]{6,})/i);
+  if(m)return {kind:"embed",src:"https://www.youtube.com/embed/"+m[1]};
+  m=s.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+  if(m)return {kind:"embed",src:"https://player.vimeo.com/video/"+m[1]};
+  return {kind:"embed",src:s};
+}
+/* learner free-text answers for open-question blocks — stored separately from SCORM progress
+   (kept out of cmi.suspend_data, which is capped at 4096 chars). localStorage only; memory in preview. */
+var TB_ANSWERS=(function(){
+  var map={},loaded=false;
+  function key(){return "tb_answers_"+((typeof BOOK!=="undefined"&&BOOK.title)||"book")}
+  function load(){if(loaded)return;loaded=true;if(window.__TB_PREVIEW__)return;try{var s=localStorage.getItem(key());if(s)map=JSON.parse(s)||{}}catch(e){}}
+  function save(){if(window.__TB_PREVIEW__)return;try{localStorage.setItem(key(),JSON.stringify(map))}catch(e){}}
+  return {
+    get:function(qid){load();return (qid&&map[qid])||""},
+    set:function(qid,v){if(!qid)return;load();map[qid]=v;save()},
+    list:function(){load();var out=[];pages().forEach(function(p){(p.blocks||[]).forEach(function(b){if(b&&b.type==="open"&&b.qid)out.push({q:b.question||"",a:map[b.qid]||""})})});return out},
+    any:function(){var found=false;pages().forEach(function(p){(p.blocks||[]).forEach(function(b){if(b&&b.type==="open")found=true})});return found}
+  };
+})();
+/* selectable font stacks (system fonts only — keeps the file airgapped; exact look depends on the viewer's device).
+   _default MUST equal the CSS fallback in .rteInput / body so unset books look identical to before. */
+var FONT_STACKS={
+  _default:"'Heebo','Assistant',Arial,sans-serif",
+  modern:"'Heebo','Assistant',Arial,sans-serif",
+  rounded:"'Varela Round','Assistant','Heebo',Arial,sans-serif",
+  classic:"'Frank Ruhl Libre','David Libre','Times New Roman',Georgia,serif",
+  clean:"'Rubik','Assistant','Heebo',Arial,sans-serif"
+};
+/* icon bank for callouts + table cells (self-contained inline SVG paths, Lucide-style, offline).
+   KEEP IN SYNC with the editor-side CALLOUT_ICON_BANK copy near fCalloutVariant(). */
+var CALLOUT_ICON_BANK={
+  tip:'<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12c.5.5 1 1.5 1 3h6c0-1.5.5-2.5 1-3a7 7 0 0 0-4-12z"/>',
+  info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/>',
+  warning:'<path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18h.01"/>',
+  success:'<circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/>',
+  star:'<path d="M12 17.3l-6.2 3.7 1.6-7L2 9.2l7.1-.6L12 2l2.9 6.6 7.1.6-5.4 4.8 1.6 7z"/>',
+  book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+  pencil:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  question:'<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+  flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/>',
+  pin:'<path d="M12 21s-6-5.7-6-10a6 6 0 0 1 12 0c0 4.3-6 10-6 10z"/><circle cx="12" cy="11" r="2"/>',
+  heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.7-7.6 1.1-1.1a5.5 5.5 0 0 0 0-7.7z"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  zap:'<path d="M4 14h7l-1 8 10-12h-7l1-8z"/>',
+  note:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/>',
+  bookmark:'<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  user:'<path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/>',
+  message:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  award:'<circle cx="12" cy="8" r="6"/><path d="M15.5 12.5 17 22l-5-3-5 3 1.5-9.5"/>',
+  rocket:'<path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2 0-2.8a2 2 0 0 0-3 0z"/><path d="M12 15l-3-3a22 22 0 0 1 8-10c3 0 5 2 5 5a22 22 0 0 1-10 8z"/><path d="M9 12H4s.5-3 2-4 5 0 5 0"/><path d="M12 15v5s3-.5 4-2 0-5 0-5"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/>',
+  map:'<path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/>',
+  image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
+  play:'<circle cx="12" cy="12" r="10"/><path d="m10 8 6 4-6 4z"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.4"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.4"/>',
+  checklist:'<path d="M11 6h10M11 12h10M11 18h10"/><path d="m3 6 1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2"/>',
+  shield:'<path d="M12 2 4 5v6c0 5 3.5 8 8 11 4.5-3 8-6 8-11V5z"/>',
+  folder:'<path d="M4 20a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2z"/>',
+  graduation:'<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2.5 3 6 3s6-2 6-3v-5"/>',
+  compass:'<circle cx="12" cy="12" r="10"/><path d="m16 8-2 6-6 2 2-6z"/>'
+};
+/* callout icon: an explicit per-block icon name (from the bank) wins; otherwise fall back to the variant's default */
+function calloutIcon(v,name){
+  var s='width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+  var def={tip:CALLOUT_ICON_BANK.tip,info:CALLOUT_ICON_BANK.info,warning:CALLOUT_ICON_BANK.warning,success:CALLOUT_ICON_BANK.success};
+  var body=(name&&CALLOUT_ICON_BANK[name])?CALLOUT_ICON_BANK[name]:(def[v]||def.tip);
+  return '<svg class="ic" '+s+'>'+body+'</svg>';
+}
+/* small inline icon for a table cell (uses the same bank); sized to sit inline with cell text */
+function cellIconSvg(name){
+  if(!name||!CALLOUT_ICON_BANK[name])return "";
+  return '<svg class="tbCellIco" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+CALLOUT_ICON_BANK[name]+'</svg>';
+}
+function renderBlock(b){
+  if(!b||!b.type)return "";
+  switch(b.type){
+    case "subheading": return `<h3 class="tbSub">${esc(b.text||"")}</h3>`;
+    case "text":{
+      const al=alignStyle(b.align);
+      const inner=(b.html!=null)?sanitizeRich(b.html):rich(b.text||"");
+      return `<div class="tbText"${al?` style="${al}"`:""}>${inner}</div>`;
+    }
+    case "image":{
+      const w=b.width?`width:${attr(b.width)};`:"";
+      const mar=b.align==="right"?"margin-inline-end:auto":b.align==="left"?"margin-inline-start:auto":"margin-inline:auto";
+      return `<figure><img class="tbImg" src="${attr(resolveSrc(b.src))}" data-name="${attr(b.src||"")}" onerror="imgError(this)" alt="${attr(b.caption||"")}" style="${w}${mar}">${b.caption?`<figcaption>${esc(b.caption)}</figcaption>`:""}</figure>`;
+    }
+    case "imagetext":{
+      const txt=(b.html!=null)?sanitizeRich(b.html):rich(b.text||"");
+      const side=b.side==="left"?"left":"right";
+      const imgW=b.width||"45%";
+      const inner=b.src
+        ? `<img class="tbImg" src="${attr(resolveSrc(b.src))}" data-name="${attr(b.src||"")}" onerror="imgError(this)" alt="${attr(b.caption||"")}">${b.caption?`<figcaption>${esc(b.caption)}</figcaption>`:""}`
+        : `<div class="tbPlaceholder">${ic("image",34)}<span>תמונה</span></div>`;
+      return `<div class="tbSplit" data-side="${side}" style="--imgw:${attr(imgW)}"><figure class="tbSplitImg">${inner}</figure><div class="tbSplitText tbText"${alignStyle(b.align)?` style="${alignStyle(b.align)}"`:""}>${txt}</div></div>`;
+    }
+    case "imagerow":{
+      const imgs=(Array.isArray(b.images)?b.images:[]).slice(0,3).filter(im=>im&&(im.src||im.caption));
+      if(!imgs.length)return `<figure><div class="tbPlaceholder">${ic("image",34)}<span>שורת תמונות — הוסיפו 1–3 תמונות</span></div></figure>`;
+      const cells=imgs.map(im=>`<figure class="tbRowCell"><img class="tbImg" src="${attr(resolveSrc(im.src))}" data-name="${attr(im.src||"")}" onerror="imgError(this)" alt="${attr(im.caption||"")}">${im.caption?`<figcaption>${esc(im.caption)}</figcaption>`:""}</figure>`).join("");
+      return `<div class="tbImgRow" style="--cols:${imgs.length}">${cells}</div>`;
+    }
+    case "video":{
+      const info=videoEmbed(b.src);
+      if(!info)return `<figure><div class="tbPlaceholder">${ic("film",34)}<span>סרטון — הזינו שם קובץ או קישור</span></div>${b.caption?`<figcaption>${esc(b.caption)}</figcaption>`:""}</figure>`;
+      const rsrc=info.kind==="file"?resolveSrc(info.src):info.src;
+      const media=info.kind==="file"
+        ? `<video class="tbVideoFrame" src="${attr(rsrc)}" controls playsinline preload="metadata" title="${attr(b.caption||"סרטון")}" onplay="this.closest('.tbVideoWrap').classList.add('tb-playing')"></video>`
+        : `<iframe class="tbVideoFrame" src="${attr(rsrc)}" allowfullscreen allow="fullscreen" title="${attr(b.caption||"סרטון")}"></iframe>`;
+      const playBadge=info.kind==="file"?`<div class="tbPlayBadge" aria-hidden="true"><span class="pc">${ic("play",30)}</span></div>`:"";
+      return `<figure><div class="tbVideoWrap">${media}${playBadge}<button class="tbFsBtn" type="button" onclick="tbFs(this)" title="מסך מלא" aria-label="מסך מלא">${ic("maximize")}</button></div><a class="tbVideoOpen" href="${attr(rsrc)}" target="_blank" rel="noopener">${ic("play",16)} פתיחת הסרטון בכרטיסייה</a>${b.caption?`<figcaption>${esc(b.caption)}</figcaption>`:""}</figure>`;
+    }
+    case "link":       return `<div><a class="tbLink" href="${attr(b.url||"#")}" target="_blank" rel="noopener">${ic("link",18)} ${esc(b.text||b.url||"קישור")}</a></div>`;
+    case "quiz":{
+      const mode=b.qmode==="multi"?"multi":(b.qmode==="truefalse"?"truefalse":"single");
+      const it=mode==="multi"?"checkbox":"radio";
+      const nm="tbq"+(window.__qn=(window.__qn||0)+1);
+      const opts=(Array.isArray(b.options)?b.options:[]).filter(o=>o&&(o.text||o.text===""));
+      const items=opts.map((o,i)=>`<label class="tbQuizOpt"><input type="${it}" name="${nm}" value="${i}" data-correct="${o.correct?1:0}"><span>${esc(o.text||"")}</span></label>`).join("");
+      const hint=mode==="multi"?`<div class="tbQuizHint">ייתכן שיש יותר מתשובה נכונה אחת</div>`:"";
+      return `<div class="tbQuiz" data-mode="${mode}"${b.qid?` data-qid="${attr(b.qid)}"`:""}>
+        <div class="tbQuizQ">${rich(b.question||"")}</div>${hint}
+        <div class="tbQuizOpts">${items}</div>
+        <div class="tbQuizBar"><button type="button" class="tbQuizCheck" onclick="tbQuizCheck(this)">בדיקה</button><span class="tbQuizFb" role="status" aria-live="polite"></span></div>
+        ${b.explain?`<div class="tbQuizExplain" hidden>${rich(b.explain)}</div>`:""}
+      </div>`;
+    }
+    case "callout":{
+      const v=/^(tip|info|warning|success)$/.test(b.variant)?b.variant:"tip";
+      const inner=(b.html!=null)?sanitizeRich(b.html):rich(b.text||"");
+      const al=alignStyle(b.align);
+      return `<div class="tbCallout tbCallout-${v}"><div class="tbCalloutIco">${calloutIcon(v,b.icon)}</div><div class="tbText tbCalloutBody"${al?` style="${al}"`:""}>${inner}</div></div>`;
+    }
+    case "accordion":{
+      const inner=(b.html!=null)?sanitizeRich(b.html):rich(b.text||"");
+      const al=alignStyle(b.align);
+      return `<details class="tbAcc"><summary class="tbAccSum"><span>${esc(b.title||"פרטים")}</span><span class="tbAccMark" aria-hidden="true">${ic("chevronL",18)}</span></summary><div class="tbText tbAccBody"${al?` style="${al}"`:""}>${inner}</div></details>`;
+    }
+    case "table":{
+      const rows=Array.isArray(b.rows)?b.rows:[];
+      if(!rows.length)return "";
+      const head=b.header!==false;
+      const icons=(b.cellIcons&&typeof b.cellIcons==="object")?b.cellIcons:null;
+      const cell=(c,tag,r,ci)=>{const ico=icons?cellIconSvg(icons[r+"_"+ci]):"";return `<${tag}>${ico?`<span class="tbCellWrap">${ico}<span>${esc(c||"")}</span></span>`:esc(c||"")}</${tag}>`;};
+      const tr=(row,tag,r)=>`<tr>${(Array.isArray(row)?row:[]).map((c,ci)=>cell(c,tag,r,ci)).join("")}</tr>`;
+      const inner=(head&&rows.length)
+        ?`<thead>${tr(rows[0],"th",0)}</thead><tbody>${rows.slice(1).map((r,i)=>tr(r,"td",i+1)).join("")}</tbody>`
+        :`<tbody>${rows.map((r,i)=>tr(r,"td",i)).join("")}</tbody>`;
+      const ncols=rows[0]?rows[0].length:0;
+      let colgroup="",fixed="";
+      if(Array.isArray(b.colWidths)&&b.colWidths.some(w=>parseInt(w,10)>0)){
+        fixed=" style=\"table-layout:fixed\"";
+        let cg="";for(let i=0;i<ncols;i++){const wv=parseInt(b.colWidths[i],10);cg+=(wv>0)?`<col style="width:${wv}px">`:"<col>";}
+        colgroup=`<colgroup>${cg}</colgroup>`;
+      }
+      return `<div class="tbTableWrap"><table class="tbTable"${fixed}>${colgroup}${inner}</table></div>`;
+    }
+    case "open":{
+      const qid=b.qid||"";
+      const hint=b.hint?`<div class="tbOpenHint">${esc(b.hint)}</div>`:"";
+      const val=esc(TB_ANSWERS.get(qid));
+      return `<div class="tbOpen" data-qid="${attr(qid)}">
+        <div class="tbOpenQ">${rich(b.question||"")}</div>${hint}
+        <textarea class="tbOpenInput" data-qid="${attr(qid)}" rows="4" placeholder="כתבו כאן את תשובתכם…" oninput="TB_ANSWERS.set(this.getAttribute('data-qid'),this.value)">${val}</textarea>
+      </div>`;
+    }
+    case "divider":   return `<hr class="tbDivider">`;
+    default:           return "";
+  }
+}
+function clockIcon(){return '<svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'}
+/* rough content stats for the home meta strip (pages · questions · reading time) */
+function bookStats(){
+  var pgs=pages(),words=0,quizzes=0,media=0;
+  function cw(t){if(!t)return;var s=String(t).replace(/<[^>]+>/g," ").replace(/&[^;]+;/g," ");var m=s.match(/\S+/g);if(m)words+=m.length}
+  pgs.forEach(function(p){cw(p&&p.title);((p&&p.blocks)||[]).forEach(function(b){if(!b)return;
+    if(b.type==="quiz"){quizzes++;cw(b.question);(b.options||[]).forEach(function(o){cw(o&&o.text)});cw(b.explain)}
+    else if(b.type==="table"){(b.rows||[]).forEach(function(r){(r||[]).forEach(cw)})}
+    else if(b.type==="imagerow"){media+=(b.images||[]).length}
+    else{if(b.type==="image"||b.type==="imagetext"||b.type==="video")media++;cw(b.html);cw(b.text);cw(b.title);cw(b.caption)}
+  })});
+  var mins=Math.max(1,Math.round(words/180+quizzes*0.4+media*0.15));
+  return {pages:pgs.length,quizzes:quizzes,mins:mins};
+}
+function homeMeta(){
+  var H=(BOOK.home&&typeof BOOK.home==="object")?BOOK.home:{};
+  if(H.showMeta===false)return "";
+  var s=bookStats();
+  var rt=(H.readTime!=null&&String(H.readTime).trim())?esc(String(H.readTime).trim()):("כ-"+s.mins+" דק׳ קריאה");
+  return '<div class="homeMeta">'+
+    '<span class="homeMetaItem">'+ic("book",16)+' '+s.pages+' דפים</span>'+
+    (s.quizzes?'<span class="homeMetaItem">'+ic("list",16)+' '+s.quizzes+' שאלות</span>':'')+
+    '<span class="homeMetaItem">'+clockIcon()+' '+rt+'</span>'+
+  '</div>';
+}
+function tocList(){return pages().map((p,i)=>`<button class="tocItem" data-page="${i+1}" onclick="goPage(${i+1})"><span class="tocNum">${i+1}</span><span class="tocLbl">${esc(p.title||("דף "+(i+1)))}</span><span class="tocDone" aria-hidden="true">${ic("award",15)}</span></button>`).join("")}
+function homeView(){
+  const H=(BOOK.home&&typeof BOOK.home==="object")?BOOK.home:{};
+  const secs=(Array.isArray(H.sections)&&H.sections.length)?H.sections:[{key:"title",visible:true},{key:"subtitle",visible:true},{key:"intro",visible:true},{key:"cta",visible:true},{key:"toc",visible:true}];
+  const showCover=H.showCover!==false;
+  const cover=(showCover&&BOOK.cover)?`<img src="${attr(resolveSrc(BOOK.cover))}" data-name="${attr(BOOK.cover)}" onerror="this.style.display='none'" alt="">`:"";
+  const part=(k)=>{
+    switch(k){
+      case "title":    return `<h1>${esc(BOOK.title||"ספר לימוד")}</h1>`;
+      case "subtitle": return BOOK.subtitle?`<p class="sub">${esc(BOOK.subtitle)}</p>`:"";
+      case "intro":    return H.intro?`<p class="intro">${rich(H.intro)}</p>`:"";
+      case "cta":      return `<button class="btn primary" onclick="goPage(1)">התחלת הלימוד ${ic("chevronL")}</button>`;
+      case "toc":      return `<div class="toc" style="margin-top:26px">${tocList()}</div>`;
+      default:         return "";
+    }
+  };
+  const vis=secs.filter(s=>s&&s.visible!==false);
+  const hasToc=vis.some(s=>s.key==="toc");
+  const out=[];vis.forEach(s=>{if(s.key==="toc")out.push(homeMeta());out.push(part(s.key))});if(!hasToc)out.push(homeMeta());
+  return `<section class="home">${showCover?`<div class="homeCover"><div class="homeCoverTint"></div>${cover}</div>`:""}<div class="homeBody">${out.join("")}</div></section>`;
+}
+function indexView(){
+  return `<section class="indexWrap"><h1>תוכן העניינים</h1>${homeMeta()}<div class="toc">${tocList()}</div></section>`;
+}
+function pageView(n){
+  const list=pages();const p=list[n-1];
+  if(!p)return indexView();
+  /* in the editor preview, wrap each block so a click in the live view can jump to its editor.
+     display:contents keeps layout/margins identical → no visual change; NOT emitted on export. */
+  const blist=(Array.isArray(p.blocks)?p.blocks:[]);
+  const body=(window.__TB_PREVIEW__
+    ?blist.map((b,bi)=>`<div class="tbEditHook" data-pi="${n-1}" data-bi="${bi}" style="display:contents">${renderBlock(b)}</div>`).join("")
+    :blist.map(renderBlock).join(""))||`<p class="tbText" style="color:var(--muted)">הדף עדיין ריק.</p>`;
+  return `<article class="sheet">
+    <div class="sheetHead"><div class="eyebrow">פרק ${n} מתוך ${list.length}</div><h1>${esc(p.title||("דף "+n))}</h1></div>
+    <div class="sheetBody" id="sheetBody"><div class="sheetInner">${body}</div></div>
+    <div class="sheetFoot">
+      <button class="btn" onclick="goPage(${n-1})" ${n<=1?"disabled":""}>${ic("chevronR")} הקודם</button>
+      <span class="counter">דף ${n} מתוך ${list.length}</span>
+      ${n>=list.length
+        ?`<button class="btn primary" onclick="goDone()">סיום ${ic("award",18)}</button>`
+        :`<button class="btn primary" onclick="goPage(${n+1})">הבא ${ic("chevronL")}</button>`}
+    </div>
+  </article>`;
+}
+function doneView(){
+  const custom=BOOK.home&&BOOK.home.outro?rich(BOOK.home.outro):"";
+  const msg=custom||"הגעת לסוף הלימוד — כל הכבוד! עכשיו הידע מוכן לשימוש.";
+  const s=(TB_TRACK&&TB_TRACK.active())?TB_TRACK.stats():null;
+  const scoreHtml=(s&&s.t)?`<div class="doneScore">ענית נכון על <b>${s.c}</b> מתוך <b>${s.t}</b> שאלות${s.c>=s.t?" — הכול! 🎉":""}</div>`:"";
+  const title=(BOOK.home&&BOOK.home.doneTitle)||"כל הכבוד! סיימת את הספר";
+  return `<section class="doneWrap">
+    <div class="doneBadge"><span class="doneBadgeRing"></span>${ic("award",40)}</div>
+    <h1>${esc(title)}</h1>
+    <p class="doneMsg">${msg}</p>
+    ${scoreHtml}
+    <div class="doneActions">
+      ${TB_ANSWERS.any()?`<button class="btn primary" onclick="tbOpenAnswers()">${ic("download",18)} הורדת התשובות שלי (PDF)</button>`:""}
+      <button class="btn" onclick="goPage(1)">${ic("restart",18)} התחלה מחדש</button>
+      <button class="btn" onclick="goIndex()">${ic("list",18)} תוכן העניינים</button>
+      <button class="btn" onclick="goHome()">${ic("home",18)} דף הבית</button>
+    </div>
+  </section>`;
+}
+/* reflection sheet: all open-question answers → an on-screen sheet the learner can save as PDF via print */
+function tbAnswersDate(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
+function tbOpenAnswers(){
+  var ov=document.getElementById("tbAnswers");
+  if(!ov){ov=document.createElement("div");ov.id="tbAnswers";ov.className="tbAnswers";document.body.appendChild(ov);
+    ov.addEventListener("click",function(e){if(e.target===ov||(e.target.closest&&e.target.closest("[data-close]")))ov.classList.remove("open")});}
+  var rows=TB_ANSWERS.list().map(function(it,i){
+    var ans=it.a?esc(it.a).replace(/\n/g,"<br>"):'<span class="tbAnsEmpty">— לא נכתבה תשובה —</span>';
+    return '<div class="tbAnsItem"><div class="tbAnsQ"><span class="tbAnsNum">'+(i+1)+'</span>'+rich(it.q)+'</div><div class="tbAnsA">'+ans+'</div></div>';
+  }).join("")||'<p class="tbText">אין שאלות פתוחות בלומדה.</p>';
+  ov.innerHTML=
+    '<div class="tbAnsSheet">'+
+      '<div class="tbAnsTools"><button class="btn primary" type="button" onclick="tbPrintAnswers()">'+ic("download",18)+' הדפסה / שמירה כ-PDF</button><button class="btn" type="button" data-close>'+ic("x",18)+' סגירה</button></div>'+
+      '<div class="tbAnsDoc">'+
+        '<h1 class="tbAnsTitle">'+esc((BOOK&&BOOK.title)||"רפלקציה")+'</h1>'+
+        '<div class="tbAnsSub">התשובות שלי</div>'+
+        '<div class="tbAnsMeta"><label>שם: <input class="tbAnsName" type="text" placeholder="שם מלא"></label><span>תאריך: '+tbAnswersDate()+'</span></div>'+
+        rows+
+      '</div>'+
+    '</div>';
+  ov.classList.add("open");
+}
+function tbPrintAnswers(){document.documentElement.classList.add("tbPrintMode");try{window.print()}catch(e){}}
+window.addEventListener("afterprint",function(){document.documentElement.classList.remove("tbPrintMode")});
+function currentRoute(){
+  const h=(location.hash||"").replace(/^#/,"");
+  if(h.startsWith("page=")){const n=parseInt(h.slice(5),10);return {view:"page",n:isNaN(n)?1:n}}
+  if(h==="index")return {view:"index"};
+  if(h==="done")return {view:"done"};
+  return {view:"home"};
+}
+/* one-shot celebratory confetti on the completion screen (self-contained; respects reduced-motion) */
+function tbCelebrate(){
+  if(window.__tbParty)return;window.__tbParty=1;
+  try{if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)return}catch(e){}
+  var cv=document.createElement("canvas");cv.className="tbConfetti";
+  var ctx=cv.getContext&&cv.getContext("2d");if(!ctx)return;
+  document.body.appendChild(cv);cv.width=innerWidth;cv.height=innerHeight;
+  var cols=["#2563eb","#7c3aed","#16a34a","#ea580c","#db2777","#0891b2"],P=[],N=90;
+  for(var i=0;i<N;i++)P.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*0.3,r:4+Math.random()*5,c:cols[i%cols.length],vy:2+Math.random()*3.5,vx:-1.5+Math.random()*3,a:Math.random()*Math.PI,va:-0.2+Math.random()*0.4});
+  var t0=performance.now(),DUR=1900;
+  function frame(now){var e=now-t0;ctx.clearRect(0,0,cv.width,cv.height);
+    P.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.a+=p.va;p.vy+=0.02;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.globalAlpha=Math.max(0,1-e/DUR);ctx.fillStyle=p.c;ctx.fillRect(-p.r,-p.r*0.6,p.r*2,p.r*1.2);ctx.restore()});
+    if(e<DUR)requestAnimationFrame(frame);else cv.remove();}
+  requestAnimationFrame(frame);
+}
+function render(){
+  const r=currentRoute();const total=pages().length;const view=document.getElementById("view");
+  view.classList.toggle("stage",true);
+  let activeN=0;
+  if(r.view==="page"){
+    const n=Math.min(Math.max(r.n,1),total||1);activeN=n;
+    view.innerHTML=pageView(n);
+    document.getElementById("progressBar").style.width=(total?(n/total*100):0)+"%";
+  }else if(r.view==="done"){
+    view.innerHTML=doneView();
+    document.getElementById("progressBar").style.width="100%";
+    tbCelebrate();
+  }else{
+    view.innerHTML=r.view==="index"?indexView():homeView();
+    document.getElementById("progressBar").style.width="0%";
+  }
+  syncSidebar(activeN,r.view);
+  TB_TRACK.onView(r);TB_TRACK.reapply();
+}
+function buildSidebar(){
+  const el=document.getElementById("tbSideList");if(!el)return;
+  const home=`<button class="tbSideItem" data-i="0" onclick="goHome();toggleSidebar(false)"><span class="n">${ic("home",16)}</span><span>דף הבית</span></button>`;
+  const items=pages().map((p,i)=>`<button class="tbSideItem" data-i="${i+1}" onclick="goPage(${i+1});toggleSidebar(false)"><span class="n">${i+1}</span><span>${esc(p.title||("דף "+(i+1)))}</span><span class="tbSideDone" aria-hidden="true">✓</span></button>`).join("");
+  el.innerHTML=home+items;
+}
+function syncSidebar(n,view){document.querySelectorAll("#tbSideList .tbSideItem").forEach(el=>{const i=Number(el.getAttribute("data-i"));el.classList.toggle("active",i===0?view==="home":i===n)})}
+function toggleSidebar(force){
+  const sb=document.getElementById("tbSidebar"),bd=document.getElementById("tbBackdrop");if(!sb)return;
+  const open=(force===undefined||force===null)?!sb.classList.contains("open"):!!force;
+  sb.classList.toggle("open",open);bd.classList.toggle("open",open);
+}
+function goHome(){location.hash=""}
+function goIndex(){location.hash="index"}
+function goDone(){location.hash="done"}
+function goPage(n){const total=pages().length;if(n<1||n>total)return;location.hash="page="+n}
+document.addEventListener("keydown",e=>{
+  const r=currentRoute();if(r.view!=="page")return;
+  const total=pages().length;
+  if(e.key==="ArrowLeft"){if(r.n>=total)goDone();else goPage(r.n+1)}
+  if(e.key==="ArrowRight")goPage(Math.max(r.n-1,1));
+});
+function applyBookTheme(){
+  var th=(BOOK.theme&&typeof BOOK.theme==="object")?BOOK.theme:{};
+  var root=document.documentElement;
+  if(th.brand){
+    /* role colors: accent drives --brand/--brand-soft (buttons, callouts, table header, backgrounds);
+       heading drives --brand-ink (eyebrow + link color). both default to the single book color, so a
+       book without the new fields looks exactly as before. */
+    var accent=th.accentColor||th.brand;
+    var heading=th.headingColor||th.brand;
+    root.style.setProperty("--brand",accent);
+    root.style.setProperty("--brand-ink",heading);
+    root.style.setProperty("--brand-soft","color-mix(in srgb, "+accent+" 15%, transparent)");
+  }
+  var sizes={regular:"940px",wide:"1140px"};
+  root.style.setProperty("--book-w",sizes[th.size]||"1140px");
+  root.setAttribute("data-bg",/^(clean|soft|glow|dots|grid)$/.test(th.bg)?th.bg:"clean");
+  root.style.setProperty("--font",FONT_STACKS[th.font]||FONT_STACKS._default);
+}
+function applyTheme(t){document.documentElement.setAttribute("data-theme",t);var b=document.getElementById("themeBtn");if(b)b.innerHTML=t==="dark"?ic("sun"):ic("moon");applyBookTheme();try{localStorage.setItem("tb_theme",t)}catch(e){}}
+function toggleTheme(){applyTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark")}
+/* ---------- learner progress + score tracking (SCORM 1.2 in an LMS, localStorage standalone) ---------- */
+function lockQuizCorrect(box){
+  box.querySelectorAll(".tbQuizOpt").forEach(function(lab){var i=lab.querySelector("input");lab.classList.remove("bad");if(i.getAttribute("data-correct")==="1"){lab.classList.add("ok");i.checked=true}else{i.checked=false}i.disabled=true});
+  var fb=box.querySelector(".tbQuizFb");if(fb){fb.textContent="נענתה נכון ✓";fb.className="tbQuizFb ok"}
+  var ex=box.querySelector(".tbQuizExplain");if(ex)ex.hidden=false;
+  var btn=box.querySelector(".tbQuizCheck");if(btn)btn.disabled=true;
+}
+var TB_TRACK=(function(){
+  var mode="off",api=null,started=false,st={pages:{},quizzes:{},loc:""};
+  function allQuizIds(){var ids=[];pages().forEach(function(p){(p.blocks||[]).forEach(function(b){if(b&&b.type==="quiz"&&b.qid)ids.push(b.qid)})});return ids}
+  function findAPI(){var w=window,n=0;try{while(w&&n<12){if(w.API)return w.API;w=(w.parent&&w.parent!==w)?w.parent:null;n++}}catch(e){}try{if(window.opener&&window.opener.API)return window.opener.API}catch(e){}return null}
+  function lsKey(){return "tb_progress_"+(BOOK.title||"book")}
+  function loadLocal(){try{var s=localStorage.getItem(lsKey());if(s){var o=JSON.parse(s);st.pages=o.pages||{};st.quizzes=o.quizzes||{};st.loc=o.loc||""}}catch(e){}}
+  function saveLocal(){try{localStorage.setItem(lsKey(),JSON.stringify(st))}catch(e){}}
+  function encode(){return "p:"+Object.keys(st.pages).join(",")+"|q:"+Object.keys(st.quizzes).join(",")+"|l:"+st.loc}
+  function decode(s){st.pages={};st.quizzes={};st.loc="";if(!s)return;String(s).split("|").forEach(function(seg){var i=seg.indexOf(":");if(i<0)return;var k=seg.slice(0,i),v=seg.slice(i+1);if(k==="p")v.split(",").forEach(function(x){if(x!=="")st.pages[x]=1});else if(k==="q")v.split(",").forEach(function(x){if(x!=="")st.quizzes[x]=1});else if(k==="l")st.loc=v})}
+  function get(k){try{return api.LMSGetValue(k)}catch(e){return ""}}
+  function set(k,v){try{api.LMSSetValue(k,String(v))}catch(e){}}
+  function commit(){try{api.LMSCommit("")}catch(e){}}
+  function stats(){var ids=allQuizIds(),c=0;ids.forEach(function(id){if(st.quizzes[id])c++});return {c:c,t:ids.length}}
+  function score(){var s=stats();return s.t?Math.round(s.c/s.t*100):null}
+  function isComplete(){var tp=pages().length;for(var i=1;i<=tp;i++){if(!st.pages[i])return false}var ids=allQuizIds();for(var j=0;j<ids.length;j++){if(!st.quizzes[ids[j]])return false}return true}
+  function persist(){
+    if(mode==="scorm"){var sc=score();if(sc!=null){set("cmi.core.score.raw",sc);set("cmi.core.score.min",0);set("cmi.core.score.max",100)}
+      var done=isComplete();set("cmi.core.lesson_status",done?(sc==null?"completed":"passed"):"incomplete");
+      set("cmi.core.lesson_location",st.loc||"");set("cmi.suspend_data",encode());commit();}
+    else if(mode==="local"){saveLocal()}
+  }
+  return {
+    start:function(){if(started)return;started=true;api=findAPI();
+      if(api){mode="scorm";try{api.LMSInitialize("")}catch(e){}decode(get("cmi.suspend_data"));var s0=get("cmi.core.lesson_status");if(s0===""||s0==="not attempted"||s0==="not_attempted")set("cmi.core.lesson_status","incomplete");var loc=get("cmi.core.lesson_location");if(loc)st.loc=loc;window.addEventListener("beforeunload",function(){set("cmi.core.exit","suspend");commit();try{api.LMSFinish("")}catch(e){}})}
+      else{mode="local";loadLocal()}
+      if(st.loc&&!location.hash)location.hash=st.loc;
+    },
+    onView:function(r){if(mode==="off")return;if(r&&r.view==="page")st.pages[r.n]=1;st.loc=(location.hash||"").replace(/^#/,"");persist()},
+    markQuiz:function(qid){if(mode==="off"||!qid)return;if(!st.quizzes[qid]){st.quizzes[qid]=1;persist()}},
+    reapply:function(){if(mode==="off")return;document.querySelectorAll(".tbQuiz[data-qid]").forEach(function(box){if(st.quizzes[box.getAttribute("data-qid")])lockQuizCorrect(box)});document.querySelectorAll("#tbSideList .tbSideItem").forEach(function(el){var i=Number(el.getAttribute("data-i"));if(i>0&&st.pages[i])el.classList.add("done")});document.querySelectorAll(".tocItem[data-page]").forEach(function(el){if(st.pages[el.getAttribute("data-page")])el.classList.add("done")})},
+    stats:stats,active:function(){return mode!=="off"}
+  };
+})();
+(function init(){
+  var t=window.__TB_THEME__||"";
+  if(!t){try{t=localStorage.getItem("tb_theme")||"light"}catch(e){t="light"}}
+  applyTheme(t);
+  document.title=BOOK.title||"ספר לימוד דיגיטלי";
+  var bt=document.getElementById("brandText");if(bt)bt.innerHTML=esc(BOOK.title||"ספר לימוד")+"<small>"+esc(BOOK.subtitle||"")+"</small>";
+  document.querySelectorAll("[data-ic]").forEach(function(el){el.innerHTML=ic(el.getAttribute("data-ic"),Number(el.getAttribute("data-ic-size"))||18)});
+  buildSidebar();
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"){toggleSidebar(false);lbClose()}});
+  /* click any image to enlarge (delegated so it covers rows and re-renders) */
+  document.addEventListener("click",function(e){var im=e.target.closest&&e.target.closest(".tbImg");if(im&&im.tagName==="IMG"){lbOpen(im.currentSrc||im.src,im.getAttribute("alt")||"")}});
+  window.addEventListener("hashchange",render);
+  /* live incremental updates from the editor (avoids a full iframe rebuild on every keystroke) */
+  window.addEventListener("message",function(e){
+    var d=e.data||{};if(d.__tb!=="update"||!d.book)return;
+    var sb=document.getElementById("sheetBody");var sc=sb?sb.scrollTop:0;
+    BOOK=d.book;document.title=BOOK.title||"ספר לימוד דיגיטלי";
+    var bt=document.getElementById("brandText");if(bt)bt.innerHTML=esc(BOOK.title||"ספר לימוד")+"<small>"+esc(BOOK.subtitle||"")+"</small>";
+    applyBookTheme();buildSidebar();render();
+    var sb2=document.getElementById("sheetBody");if(sb2)sb2.scrollTop=sc;
+  });
+  if(window.__TB_START__)location.hash=window.__TB_START__;
+  if(!window.__TB_PREVIEW__)TB_TRACK.start();
+  /* preview only: click a block in the live view → tell the editor to open + scroll to that block's editor.
+     ignore clicks on interactive reader elements so quizzes/links/accordions keep working. */
+  if(window.__TB_PREVIEW__){
+    document.addEventListener("click",function(e){
+      if(e.target.closest&&e.target.closest("a,button,input,textarea,select,summary,label,details"))return;
+      var hook=e.target.closest&&e.target.closest(".tbEditHook[data-bi]");
+      if(!hook)return;
+      var pi=parseInt(hook.getAttribute("data-pi"),10),bi=parseInt(hook.getAttribute("data-bi"),10);
+      if(isNaN(pi)||isNaN(bi))return;
+      try{window.parent.postMessage({__tb:"editBlock",pi:pi,bi:bi},"*")}catch(err){}
+    });
+  }
+  render();
+})();
+</script>
+
+<script>
+/* ================= editor logic ================= */
+const LS="textbook_editor_v1";
+const SAMPLE={
+  title:"יסודות למידה דיגיטלית",
+  subtitle:"דוגמה חיה שמציגה את כל יכולות העורך",
+  cover:"cover.jpg",
+  theme:{brand:"#2563eb",size:"wide",bg:"soft"},
+  home:{
+    intro:"ברוכים הבאים! זו **דוגמה חיה** לכל מה שאפשר לבנות: טקסט מעוצב, תמונות ווידאו מתיקיית החומרים, טבלאות, תיבות הדגשה ואקורדיונים, שאלות בדיקה עם משוב, ו**שאלות פתוחות** — שהתלמיד עונה בהן, ובסיום מוריד **PDF עם כל התשובות שלו** לכיתה. אפשר גם לבחור לספר צבע ורקע. עברו בין העמודים כדי לראות הכול, ואז החליפו בתוכן שלכם.",
+    outro:"סיימתם את סיור הדוגמה! שימו לב לכפתור «הורדת התשובות שלי (PDF)» כאן למטה — ככה תלמיד מסכם את הרפלקציה שלו ומביא אותה לכיתה. עכשיו החליפו את התוכן בשלכם, או לחצו «איפוס דוגמה» כדי לחזור לכאן בכל רגע.",
+    doneTitle:"כל הכבוד! סיימתם את סיור הדוגמה"
+  },
+  pages:[
+    {title:"עיצוב טקסט ותוכן",blocks:[
+      {type:"subheading",text:"טקסט מעוצב"},
+      {type:"text",html:'סמנו טקסט והחילו עיצוב מהסרגל: <strong>מודגש</strong>, <u>קו תחתון</u>, <span style="color:#dc2626">צבע</span>, <mark style="background-color:#fde68a">הדגשה</mark>, ואפילו <span style="font-size:1.35em">גודל גדול</span>.'},
+      {type:"subheading",text:"רשימות וקישורים בתוך טקסט"},
+      {type:"text",text:"שלושה עקרונות ללמידה טובה:\n- ללמוד במנות קטנות\n- לתרגל מיד את החומר\n- לחזור אחרי יום\n\nאפשר גם קישור בתוך משפט, למשל אל [מרכז העזרה](https://example.org)."},
+      {type:"image",src:"learning-cycle.png",caption:"דוגמה — החליפו בשם קובץ מהתיקייה; הרוחב והיישור נשלטים בעורך",width:"70%",align:"center"},
+      {type:"link",text:"קישור / כפתור להורדה (PDF)",url:"worksheet-1.pdf"}
+    ]},
+    {title:"מדיה ופריסה",blocks:[
+      {type:"callout",variant:"info",html:"התמונות והווידאו כאן מופיעים כ«ריבוע ממתין» כי הם רק <b>דוגמה</b> — הקבצים לא בתיקייה. ככה בדיוק מפנים לחומרים שלכם: שמרו את הקבצים בתיקייה אחת, לחצו «בחירת תיקיית חומרים», והקלידו את שם הקובץ."},
+      {type:"subheading",text:"תמונה לצד טקסט"},
+      {type:"imagetext",src:"concept.png",caption:"החליפו בשם קובץ מהתיקייה שלכם",html:'בבלוק «תמונה וטקסט» התמונה והטקסט מופיעים <strong>זה לצד זה</strong> — אפשר לבחור צד (ימין/שמאל) ורוחב, ובמסך צר הם נערמים אוטומטית.',side:"right",width:"45%"},
+      {type:"subheading",text:"שורת תמונות (1–3)"},
+      {type:"imagerow",images:[{src:"step1.png",caption:"שלב 1"},{src:"step2.png",caption:"שלב 2"},{src:"step3.png",caption:"שלב 3"}]},
+      {type:"subheading",text:"וידאו"},
+      {type:"video",src:"demo-lesson.mp4",caption:"שם קובץ וידאו מהתיקייה, או קישור יוטיוב / וימאו / קלטורה"}
+    ]},
+    {title:"בדיקת ידע",blocks:[
+      {type:"text",text:"בלוק «שאלת בדיקה» נותן משוב מיידי ומאפשר ניסיון חוזר. יש שלושה סוגים:"},
+      {type:"subheading",text:"תשובה אחת נכונה"},
+      {type:"quiz",qmode:"single",question:"מהו העיקרון הראשון של למידה טובה?",options:[{text:"ללמוד במנות קטנות",correct:true},{text:"ללמוד הכול בבת אחת",correct:false},{text:"לוותר על תרגול",correct:false}],explain:"למידה במנות קטנות משפרת את הזכירה לאורך זמן."},
+      {type:"subheading",text:"כמה תשובות נכונות"},
+      {type:"quiz",qmode:"multi",question:"אילו מהבאים מחזקים זכירה? (ייתכן יותר מאחד)",options:[{text:"תרגול מיידי",correct:true},{text:"חזרה מרווחת",correct:true},{text:"קריאה פסיבית בלבד",correct:false}],explain:"תרגול וחזרה מרווחת מחזקים את הזיכרון; קריאה פסיבית פחות יעילה."},
+      {type:"subheading",text:"נכון / לא נכון"},
+      {type:"quiz",qmode:"truefalse",question:"כדאי לחזור על החומר יום לאחר הלמידה.",options:[{text:"נכון",correct:true},{text:"לא נכון",correct:false}],explain:"חזרה אחרי יום מקבעת את החומר בזיכרון לטווח הארוך."},
+      {type:"link",text:"למדריך המלא",url:"https://example.org"}
+    ]},
+    {title:"רכיבים נוספים",blocks:[
+      {type:"text",text:"אפשר להעשיר את הדף בבלוקים נוספים — הוסיפו אותם מתפריט «הוסף בלוק»:"},
+      {type:"callout",variant:"tip",html:"<b>תיבת הדגשה</b> מדגישה טיפ או רעיון מרכזי. יש ארבעה סוגים: טיפ, מידע, אזהרה והצלחה."},
+      {type:"callout",variant:"warning",html:"שימו לב — <b>אזהרה</b> מסבה את תשומת הלב לנקודה קריטית."},
+      {type:"accordion",title:"מה זה אקורדיון? (לחצו כדי לפתוח)",html:"בלוק <b>אקורדיון</b> מסתיר תוכן עד שהלומד לוחץ עליו — נהדר להרחבות, פתרונות, או «קרא עוד» בלי להעמיס על הדף."},
+      {type:"subheading",text:"טבלה"},
+      {type:"table",header:true,rows:[["עיקרון","למה זה עוזר"],["מנות קטנות","נזכרים טוב יותר לאורך זמן"],["חזרה מרווחת","מקבעת את החומר בזיכרון"]]},
+      {type:"divider"},
+      {type:"text",text:"קו מפריד עדין עוזר לחלק את הדף לחלקים ברורים."},
+      {type:"subheading",text:"שאלה פתוחה (רפלקציה)"},
+      {type:"open",question:"מה הדבר המשמעותי ביותר שלמדתם ביחידה הזו, ואיך תיישמו אותו?",hint:"בסיום הלומדה אפשר להוריד PDF עם כל התשובות שכתבתם — להביא לכיתה."}
+    ]}
+  ]
+};
+const clone=o=>JSON.parse(JSON.stringify(o));
+function esc(v=""){return String(v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function attr(v=""){return esc(v).replace(/'/g,"&#39;")}
+/* ---------- rich text (editor side) ---------- */
+/* markdown → html, mirrors the reader's rich(): used to seed the WYSIWYG from legacy text blocks */
+function mdToHtml(t=""){
+  const links=[];
+  let raw=String(t).replace(/\[([^\]\n]+)\]\(([^)\n]+)\)/g,(m,txt,u)=>{const i=links.length;links.push({txt,url:u});return "@@L"+i+"@@"});
+  let s=esc(raw);
+  s=s.replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>");
+  s=s.replace(/@@L(\d+)@@/g,(m,i)=>{const L=links[+i]||{};const txtHtml=esc(L.txt||"").replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>");return `<a href="${attr(L.url||"")}" target="_blank" rel="noopener">${txtHtml}</a>`});
+  const lines=s.split("\n"),out=[],isUL=l=>/^\s*[-*]\s+/.test(l),isOL=l=>/^\s*\d+[.)]\s+/.test(l);
+  let i=0;
+  while(i<lines.length){
+    if(isUL(lines[i])){const it=[];while(i<lines.length&&isUL(lines[i])){it.push("<li>"+lines[i].replace(/^\s*[-*]\s+/,"")+"</li>");i++}out.push("<ul>"+it.join("")+"</ul>")}
+    else if(isOL(lines[i])){const it=[];while(i<lines.length&&isOL(lines[i])){it.push("<li>"+lines[i].replace(/^\s*\d+[.)]\s+/,"")+"</li>");i++}out.push("<ol>"+it.join("")+"</ol>")}
+    else{const buf=[];while(i<lines.length&&!isUL(lines[i])&&!isOL(lines[i])){buf.push(lines[i]);i++}out.push(buf.join("<br>"))}
+  }
+  return out.join("");
+}
+/* whitelist sanitizer (editor side) — keeps stored html + editor DOM safe when a project file is loaded */
+function rteClean(html){
+  const tpl=document.createElement("template");tpl.innerHTML=String(html==null?"":html);
+  const ALLOWED={B:1,STRONG:1,I:1,EM:1,U:1,S:1,STRIKE:1,SPAN:1,A:1,UL:1,OL:1,LI:1,BR:1,MARK:1,DIV:1,P:1};
+  const STYLE_OK=/^(color|background-color|font-size|font-weight|font-style|text-decoration|text-align)$/;
+  const cleanStyle=s=>{const out=[];String(s||"").split(";").forEach(d=>{const i=d.indexOf(":");if(i<0)return;const p=d.slice(0,i).trim().toLowerCase(),v=d.slice(i+1).trim();if(STYLE_OK.test(p)&&!/url\(|expression|javascript:/i.test(v))out.push(p+":"+v)});return out.join(";")};
+  (function walk(node){
+    let c=node.firstChild;
+    while(c){
+      const next=c.nextSibling;
+      if(c.nodeType===1){
+        const tag=c.tagName;
+        if(!ALLOWED[tag]){while(c.firstChild)node.insertBefore(c.firstChild,c);node.removeChild(c)}
+        else{
+          Array.prototype.slice.call(c.attributes).forEach(a=>{
+            const n=a.name.toLowerCase();
+            if(tag==="A"&&n==="href"){if(/^\s*javascript:/i.test(a.value))c.removeAttribute(a.name)}
+            else if(n==="style"){const cs=cleanStyle(a.value);if(cs)c.setAttribute("style",cs);else c.removeAttribute("style")}
+            else c.removeAttribute(a.name);
+          });
+          if(tag==="A"){c.setAttribute("target","_blank");c.setAttribute("rel","noopener")}
+          walk(c);
+        }
+      }else if(c.nodeType===8){node.removeChild(c)}
+      c=next;
+    }
+  })(tpl.content);
+  return tpl.innerHTML;
+}
+/* toolbar runtime: preserve selection across focus loss, apply commands to the focused editable */
+let _rteRange=null;
+function rteSave(){const s=window.getSelection();if(!s||!s.rangeCount)return;const r=s.getRangeAt(0);let n=r.commonAncestorContainer;n=n.nodeType===1?n:n.parentNode;if(n&&n.closest&&n.closest(".rteInput"))_rteRange=r.cloneRange()}
+function rteFocus(id){const el=document.getElementById(id);if(!el)return null;el.focus();if(_rteRange){const s=window.getSelection();try{s.removeAllRanges();s.addRange(_rteRange)}catch(e){}}return el}
+function rteFire(el){el.dispatchEvent(new Event("input",{bubbles:true}))}
+function rteCmd(id,cmd,val){const el=rteFocus(id);if(!el)return;try{document.execCommand(cmd,false,val==null?null:val)}catch(e){}rteSave();rteFire(el)}
+/* Apply text/highlight color by wrapping the selection directly in a <span>/<mark> with an inline style.
+   This is deterministic across browsers (unlike execCommand hiliteColor, which can silently no-op or emit
+   legacy <font>/bgcolor markup that the sanitizer then strips — the "sometimes works" bug). The produced
+   markup (span[style=color] / mark[style=background-color]) is whitelisted by rteClean/sanitizeRich. */
+function rteColor(id,cmd,val){
+  const el=rteFocus(id);if(!el)return;
+  const s=window.getSelection();if(!s||!s.rangeCount){rteSave();return}
+  const r=s.getRangeAt(0);
+  const isHi=(cmd==="hiliteColor"||cmd==="backColor");
+  if(r.collapsed){ /* no selection: let execCommand set the color for the next typed text, then bail */
+    try{document.execCommand("styleWithCSS",false,true);document.execCommand(cmd,false,val);document.execCommand("styleWithCSS",false,false)}catch(e){}
+    rteSave();rteFire(el);return;
+  }
+  const wrap=document.createElement(isHi?"mark":"span");
+  if(isHi)wrap.style.backgroundColor=val;else wrap.style.color=val;
+  try{
+    const frag=r.extractContents();
+    /* clear the same property on nested spans/marks so the new color fully takes effect */
+    if(frag.querySelectorAll)frag.querySelectorAll("span,mark").forEach(function(x){if(isHi)x.style.backgroundColor="";else x.style.color="";if(!x.getAttribute("style"))x.removeAttribute("style")});
+    wrap.appendChild(frag);r.insertNode(wrap);
+    const nr=document.createRange();nr.selectNodeContents(wrap);s.removeAllRanges();s.addRange(nr);_rteRange=nr.cloneRange();
+  }catch(e){
+    try{document.execCommand("styleWithCSS",false,true);document.execCommand(cmd,false,val);document.execCommand("styleWithCSS",false,false)}catch(e2){}
+  }
+  rteFire(el);
+}
+/* Apply a font-size to the selection. Updates an existing size span in place when the selection covers it,
+   and flattens nested sizes on wrap, so repeated size changes stay stable instead of compounding (em×em). */
+function rteSize(id,size){
+  const el=rteFocus(id);if(!el||!size)return;
+  const s=window.getSelection();if(!s.rangeCount)return;
+  const r=s.getRangeAt(0);if(r.collapsed)return;
+  let anc=r.commonAncestorContainer;anc=anc.nodeType===1?anc:anc.parentNode;
+  const sp=(anc&&anc.closest)?anc.closest(".rteInput span[style*='font-size']"):null;
+  if(sp&&sp.textContent===r.toString()){sp.style.fontSize=size;const nr=document.createRange();nr.selectNodeContents(sp);s.removeAllRanges();s.addRange(nr);_rteRange=nr.cloneRange();rteFire(el);return}
+  const span=document.createElement("span");span.style.fontSize=size;
+  try{
+    const frag=r.extractContents();
+    if(frag.querySelectorAll)frag.querySelectorAll("span[style*='font-size']").forEach(function(x){x.style.fontSize="";if(!x.getAttribute("style"))x.removeAttribute("style")});
+    span.appendChild(frag);r.insertNode(span);
+    const nr=document.createRange();nr.selectNodeContents(span);s.removeAllRanges();s.addRange(nr);_rteRange=nr.cloneRange();
+  }catch(e){}
+  rteFire(el);
+}
+function rteLink(id){const url=prompt("כתובת הקישור:","https://");if(url===null)return;rteCmd(id,"createLink",url)}
+function rteClear(id){const el=rteFocus(id);if(!el)return;try{document.execCommand("removeFormat")}catch(e){}rteSave();rteFire(el)}
+function setBlkAlign(pi,bi,val,btn){updBlock(pi,bi,"align",val);if(btn){const bar=btn.closest(".rteBar");if(bar)bar.querySelectorAll(".rteAlign").forEach(b=>b.classList.toggle("active",b===btn))}}
+/* image alignment + image/text side toggles (update in place, no full re-render) */
+function setAlign(pi,bi,val,btn){updBlock(pi,bi,"align",val);const row=btn.closest(".alnRow");if(row)row.querySelectorAll(".alnBtn").forEach(x=>x.classList.toggle("active",x===btn))}
+function setSide(pi,bi,val,btn){updBlock(pi,bi,"side",val);const row=btn.closest(".alnRow");if(row)row.querySelectorAll(".alnBtn").forEach(x=>x.classList.toggle("active",x===btn))}
+/* ---------- knowledge-check (quiz) editing ---------- */
+function updQuizMode(pi,bi,mode){snapshot();const b=book.pages[pi].blocks[bi];b.qmode=mode;
+  if(mode==="truefalse")b.options=[{text:"נכון",correct:true},{text:"לא נכון",correct:false}];
+  else if(mode==="single"){let seen=false;(b.options||[]).forEach(o=>{if(o.correct){if(seen)o.correct=false;else seen=true}});if(!seen&&b.options&&b.options[0])b.options[0].correct=true}
+  activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function updQuizOptText(pi,bi,idx,v){histCoalesce();book.pages[pi].blocks[bi].options[idx].text=v;previewRoute="page="+(pi+1);save();refreshPreview()}
+function setQuizCorrect(pi,bi,idx){snapshot();const b=book.pages[pi].blocks[bi];if(b.qmode==="multi")b.options[idx].correct=!b.options[idx].correct;else b.options.forEach((o,i)=>o.correct=(i===idx));activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function addQuizOpt(pi,bi){const b=book.pages[pi].blocks[bi];if(b.qmode==="truefalse")return;snapshot();b.options.push({text:"",correct:false});activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function delQuizOpt(pi,bi,idx){const b=book.pages[pi].blocks[bi];if(b.qmode==="truefalse"||b.options.length<=2)return;snapshot();b.options.splice(idx,1);if(b.qmode==="single"&&!b.options.some(o=>o.correct))b.options[0].correct=true;activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+/* inline Lucide-style line icons for the editor chrome */
+const EICONS={
+  book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  award:'<path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/><circle cx="12" cy="8" r="6"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+  save:'<path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/>',
+  folder:'<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  reset:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+  home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  list:'<line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>',
+  book2:'<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>',
+  up:'<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',
+  down:'<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>',
+  copy:'<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  trash:'<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+  plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',
+  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>',
+  chevronDown:'<path d="m6 9 6 6 6-6"/>',
+  undo:'<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>',
+  redo:'<path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/>',
+  grip:'<circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/>',
+  info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  help:'<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  palette:'<circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>'
+};
+function eic(name,size){return '<svg class="ic" width="'+(size||16)+'" height="'+(size||16)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(EICONS[name]||"")+'</svg>'}
+function normalize(o){o=o&&typeof o==="object"?o:{};o.pages=Array.isArray(o.pages)?o.pages:[];o.pages.forEach(p=>{if(!p||typeof p!=="object")return;p.blocks=Array.isArray(p.blocks)?p.blocks:[];p.blocks.forEach(b=>{if(b&&b.type==="text"&&typeof b.html==="string")b.html=rteClean(b.html);if(b&&b.type==="quiz"){if(!b.qid)b.qid="q"+Math.random().toString(36).slice(2,9);b.qmode=(b.qmode==="multi"||b.qmode==="truefalse")?b.qmode:"single";if(typeof b.question!=="string")b.question="";if(typeof b.explain!=="string")b.explain="";if(b.qmode==="truefalse"){b.options=[{text:"נכון",correct:!!(b.options&&b.options[0]&&b.options[0].correct)},{text:"לא נכון",correct:!!(b.options&&b.options[1]&&b.options[1].correct)}];if(!b.options[0].correct&&!b.options[1].correct)b.options[0].correct=true}else{b.options=(Array.isArray(b.options)?b.options:[]).map(o=>({text:(o&&o.text)||"",correct:!!(o&&o.correct)}));while(b.options.length<2)b.options.push({text:"",correct:false});if(b.qmode==="single"){let seen=false;b.options.forEach(o=>{if(o.correct){if(seen)o.correct=false;else seen=true}});if(!seen)b.options[0].correct=true}}}if(b&&b.type==="imagetext"){if(typeof b.html==="string")b.html=rteClean(b.html);if(!b.side)b.side="right";if(!b.width)b.width="45%"}if(b&&b.type==="imagerow"){b.images=(Array.isArray(b.images)?b.images:[]).slice(0,3).map(im=>({src:(im&&im.src)||"",caption:(im&&im.caption)||""}));if(!b.images.length)b.images=[{src:"",caption:""}]}if(b&&(b.type==="callout"||b.type==="accordion")&&typeof b.html==="string")b.html=rteClean(b.html);if(b&&b.type==="callout"&&!/^(tip|info|warning|success)$/.test(b.variant))b.variant="tip";if(b&&b.type==="callout"&&b.icon!=null&&typeof b.icon!=="string")delete b.icon;if(b&&b.type==="table"){b.rows=(Array.isArray(b.rows)?b.rows:[]).map(r=>(Array.isArray(r)?r:[]).map(c=>c==null?"":String(c)));if(!b.rows.length)b.rows=[["",""]];const tw=Math.max.apply(null,b.rows.map(r=>r.length));b.rows.forEach(r=>{while(r.length<tw)r.push("")});b.header=b.header!==false;const _nc=b.rows[0]?b.rows[0].length:0,_nr=b.rows.length;if(Array.isArray(b.colWidths)){const cw=b.colWidths.slice(0,_nc).map(w=>{const v=parseInt(w,10);return v>0?v:0});while(cw.length<_nc)cw.push(0);b.colWidths=cw}if(b.cellIcons&&typeof b.cellIcons==="object"){Object.keys(b.cellIcons).forEach(k=>{const m=/^(\d+)_(\d+)$/.exec(k);if(!m||+m[1]>=_nr||+m[2]>=_nc||typeof b.cellIcons[k]!=="string")delete b.cellIcons[k]})}}if(b&&b.type==="open"){if(!b.qid)b.qid="o"+Math.random().toString(36).slice(2,9);if(typeof b.question!=="string")b.question="";if(typeof b.hint!=="string")b.hint=""}})});o.home=o.home&&typeof o.home==="object"?o.home:{};
+  {const VALID={title:1,subtitle:1,intro:1,cta:1,toc:1},ORDER=["title","subtitle","intro","cta","toc"],seen={};
+   let secs=Array.isArray(o.home.sections)?o.home.sections.filter(s=>s&&VALID[s.key]&&!seen[s.key]&&(seen[s.key]=1)).map(s=>({key:s.key,visible:s.visible!==false})):[];
+   ORDER.forEach(k=>{if(!seen[k])secs.push({key:k,visible:true})});
+   o.home.sections=secs;if(o.home.showCover===undefined)o.home.showCover=true;}
+  o.theme=o.theme&&typeof o.theme==="object"?o.theme:{};if(!o.theme.brand)o.theme.brand="#2563eb";if(!o.theme.size||o.theme.size==="full")o.theme.size="wide";return o}
+function loadBook(){try{const s=localStorage.getItem(LS);if(s)return normalize(JSON.parse(s))}catch(e){}return normalize(clone(SAMPLE))}
+let saveState="saved";
+function setSaveStatus(state){saveState=state;const el=document.getElementById("saveStatus");if(el){el.textContent=state==="error"?"לא נשמר — לחצו לשמירה ⚠":"נשמר ✓";el.className="saveStat "+(state==="error"?"err":"ok");el.title=state==="error"?"השמירה האוטומטית נכשלה — לחצו לשמירת הפרויקט לקובץ":"נשמר אוטומטית בדפדפן"}
+  const al=document.getElementById("saveAlert");if(al)al.classList.toggle("show",state==="error")}
+/* clicking the status pill while it shows «לא נשמר» downloads the project so nothing is lost */
+function onSaveStatusClick(){if(saveState==="error")saveProject()}
+function save(){try{localStorage.setItem(LS,JSON.stringify(book));setSaveStatus("saved");return true}catch(e){setSaveStatus("error");return false}}
+
+let book=loadBook();
+let previewRoute=book.pages.length?"page=1":"home";
+let previewTheme="light";
+let activePage=0;
+/* materials folder (authoring convenience + preview only; NOT saved in the book, NOT exported) */
+let mediaMap=null,mediaLib=[],folderName="";
+
+/* ---------- undo / redo ---------- */
+let undoStack=[],redoStack=[],histTimer=null;
+function updUndoButtons(){const u=document.getElementById("undoBtn"),r=document.getElementById("redoBtn");if(u)u.disabled=!undoStack.length;if(r)r.disabled=!redoStack.length}
+/* snapshot the CURRENT state before a mutation, so undo restores it */
+function snapshot(){undoStack.push(JSON.stringify(book));if(undoStack.length>60)undoStack.shift();redoStack.length=0;updUndoButtons()}
+/* coalesce rapid field edits into a single history entry (snapshot on first keystroke of a burst) */
+function histCoalesce(){if(histTimer){clearTimeout(histTimer)}else{snapshot()}histTimer=setTimeout(()=>{histTimer=null},800)}
+function undo(){if(!undoStack.length)return;if(histTimer){clearTimeout(histTimer);histTimer=null}redoStack.push(JSON.stringify(book));book=normalize(JSON.parse(undoStack.pop()));afterHistory()}
+function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(book));book=normalize(JSON.parse(redoStack.pop()));afterHistory()}
+function afterHistory(){if(activePage>book.pages.length-1)activePage=book.pages.length-1;previewRoute=book.pages.length?"page="+(Math.max(0,activePage)+1):"home";save();renderEditor();refreshPreview(true);updUndoButtons()}
+
+/* ---------- build reader (single source of truth for preview + export) ---------- */
+function readerText(id){return document.getElementById(id).textContent}
+function buildReaderHtml(bk,opts){
+  opts=opts||{};
+  const css=readerText("readerCss"),body=readerText("readerBody"),js=readerText("readerEngine");
+  let pre="";
+  if(opts.theme)pre+="window.__TB_THEME__="+JSON.stringify(opts.theme)+";";
+  if(opts.startRoute!=null)pre+="window.__TB_START__="+JSON.stringify(opts.startRoute)+";";
+  if(opts.media)pre+="window.__TB_MEDIA__="+JSON.stringify(opts.media)+";";/* preview only — never passed on export */
+  if(opts.preview)pre+="window.__TB_PREVIEW__=true;";/* disables learner progress tracking inside the editor */
+  if(opts.scorm)pre+="window.__TB_SCORM__=true;";
+  return `<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${esc(bk.title||"ספר לימוד דיגיטלי")}</title><style>${css}</style></head><body>${body}<`+`script>${pre}let BOOK=${JSON.stringify(bk)};${js}<\/script></body></html>`;
+}
+
+/* ---------- preview ---------- */
+let pvTimer,pvLastRoute="",pvLastTheme="",pvReady=false;
+function updatePvNow(){
+  const el=document.getElementById("pvNow");if(!el)return;
+  const r=previewRoute;let txt="";
+  if(r==="home")txt="דף הבית";
+  else if(r==="index")txt="תוכן העניינים";
+  else if(r==="done")txt="מסך הסיום";
+  else if(/^page=/.test(r)){const n=parseInt(r.slice(5),10)||1;const p=book.pages[n-1];txt="דף "+n+(p&&p.title?" · "+p.title:"")}
+  el.textContent=txt?("מציג: "+txt):"";
+}
+function refreshPreview(now){
+  clearTimeout(pvTimer);
+  updatePvNow();
+  const go=()=>{
+    const pv=document.getElementById("pv");
+    const sameRoute=(pvLastRoute===previewRoute),sameTheme=(pvLastTheme===previewTheme);
+    /* same route + theme and iframe already loaded → patch in place (keeps scroll, no reload flicker) */
+    if(pvReady&&sameRoute&&sameTheme){
+      try{pv.contentWindow.postMessage({__tb:"update",book:book},"*");return}catch(e){}
+    }
+    pvLastRoute=previewRoute;pvLastTheme=previewTheme;
+    let sc=0;
+    if(sameRoute){try{const sb=pv.contentWindow.document.getElementById("sheetBody");if(sb)sc=sb.scrollTop}catch(e){}}
+    pvReady=false;
+    pv.onload=()=>{pvReady=true;if(!sc)return;try{const sb=pv.contentWindow.document.getElementById("sheetBody");if(sb)sb.scrollTop=sc}catch(e){}};
+    pv.srcdoc=buildReaderHtml(book,{theme:previewTheme,startRoute:previewRoute,media:mediaMap||undefined,preview:true});
+  };
+  if(now)go();else pvTimer=setTimeout(go,220);
+}
+function pvGoPage(pi){const r="page="+(pi+1);if(previewRoute!==r){previewRoute=r;refreshPreview(true)}}
+function pvHome(){previewRoute="home";refreshPreview(true)}
+function pvIndex(){previewRoute="index";refreshPreview(true)}
+function pvDone(){previewRoute="done";refreshPreview(true)}
+function pvTheme(){previewTheme=previewTheme==="dark"?"light":"dark";document.getElementById("pvThemeBtn").innerHTML=previewTheme==="dark"?eic("sun"):eic("moon");refreshPreview(true)}
+
+/* ---------- field updates (no editor re-render → keep focus) ---------- */
+function updMeta(k,v){histCoalesce();book[k]=v;previewRoute="home";save();refreshPreview()}
+function updHome(v){histCoalesce();book.home=book.home||{};book.home.intro=v;previewRoute="home";save();refreshPreview()}
+function updOutro(v){histCoalesce();book.home=book.home||{};book.home.outro=v;previewRoute="done";save();refreshPreview()}
+function updDoneTitle(v){histCoalesce();book.home=book.home||{};book.home.doneTitle=v;previewRoute="done";save();refreshPreview()}
+function updPageTitle(i,v){histCoalesce();book.pages[i].title=v;previewRoute="page="+(i+1);save();refreshPreview()}
+function updBlock(pi,bi,k,v){histCoalesce();book.pages[pi].blocks[bi][k]=v;previewRoute="page="+(pi+1);save();refreshPreview()}
+/* media src typed by hand → also drop the "embedded" badge live (typing a filename replaces any embedded data URL) */
+function updMediaSrc(pi,bi,el){histCoalesce();book.pages[pi].blocks[bi].src=el.value;previewRoute="page="+(pi+1);save();refreshPreview();const field=el.closest(".field");if(field&&!/^data:/.test(el.value)){const b=field.querySelector(".embBadge");if(b)b.remove()}}
+
+/* ---------- structural ops (re-render editor + preview) ---------- */
+function newBlock(t){
+  if(t==="subheading")return {type:"subheading",text:"תת כותרת"};
+  if(t==="image")return {type:"image",src:"תמונה.png",caption:"",width:"80%",align:"center"};
+  if(t==="imagetext")return {type:"imagetext",src:"תמונה.png",caption:"",html:"כתבו כאן טקסט שילווה את התמונה. אפשר לעצב אותו בסרגל למעלה.",side:"right",width:"45%"};
+  if(t==="imagerow")return {type:"imagerow",images:[{src:"תמונה1.png",caption:""},{src:"תמונה2.png",caption:""}]};
+  if(t==="video")return {type:"video",src:"",caption:""};
+  if(t==="link")return {type:"link",text:"טקסט הקישור",url:"#"};
+  if(t==="quiz")return {type:"quiz",qid:"q"+Math.random().toString(36).slice(2,9),qmode:"single",question:"כתבו כאן את השאלה",options:[{text:"תשובה נכונה",correct:true},{text:"תשובה שגויה",correct:false},{text:"תשובה שגויה",correct:false}],explain:""};
+  if(t==="callout")return {type:"callout",variant:"tip",html:"כתבו כאן הערה חשובה. אפשר לעצב את הטקסט בסרגל."};
+  if(t==="accordion")return {type:"accordion",title:"לחצו כדי להרחיב",html:"התוכן שמופיע כשלוחצים על הכותרת."};
+  if(t==="table")return {type:"table",header:true,rows:[["כותרת א׳","כותרת ב׳"],["תא","תא"],["תא","תא"]]};
+  if(t==="divider")return {type:"divider"};
+  if(t==="open")return {type:"open",qid:"o"+Math.random().toString(36).slice(2,9),question:"כתבו כאן שאלה פתוחה לרפלקציה",hint:""};
+  return {type:"text",text:"טקסט חדש..."};
+}
+function addPage(){snapshot();book.pages.push({title:"דף חדש",blocks:[{type:"text",text:"תוכן הדף..."}]});activePage=book.pages.length-1;previewRoute="page="+book.pages.length;save();renderEditor();refreshPreview(true)}
+function delPage(i){if(!confirm("למחוק את הדף?"))return;snapshot();book.pages.splice(i,1);activePage=Math.max(0,Math.min(i,book.pages.length-1));previewRoute=book.pages.length?"page="+(activePage+1):"home";save();renderEditor();refreshPreview(true)}
+function dupPage(i){snapshot();book.pages.splice(i+1,0,clone(book.pages[i]));activePage=i+1;previewRoute="page="+(i+2);save();renderEditor();refreshPreview(true)}
+function movePage(i,d){const j=i+d;if(j<0||j>=book.pages.length)return;snapshot();const x=book.pages.splice(i,1)[0];book.pages.splice(j,0,x);activePage=j;previewRoute="page="+(j+1);save();renderEditor();refreshPreview(true)}
+function addBlock(pi,t){snapshot();book.pages[pi].blocks.push(newBlock(t));activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function delBlock(pi,bi){snapshot();book.pages[pi].blocks.splice(bi,1);activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function dupBlock(pi,bi){snapshot();const nb=clone(book.pages[pi].blocks[bi]);if(nb&&(nb.type==="quiz"||nb.type==="open"))nb.qid=(nb.type==="open"?"o":"q")+Math.random().toString(36).slice(2,9);book.pages[pi].blocks.splice(bi+1,0,nb);activePage=pi;save();renderEditor();refreshPreview(true)}
+function moveBlock(pi,bi,d){const arr=book.pages[pi].blocks;const j=bi+d;if(j<0||j>=arr.length)return;snapshot();const x=arr.splice(bi,1)[0];arr.splice(j,0,x);activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function setBlockType(pi,bi,t){snapshot();const old=book.pages[pi].blocks[bi];const nb=newBlock(t);
+  if(old.text&&(t==="subheading"||t==="text"||t==="link"))nb.text=old.text;
+  const htmlType=(t==="text"||t==="imagetext"||t==="callout"||t==="accordion");
+  if(htmlType&&old.html!=null)nb.html=old.html;
+  else if(htmlType&&old.text)nb.html=mdToHtml(old.text);
+  if((t==="imagetext"||t==="image")&&(old.type==="image"||old.type==="imagetext")){nb.src=old.src||"";nb.caption=old.caption||""}
+  if(t==="imagerow"&&old.type==="image")nb.images=[{src:old.src||"",caption:old.caption||""}];
+  if(t==="image"&&old.type==="imagerow"&&old.images&&old.images[0]){nb.src=old.images[0].src||"";nb.caption=old.images[0].caption||""}
+  book.pages[pi].blocks[bi]=nb;activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+/* imagerow image-slot editing */
+function updRowSrc(pi,bi,idx,el){histCoalesce();book.pages[pi].blocks[bi].images[idx].src=el.value;previewRoute="page="+(pi+1);save();refreshPreview();const field=el.closest(".field");if(field&&!/^data:/.test(el.value)){const bdg=field.querySelector(".embBadge");if(bdg)bdg.remove()}}
+function updRowCap(pi,bi,idx,v){histCoalesce();book.pages[pi].blocks[bi].images[idx].caption=v;previewRoute="page="+(pi+1);save();refreshPreview()}
+function addRowImg(pi,bi){const im=book.pages[pi].blocks[bi].images;if(im.length>=3)return;snapshot();im.push({src:"",caption:""});activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function delRowImg(pi,bi,idx){const im=book.pages[pi].blocks[bi].images;if(im.length<=1)return;snapshot();im.splice(idx,1);activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function togglePage(pi){activePage=(activePage===pi?-1:pi);renderEditor();if(activePage===pi)pvGoPage(pi)}
+function jumpPage(pi){activePage=pi;renderEditor();pvGoPage(pi);const c=document.getElementById("pageCard_"+pi);if(c)c.scrollIntoView({behavior:"smooth",block:"start"})}
+/* open the page and scroll to a specific block's editor, briefly highlighting it (used by preview click-to-edit) */
+function editBlockFromPreview(pi,bi){
+  if(typeof pi!=="number"||pi<0||pi>book.pages.length-1)return;
+  activePage=pi;renderEditor();
+  setTimeout(function(){
+    const card=document.getElementById("blkCard_"+pi+"_"+bi);
+    if(card){card.scrollIntoView({behavior:"smooth",block:"center"});card.classList.remove("flash");void card.offsetWidth;card.classList.add("flash");setTimeout(function(){card.classList.remove("flash")},1600);}
+    else{const pc=document.getElementById("pageCard_"+pi);if(pc)pc.scrollIntoView({behavior:"smooth",block:"start"})}
+  },60);
+}
+/* ---------- drag & drop reordering (pages + blocks within a page) ---------- */
+let dragPage=null,dragBlk=null;
+function pageDragStart(pi,ev){dragPage=pi;ev.dataTransfer.effectAllowed="move";try{ev.dataTransfer.setData("text/plain","p"+pi)}catch(e){}}
+function pageDragOver(pi,ev){if(dragPage===null)return;ev.preventDefault();ev.dataTransfer.dropEffect="move"}
+function pageDrop(pi,ev){if(dragPage===null)return;ev.preventDefault();ev.stopPropagation();const from=dragPage;dragPage=null;if(from===pi)return;snapshot();const x=book.pages.splice(from,1)[0];book.pages.splice(pi,0,x);activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function blkDragStart(pi,bi,ev){dragBlk={pi,bi};ev.dataTransfer.effectAllowed="move";try{ev.dataTransfer.setData("text/plain","b"+pi+"_"+bi)}catch(e){}ev.stopPropagation()}
+function blkDragOver(pi,bi,ev){if(!dragBlk||dragBlk.pi!==pi)return;ev.preventDefault();ev.dataTransfer.dropEffect="move"}
+function blkDrop(pi,bi,ev){if(!dragBlk||dragBlk.pi!==pi){dragBlk=null;return}ev.preventDefault();ev.stopPropagation();const from=dragBlk.bi;dragBlk=null;if(from===bi)return;snapshot();const arr=book.pages[pi].blocks;const x=arr.splice(from,1)[0];arr.splice(bi,0,x);activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+/* ---------- materials folder: pick once, then filenames autocomplete + preview from it ---------- */
+const IMG_EXT=/\.(png|jpe?g|gif|webp|svg|avif|bmp)$/i,VID_EXT=/\.(mp4|webm|ogg|ogv|mov|m4v)$/i;
+function pickFolder(ev){
+  const files=Array.from(ev.target.files||[]);ev.target.value="";if(!files.length)return;
+  mediaLib.forEach(m=>{try{URL.revokeObjectURL(m.url)}catch(e){}});
+  mediaMap={};mediaLib=[];const seen={};
+  files.forEach(f=>{const name=f.name;if(seen[name])return;seen[name]=1;const kind=IMG_EXT.test(name)?"image":VID_EXT.test(name)?"video":"other";const url=URL.createObjectURL(f);mediaMap[name]=url;mediaLib.push({name,url,kind,file:f})});
+  const rp=files[0].webkitRelativePath||"";folderName=rp.indexOf("/")>=0?rp.split("/")[0]:"";
+  pvReady=false;renderEditor();refreshPreview(true);
+  toast("נטענה תיקייה"+(folderName?" «"+folderName+"»":"")+" — "+mediaLib.length+" קבצים");
+}
+function clearFolder(){mediaLib.forEach(m=>{try{URL.revokeObjectURL(m.url)}catch(e){}});mediaMap=null;mediaLib=[];folderName="";pvReady=false;renderEditor();refreshPreview(true)}
+function mediaDatalists(){const opt=arr=>arr.map(m=>`<option value="${attr(m.name)}"></option>`).join("");return `<datalist id="tbImgFiles">${opt(mediaLib.filter(m=>m.kind==="image"))}</datalist><datalist id="tbVidFiles">${opt(mediaLib.filter(m=>m.kind==="video"))}</datalist>`}
+function folderCard(){
+  const has=mediaLib.length>0;
+  const info=has?`<div class="folderInfo">${eic("folder",14)} <b>${esc(folderName||"תיקייה")}</b> · ${mediaLib.length} קבצים (${mediaLib.filter(m=>m.kind==="image").length} תמונות, ${mediaLib.filter(m=>m.kind==="video").length} וידאו) <button type="button" class="btn sm" onclick="clearFolder()">ניקוי</button></div>`:`<div class="hint" style="margin:0">בחרו את תיקיית החומרים כדי לבחור שמות קבצים בהשלמה אוטומטית ולראות תמונות/וידאו בתצוגה — גם אם העורך לא נפתח מתוך התיקייה. (יש לבחור מחדש בכל פתיחה.)</div>`;
+  return `<div class="card" id="folderCard"><div class="cardTitle">${eic("folder",15)} תיקיית חומרים</div><div class="cardBody"><label class="btn wide filebtn" style="margin-top:0">${eic("folder")} ${has?"החלפת תיקייה":"בחירת תיקיית חומרים"}<input type="file" webkitdirectory directory multiple onchange="pickFolder(event)"></label>${info}</div></div>`;
+}
+/* editor-side font stacks (mirror of the reader-engine FONT_STACKS). system fonts only — airgapped. */
+const EFONT_STACKS={_default:"'Heebo','Assistant',Arial,sans-serif",modern:"'Heebo','Assistant',Arial,sans-serif",rounded:"'Varela Round','Assistant','Heebo',Arial,sans-serif",classic:"'Frank Ruhl Libre','David Libre','Times New Roman',Georgia,serif",clean:"'Rubik','Assistant','Heebo',Arial,sans-serif"};
+const FONT_LBL={modern:"מודרני (Heebo)",rounded:"עגול (Varela)",classic:"קלאסי עם תגים",clean:"נקי (Rubik)"};
+const FONT_VAL={"מודרני (Heebo)":"modern","עגול (Varela)":"rounded","קלאסי עם תגים":"classic","נקי (Rubik)":"clean"};
+/* reflect the chosen font in the editor chrome + RTE inputs so authoring is WYSIWYG with the preview */
+function applyEditorFont(){var f=(book.theme&&book.theme.font);document.documentElement.style.setProperty("--font",EFONT_STACKS[f]||EFONT_STACKS._default)}
+/* reset a role color back to "same as the book color" (removes the override entirely → backward-compatible default) */
+function resetThemeColor(k){
+  histCoalesce();book.theme=book.theme||{};delete book.theme[k];save();
+  var base=((book.theme&&book.theme.brand)||"#2563eb").toLowerCase();
+  var row=document.querySelector('.palRow[data-key="'+k+'"]');
+  if(row){
+    row.querySelectorAll('.swatch[data-c]').forEach(function(s){s.classList.toggle("active",s.getAttribute("data-c")===base)});
+    var cp=row.querySelector('.cpick');if(cp)cp.value=base;
+    var rb=row.querySelector('.inheritBtn');if(rb)rb.classList.add("active");
+  }
+  refreshPreview(true);
+}
+/* palette + size — update live WITHOUT a full editor re-render (re-rendering mid-click could retarget the click onto the color input and pop the native picker) */
+function updTheme(k,v){
+  histCoalesce();book.theme=book.theme||{};book.theme[k]=v;save();
+  if(k==="brand"||k==="headingColor"||k==="accentColor"){
+    var row=document.querySelector('.palRow[data-key="'+k+'"]');
+    if(row){
+      row.querySelectorAll('.swatch[data-c]').forEach(function(s){s.classList.toggle("active",s.getAttribute("data-c")===String(v).toLowerCase())});
+      var cp=row.querySelector('.cpick');if(cp&&cp.value.toLowerCase()!==String(v).toLowerCase())cp.value=v;
+      var rb=row.querySelector('.inheritBtn');if(rb)rb.classList.remove("active");
+    }
+  }
+  else if(k==="bg"){
+    document.querySelectorAll(".bgRow .bgvar[data-b]").forEach(function(s){s.classList.toggle("active",s.getAttribute("data-b")===String(v))});
+  }
+  else if(k==="font"){applyEditorFont()}
+  refreshPreview(true);
+}
+
+/* ---------- markup buttons ---------- */
+function ebWrap(id,before,after){const ta=document.getElementById(id);if(!ta)return;const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value;const sel=v.slice(s,e)||"טקסט";ta.value=v.slice(0,s)+before+sel+after+v.slice(e);ta.dispatchEvent(new Event("input"));ta.focus();const ns=s+before.length;ta.setSelectionRange(ns,ns+sel.length)}
+function ebLink(id){const ta=document.getElementById(id);if(!ta)return;const url=prompt("כתובת הקישור:","https://");if(url===null)return;const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value;const sel=v.slice(s,e)||"טקסט הקישור";const ins="["+sel+"]("+url+")";ta.value=v.slice(0,s)+ins+v.slice(e);ta.dispatchEvent(new Event("input"));ta.focus()}
+function ebList(id){const ta=document.getElementById(id);if(!ta)return;const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value;
+  const ls=v.lastIndexOf("\n",s-1)+1;let le=v.indexOf("\n",e);if(le<0)le=v.length;
+  const seg=v.slice(ls,le);const out=seg.split("\n").map(l=>l.trim()?(/^\s*[-*]\s+/.test(l)?l:"- "+l):l).join("\n");
+  ta.value=v.slice(0,ls)+out+v.slice(le);ta.dispatchEvent(new Event("input"));ta.focus();ta.setSelectionRange(ls,ls+out.length)}
+
+/* ---------- editor field builders ---------- */
+function fInput(label,val,handler,focus){return `<div class="field"><label>${esc(label)}</label><input value="${attr(val||"")}" oninput="${handler}"${focus?` onfocus="${focus}"`:""}></div>`}
+function fSelect(label,val,opts,handler,focus){return `<div class="field"><label>${esc(label)}</label><select onchange="${handler}"${focus?` onfocus="${focus}"`:""}>${opts.map(o=>`<option value="${o}" ${String(val)===o?"selected":""}>${o}</option>`).join("")}</select></div>`}
+function fArea(id,label,val,handler,focus){return `<div class="field"><label>${esc(label)}</label><div class="mkbar"><button type="button" onmousedown="event.preventDefault()" onclick="ebWrap('${id}','**','**')"><b>B</b> מודגש</button><button type="button" onmousedown="event.preventDefault()" onclick="ebList('${id}')">${eic("list",14)} רשימה</button><button type="button" onmousedown="event.preventDefault()" onclick="ebLink('${id}')">${eic("link",14)} קישור</button></div><textarea id="${id}" oninput="${handler}"${focus?` onfocus="${focus}"`:""}>${esc(val||"")}</textarea></div>`}
+/* image width slider (20–100%) — gives real resize feel; stores "NN%" */
+function fWidth(pi,bi,val,min){const n=parseInt(val)||80;const lo=min||20;return `<div class="field"><label>רוחב התמונה — <span id="wl_${pi}_${bi}">${n}%</span></label><input type="range" class="wSlider" min="${lo}" max="100" step="5" value="${n}" oninput="var e=document.getElementById('wl_${pi}_${bi}');if(e)e.textContent=this.value+'%';updBlock(${pi},${bi},'width',this.value+'%')" onfocus="pvGoPage(${pi})"></div>`}
+/* image alignment button group (right / center / left) */
+function fAlign(pi,bi,cur,label){const cu=cur||"center";const b=(v,g,t)=>`<button type="button" class="opb alnBtn${cu===v?" active":""}" title="${t}" onclick="setAlign(${pi},${bi},'${v}',this)">${g}</button>`;return `<div class="field"><label>${esc(label||"יישור התמונה")}</label><div class="alnRow">${b("right","→ ימין","יישור לימין")+b("center","↔ מרכז","מרכוז")+b("left","← שמאל","יישור לשמאל")}</div></div>`}
+/* image+text: side of the image + width of its column */
+function fSideWidth(pi,bi,b){const side=b.side==="left"?"left":"right";const n=parseInt(b.width)||45;const sb=(v,t)=>`<button type="button" class="opb alnBtn${side===v?" active":""}" title="${t}" onclick="setSide(${pi},${bi},'${v}',this)">${t}</button>`;
+  return `<div class="field"><label>צד התמונה</label><div class="alnRow">${sb("right","→ ימין")+sb("left","← שמאל")}</div></div>`+
+  `<div class="field"><label>רוחב התמונה — <span id="sw_${pi}_${bi}">${n}%</span></label><input type="range" class="wSlider" min="25" max="70" step="5" value="${n}" oninput="var e=document.getElementById('sw_${pi}_${bi}');if(e)e.textContent=this.value+'%';updBlock(${pi},${bi},'width',this.value+'%')" onfocus="pvGoPage(${pi})"></div>`}
+/* rich-text WYSIWYG field for a text block (or the text side of an image+text block) */
+function fRich(id,pi,bi,b,label){
+  const initial=(b.html!=null)?rteClean(b.html):mdToHtml(b.text||"");
+  const al=b.align||"right";
+  const cbtn=(cmd,inner,title)=>`<button type="button" class="rteBtn" title="${title}" onmousedown="event.preventDefault()" onclick="rteCmd('${id}','${cmd}')">${inner}</button>`;
+  const abtn=(val,glyph,title)=>`<button type="button" class="rteBtn rteAlign${al===val?" active":""}" title="${title}" onmousedown="event.preventDefault()" onclick="setBlkAlign(${pi},${bi},'${val}',this)">${glyph}</button>`;
+  const bar=`<div class="rteBar">`+
+    cbtn("bold","<b>B</b>","מודגש")+cbtn("italic","<i>I</i>","נטוי")+cbtn("underline","<u>U</u>","קו תחתון")+cbtn("strikeThrough","<s>S</s>","קו חוצה")+
+    `<label class="rteBtn rteColorLbl" title="צבע טקסט" onmousedown="event.preventDefault()"><b>A</b><span class="bar" style="background:#e11d48"></span><input type="color" value="#e11d48" onmousedown="rteSave()" onchange="rteColor('${id}','foreColor',this.value)"></label>`+
+    `<label class="rteBtn rteColorLbl" title="צבע הדגשה" onmousedown="event.preventDefault()">${eic("palette",14)}<span class="bar" style="background:#ffe066"></span><input type="color" value="#ffe066" onmousedown="rteSave()" onchange="rteColor('${id}','hiliteColor',this.value)"></label>`+
+    `<select class="rteSel" title="גודל טקסט" onmousedown="rteSave()" onchange="rteSize('${id}',this.value);this.selectedIndex=0"><option value="">גודל</option><option value="0.85em">קטן</option><option value="1.25em">גדול</option><option value="1.6em">גדול מאוד</option><option value="2.1em">ענק</option></select>`+
+    `<span class="rteSep"></span>`+
+    abtn("right","→","יישור לימין")+abtn("center","↔","מרכוז")+abtn("left","←","יישור לשמאל")+abtn("justify","≣","מוצדק")+
+    `<span class="rteSep"></span>`+
+    cbtn("insertUnorderedList",eic("list",14),"רשימה")+
+    `<button type="button" class="rteBtn" title="קישור" onmousedown="event.preventDefault()" onclick="rteLink('${id}')">${eic("link",14)}</button>`+
+    `<button type="button" class="rteBtn" title="ניקוי עיצוב" onmousedown="event.preventDefault()" onclick="rteClear('${id}')">✕</button>`+
+  `</div>`;
+  return `<div class="field"><label>${esc(label||"טקסט — סמנו טקסט והחילו עיצוב")}</label><div class="rte">${bar}<div class="rteInput" id="${id}" contenteditable="true" dir="rtl" data-ph="כתבו כאן…" oninput="updBlock(${pi},${bi},'html',rteClean(this.innerHTML))" onfocus="pvGoPage(${pi})" onmouseup="rteSave()" onkeyup="rteSave()" onblur="rteSave()">${initial}</div></div></div>`;
+}
+/* knowledge-check editor: type, question, options (text + correct toggle + delete), explanation */
+function fQuiz(id,pi,bi,b){
+  const mode=b.qmode==="multi"?"multi":(b.qmode==="truefalse"?"truefalse":"single");
+  const MODE_LBL={single:"תשובה אחת נכונה",multi:"כמה תשובות נכונות",truefalse:"נכון / לא נכון"};
+  const modeSel=`<div class="field"><label>סוג השאלה</label><select onchange="updQuizMode(${pi},${bi},this.value)">${["single","multi","truefalse"].map(m=>`<option value="${m}" ${mode===m?"selected":""}>${MODE_LBL[m]}</option>`).join("")}</select></div>`;
+  const q=fInput("השאלה",b.question,`updBlock(${pi},${bi},'question',this.value)`,`pvGoPage(${pi})`);
+  const opts=Array.isArray(b.options)?b.options:[];
+  const lockText=mode==="truefalse";
+  const canDel=mode!=="truefalse"&&opts.length>2;
+  const rows=opts.map((o,idx)=>{const on=o.correct?" active":"";const mark=mode==="multi"?"☑":"◉";
+    return `<div class="qOpt"><button type="button" class="opb qCorrect${on}" title="${o.correct?"מסומנת כנכונה":"סימון כתשובה נכונה"}" onclick="setQuizCorrect(${pi},${bi},${idx})">${o.correct?mark+" נכונה":"סימון נכונה"}</button><input class="qOptText" value="${attr(o.text||"")}" placeholder="טקסט התשובה" ${lockText?"readonly":""} oninput="updQuizOptText(${pi},${bi},${idx},this.value)" onfocus="pvGoPage(${pi})">${canDel?`<button type="button" class="opb del" title="מחיקה" aria-label="מחיקת אפשרות" onclick="delQuizOpt(${pi},${bi},${idx})">${eic("trash",14)}</button>`:""}</div>`}).join("");
+  const add=mode!=="truefalse"?`<button type="button" class="chip" onclick="addQuizOpt(${pi},${bi})">${eic("plus",14)} הוספת אפשרות</button>`:"";
+  const explain=fArea(id+"_ex","הסבר / משוב (מוצג אחרי הבדיקה, רשות)",b.explain,`updBlock(${pi},${bi},'explain',this.value)`,`pvGoPage(${pi})`);
+  return modeSel+q+`<div class="field"><label>אפשרויות (סמנו את התשובה/ות הנכונה/ות)</label><div class="qOpts">${rows}</div><div style="margin-top:8px">${add}</div></div>`+explain;
+}
+function fMedia(pi,bi,label,val,accept){const isData=/^data:/.test(val||"");const isVid=accept.indexOf("video")>=0;
+  /* video: link only (no upload) — prefer a YouTube/Vimeo/Kaltura link, or a filename bundled into the Moodle folder */
+  if(isVid){
+    return `<div class="field"><label>${esc(label)}</label>
+    <input list="tbVidFiles" value="${isData?"":attr(val||"")}" placeholder="קישור ליוטיוב / וימאו / קלטורה, קוד הטמעה, או שם קובץ בתיקייה" oninput="updMediaSrc(${pi},${bi},this)" onfocus="pvGoPage(${pi})">
+    <div class="uplNote">הדביקו קישור לסרטון (יוטיוב / וימאו / קלטורה), או הזינו שם קובץ והעלו אותו לתיקייה ב-Moodle יחד עם שאר הקבצים.${isData?" <b>קיים סרטון מוטמע — הזינו קישור כדי להחליפו.</b>":""}</div></div>`;
+  }
+  /* image: reference by filename from the materials folder (or a link) */
+  return `<div class="field"><label>${esc(label)}</label>
+  <input list="tbImgFiles" value="${isData?"":attr(val||"")}" placeholder="שם קובץ (למשל תמונה.png) או קישור" oninput="updMediaSrc(${pi},${bi},this)" onfocus="pvGoPage(${pi})">${isData?`<div class="mkbar" style="margin-top:6px"><span class="embBadge" style="font-size:12px;color:var(--muted)">✔ קובץ מוטמע (מפרויקט קודם)</span></div>`:""}
+  <div class="uplNote">בחרו «תיקיית חומרים» למעלה, הקלידו שם קובץ ובחרו מההשלמה האוטומטית. את כל הקבצים מעלים לתיקייה אחת ב-Moodle יחד עם הספר.</div></div>`}
+/* image slot inside an image-row block */
+function fRowImg(pi,bi,idx,im,canDel){const isData=/^data:/.test(im.src||"");const fc=`pvGoPage(${pi})`;
+  return `<div class="rowImg"><div class="rowImgHead"><span class="rowImgNum">${idx+1}</span>${canDel?`<button type="button" class="opb del" title="הסרה" aria-label="הסרת תמונה" onclick="delRowImg(${pi},${bi},${idx})">${eic("trash",14)}</button>`:""}</div>
+  <div class="field"><input list="tbImgFiles" value="${isData?"":attr(im.src||"")}" placeholder="שם קובץ (למשל תמונה.png) או קישור" oninput="updRowSrc(${pi},${bi},${idx},this)" onfocus="${fc}">${isData?`<div class="mkbar" style="margin-top:6px"><span class="embBadge" style="font-size:12px;color:var(--muted)">✔ מוטמע (מפרויקט קודם)</span></div>`:""}</div>
+  <div class="field"><input value="${attr(im.caption||"")}" placeholder="כיתוב (רשות)" oninput="updRowCap(${pi},${bi},${idx},this.value)" onfocus="${fc}"></div></div>`}
+function fImageRow(pi,bi,b){const imgs=Array.isArray(b.images)?b.images:[];
+  const cells=imgs.slice(0,3).map((im,idx)=>fRowImg(pi,bi,idx,im,imgs.length>1)).join("");
+  const addBtn=imgs.length<3?`<button type="button" class="chip" onclick="addRowImg(${pi},${bi})">${eic("plus",14)} הוספת תמונה</button>`:`<span class="hint" style="margin:0;padding:6px 10px">מקסימום 3 תמונות בשורה</span>`;
+  return `<div class="field"><label>תמונות בשורה (1–3)</label><div class="rowImgs">${cells}</div><div style="margin-top:8px">${addBtn}</div><div class="uplNote">הקלידו שם קובץ (מהשלמה אוטומטית של «תיקיית חומרים») או קישור. את כל הקבצים מעלים לתיקייה אחת ב-Moodle יחד עם הספר.</div></div>`}
+/* ---------- callout (highlight / note box) ---------- */
+const CALLOUT_VARIANTS=[["tip","טיפ"],["info","מידע"],["warning","אזהרה"],["success","הצלחה"]];
+/* editor-side copy of the icon bank (for the pickers). KEEP IN SYNC with the reader-engine CALLOUT_ICON_BANK. */
+const EBANK={
+  tip:'<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12c.5.5 1 1.5 1 3h6c0-1.5.5-2.5 1-3a7 7 0 0 0-4-12z"/>',
+  info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/>',
+  warning:'<path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18h.01"/>',
+  success:'<circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/>',
+  star:'<path d="M12 17.3l-6.2 3.7 1.6-7L2 9.2l7.1-.6L12 2l2.9 6.6 7.1.6-5.4 4.8 1.6 7z"/>',
+  book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+  pencil:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  question:'<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+  flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/>',
+  pin:'<path d="M12 21s-6-5.7-6-10a6 6 0 0 1 12 0c0 4.3-6 10-6 10z"/><circle cx="12" cy="11" r="2"/>',
+  heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.7-7.6 1.1-1.1a5.5 5.5 0 0 0 0-7.7z"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  zap:'<path d="M4 14h7l-1 8 10-12h-7l1-8z"/>',
+  note:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/>',
+  bookmark:'<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  user:'<path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/>',
+  message:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  award:'<circle cx="12" cy="8" r="6"/><path d="M15.5 12.5 17 22l-5-3-5 3 1.5-9.5"/>',
+  rocket:'<path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2 0-2.8a2 2 0 0 0-3 0z"/><path d="M12 15l-3-3a22 22 0 0 1 8-10c3 0 5 2 5 5a22 22 0 0 1-10 8z"/><path d="M9 12H4s.5-3 2-4 5 0 5 0"/><path d="M12 15v5s3-.5 4-2 0-5 0-5"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/>',
+  map:'<path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/>',
+  image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
+  play:'<circle cx="12" cy="12" r="10"/><path d="m10 8 6 4-6 4z"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.4"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.4"/>',
+  checklist:'<path d="M11 6h10M11 12h10M11 18h10"/><path d="m3 6 1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2"/>',
+  shield:'<path d="M12 2 4 5v6c0 5 3.5 8 8 11 4.5-3 8-6 8-11V5z"/>',
+  folder:'<path d="M4 20a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2z"/>',
+  graduation:'<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2.5 3 6 3s6-2 6-3v-5"/>',
+  compass:'<circle cx="12" cy="12" r="10"/><path d="m16 8-2 6-6 2 2-6z"/>'
+};
+const ICON_BANK_LIST=[["tip","נורה"],["info","מידע"],["warning","אזהרה"],["success","וי בעיגול"],["star","כוכב"],["book","ספר"],["pencil","עיפרון"],["question","שאלה"],["flag","דגל"],["pin","סיכה"],["heart","לב"],["clock","שעון"],["target","מטרה"],["bell","פעמון"],["check","סימון"],["x","איקס"],["zap","ברק"],["note","פתק"],["bookmark","סימנייה"],["search","חיפוש"],["eye","עין"],["users","קבוצה"],["user","משתמש"],["message","הודעה"],["calendar","לוח שנה"],["award","פרס"],["rocket","רקטה"],["globe","גלובוס"],["map","מפה"],["image","תמונה"],["play","נגן"],["link","קישור"],["checklist","רשימת מטלות"],["shield","מגן"],["folder","תיקייה"],["graduation","כובע סיום"],["compass","מצפן"]];
+function bankIcon(name,size){return '<svg class="ic" width="'+(size||18)+'" height="'+(size||18)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(EBANK[name]||"")+'</svg>'}
+function setCalloutIcon(pi,bi,name){snapshot();const b=book.pages[pi].blocks[bi];if(name)b.icon=name;else delete b.icon;activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true);closeIcoPop()}
+function openCalloutIcoPop(pi,bi,btn){const b=book.pages[pi].blocks[bi];openIcoPop(btn,b.icon||"","אוטומטי (לפי סוג)",function(name){setCalloutIcon(pi,bi,name)})}
+function fCalloutVariant(pi,bi,b){
+  const cur=b.variant||"tip";
+  const btns=CALLOUT_VARIANTS.map(([v,lbl])=>`<button type="button" class="opb alnBtn cvar cvar-${v}${cur===v?" active":""}" onclick="updBlock(${pi},${bi},'variant','${v}')"><span class="cvarDot"></span>${lbl}</button>`).join("");
+  const icoLabel=b.icon?`${bankIcon(b.icon,20)}<span class="icoChooseName">${esc((ICON_BANK_LIST.find(x=>x[0]===b.icon)||["",b.icon])[1])}</span>`:`<span class="icoChooseName">אוטומטי (לפי סוג)</span>`;
+  const icoBtn=`<button type="button" class="icoChooseBtn" title="בחירת אייקון לתיבה" onclick="openCalloutIcoPop(${pi},${bi},this)">${icoLabel}<span class="icoChooseCaret">${eic("chevronDown",14)}</span></button>`;
+  return `<div class="field"><label>סוג התיבה</label><div class="alnRow">${btns}</div></div>`+
+    `<div class="field"><label>אייקון התיבה</label>${icoBtn}</div>`;
+}
+/* ---------- table editor (grid of text inputs; optional header row) ---------- */
+function tblRows(b){return Array.isArray(b.rows)?b.rows:[]}
+function updTableCell(pi,bi,r,c,v){histCoalesce();const rows=tblRows(book.pages[pi].blocks[bi]);if(rows[r])rows[r][c]=v;previewRoute="page="+(pi+1);save();refreshPreview()}
+function toggleTableHeader(pi,bi){snapshot();const b=book.pages[pi].blocks[bi];b.header=!(b.header!==false);activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function addTableRow(pi,bi){snapshot();const b=book.pages[pi].blocks[bi],rows=tblRows(b),cols=rows[0]?rows[0].length:2;rows.push(new Array(cols).fill(""));activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function delTableRow(pi,bi){snapshot();const b=book.pages[pi].blocks[bi],rows=tblRows(b);if(rows.length>1){rows.pop();tblPrune(b)}activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function addTableCol(pi,bi){snapshot();const b=book.pages[pi].blocks[bi],rows=tblRows(b);rows.forEach(r=>r.push(""));if(Array.isArray(b.colWidths))b.colWidths.push(0);activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+function delTableCol(pi,bi){snapshot();const b=book.pages[pi].blocks[bi],rows=tblRows(b);if(rows[0]&&rows[0].length>1){rows.forEach(r=>r.pop());if(Array.isArray(b.colWidths))b.colWidths.pop();tblPrune(b)}activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true)}
+/* drop any cell-icon entries that point outside the current row/col count (after a row/col removal) */
+function tblPrune(b){if(!b.cellIcons||typeof b.cellIcons!=="object")return;const nr=b.rows.length,nc=b.rows[0]?b.rows[0].length:0;Object.keys(b.cellIcons).forEach(k=>{const m=/^(\d+)_(\d+)$/.exec(k);if(!m||+m[1]>=nr||+m[2]>=nc)delete b.cellIcons[k]})}
+/* column width (px). Empty/0 = automatic. No editor re-render so the number input keeps focus while typing. */
+function setColWidth(pi,bi,c,v){histCoalesce();const b=book.pages[pi].blocks[bi];const nc=b.rows[0]?b.rows[0].length:0;if(!Array.isArray(b.colWidths))b.colWidths=new Array(nc).fill(0);while(b.colWidths.length<nc)b.colWidths.push(0);const n=parseInt(v,10);b.colWidths[c]=(n>0)?n:0;if(b.colWidths.every(w=>!w))delete b.colWidths;previewRoute="page="+(pi+1);save();refreshPreview()}
+/* shared icon-bank picker popover (one at a time) — used by callouts and table cells.
+   firstLabel is the "no icon"/"auto" choice (passes '' to pickFn); a scrollable grid follows. */
+let _icoPick=null;
+function closeIcoPop(){const p=document.getElementById("icoPop");if(p)p.remove();document.removeEventListener("mousedown",_icoOutside,true);_icoPick=null}
+function _icoOutside(e){const p=document.getElementById("icoPop");if(p&&!p.contains(e.target))closeIcoPop()}
+function _icoChoose(name){const fn=_icoPick;if(fn)fn(name)}
+function openIcoPop(btn,cur,firstLabel,pickFn){
+  closeIcoPop();_icoPick=pickFn;
+  const pop=document.createElement("div");pop.id="icoPop";pop.className="icoPop";
+  pop.innerHTML=`<button type="button" class="opb icoPick icoPickWide${!cur?" active":""}" title="${esc(firstLabel)}" onclick="_icoChoose('')">${esc(firstLabel)}</button>`+
+    ICON_BANK_LIST.map(([n,lbl])=>`<button type="button" class="opb icoPick${cur===n?" active":""}" title="${esc(lbl)}" aria-label="${esc(lbl)}" onclick="_icoChoose('${n}')">${bankIcon(n,18)}</button>`).join("");
+  document.body.appendChild(pop);
+  const rc=btn.getBoundingClientRect();
+  pop.style.top=Math.min(rc.bottom+4,window.innerHeight-8-pop.offsetHeight)+"px";
+  pop.style.left=Math.max(8,Math.min(rc.left,window.innerWidth-pop.offsetWidth-8))+"px";
+  setTimeout(()=>document.addEventListener("mousedown",_icoOutside,true),0);
+}
+function setCellIcon(pi,bi,r,c,name){snapshot();const b=book.pages[pi].blocks[bi];b.cellIcons=b.cellIcons&&typeof b.cellIcons==="object"?b.cellIcons:{};const k=r+"_"+c;if(name)b.cellIcons[k]=name;else delete b.cellIcons[k];if(!Object.keys(b.cellIcons).length)delete b.cellIcons;activePage=pi;previewRoute="page="+(pi+1);save();renderEditor();refreshPreview(true);closeIcoPop()}
+function openCellIcoPop(pi,bi,r,c,btn){const cur=((book.pages[pi].blocks[bi].cellIcons)||{})[r+"_"+c]||"";openIcoPop(btn,cur,"ללא אייקון",function(name){setCellIcon(pi,bi,r,c,name)})}
+function fTable(pi,bi,b){
+  const rows=tblRows(b),hasHead=b.header!==false;
+  const cw=Array.isArray(b.colWidths)?b.colWidths:[];
+  const ncols=rows[0]?rows[0].length:0;
+  const icons=(b.cellIcons&&typeof b.cellIcons==="object")?b.cellIcons:{};
+  const grid=rows.map((row,r)=>`<div class="tblEdRow">${row.map((cell,c)=>{const ic=icons[r+"_"+c]||"";return `<div class="tblEdCellWrap"><button type="button" class="tblCellIcoBtn${ic?" has":""}" title="אייקון לתא" aria-label="בחירת אייקון לתא" onclick="openCellIcoPop(${pi},${bi},${r},${c},this)">${ic?bankIcon(ic,16):eic("plus",13)}</button><input class="tblEdCell${hasHead&&r===0?" head":""}" value="${attr(cell||"")}" placeholder="${hasHead&&r===0?"כותרת":"תא"}" oninput="updTableCell(${pi},${bi},${r},${c},this.value)" onfocus="pvGoPage(${pi})"></div>`}).join("")}</div>`).join("");
+  const widthRow=ncols?`<div class="tblWidthRow"><span class="tblWidthLbl">רוחב עמודות (px, ריק=אוטומטי):</span>${Array.from({length:ncols}).map((_,c)=>`<input type="number" min="0" step="10" class="tblWidthIn" value="${cw[c]?parseInt(cw[c],10):""}" placeholder="אוטו" title="רוחב עמודה ${c+1}" oninput="setColWidth(${pi},${bi},${c},this.value)">`).join("")}</div>`:"";
+  const ctr=`<div class="tblEdBar">`+
+    `<button type="button" class="chip" onclick="addTableRow(${pi},${bi})">${eic("plus",14)} שורה</button>`+
+    `<button type="button" class="chip" onclick="addTableCol(${pi},${bi})">${eic("plus",14)} עמודה</button>`+
+    `<button type="button" class="chip" onclick="delTableRow(${pi},${bi})">${eic("trash",14)} שורה</button>`+
+    `<button type="button" class="chip" onclick="delTableCol(${pi},${bi})">${eic("trash",14)} עמודה</button>`+
+    `<label class="hsCover" style="margin:0 4px"><input type="checkbox" ${hasHead?"checked":""} onchange="toggleTableHeader(${pi},${bi})"> שורת כותרת</label>`+
+  `</div>`;
+  return `<div class="field"><label>טבלה — לחצו על תא כדי לערוך, או על ＋ להוספת אייקון</label><div class="tblEd">${grid}</div>${widthRow}${ctr}</div>`;
+}
+const TYPES=["subheading","text","callout","image","imagetext","imagerow","video","table","accordion","link","divider","quiz","open"];
+function blkLabel(t){return {subheading:"תת-כותרת",text:"טקסט",callout:"תיבת הדגשה",image:"תמונה",imagetext:"תמונה וטקסט",imagerow:"שורת תמונות",video:"וידאו",table:"טבלה",accordion:"אקורדיון (קרא עוד)",link:"קישור",divider:"קו מפריד",quiz:"שאלת בדיקה",open:"שאלה פתוחה"}[t]||t}
+/* small inline icons for the visual add-block menu (self-contained, currentColor) */
+function blkIcon(t){
+  var a='class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+  var P={
+    subheading:'<path d="M6 4v16M18 4v16M6 12h12"/>',
+    text:'<path d="M4 6h16M4 12h16M4 18h11"/>',
+    callout:'<path d="M4 5h16v11H9l-4 3z"/><path d="M8 9h8M8 12.5h5"/>',
+    image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m21 16-5-5L5 20"/>',
+    imagetext:'<rect x="3" y="5" width="7" height="14" rx="1"/><path d="M13 7h8M13 12h8M13 17h5"/>',
+    imagerow:'<rect x="3" y="6" width="5" height="12" rx="1"/><rect x="9.5" y="6" width="5" height="12" rx="1"/><rect x="16" y="6" width="5" height="12" rx="1"/>',
+    video:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/>',
+    table:'<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 10h18M3 15h18M9 4v16M15 4v16"/>',
+    accordion:'<rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="11" width="18" height="9" rx="1"/><path d="M7 15.5h6"/>',
+    link:'<path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/>',
+    divider:'<path d="M3 12h6M15 12h6"/><circle cx="12" cy="12" r="1.6"/>',
+    quiz:'<circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.4 2.4 0 1 1 3.4 2.2c-.8.4-1 .8-1 1.6M12 17h.01"/>',
+    open:'<path d="M4 5h16v11H9l-4 3z"/><path d="M8 10h8M8 13h5"/><path d="M17.5 3.5 20 6l-1.5 1.5"/>'
+  };
+  return '<svg '+a+'>'+(P[t]||P.text)+'</svg>';
+}
+function opBtns(up,down,dup,del){return `<button type="button" class="opb" title="למעלה" aria-label="הזזה למעלה" onclick="${up}">${eic("up",15)}</button><button type="button" class="opb" title="למטה" aria-label="הזזה למטה" onclick="${down}">${eic("down",15)}</button><button type="button" class="opb" title="שכפול" aria-label="שכפול" onclick="${dup}">${eic("copy",15)}</button><button type="button" class="opb del" title="מחיקה" aria-label="מחיקה" onclick="${del}">${eic("trash",15)}</button>`}
+
+function blockCard(b,pi,bi){
+  const sel=`<select class="tsel" onchange="setBlockType(${pi},${bi},this.value)">${TYPES.map(t=>`<option value="${t}" ${b.type===t?"selected":""}>${blkLabel(t)}</option>`).join("")}</select>`;
+  const id=`tb_${pi}_${bi}`;const fc=`pvGoPage(${pi})`;let f="";
+  if(b.type==="subheading")f=fInput("טקסט תת-הכותרת",b.text,`updBlock(${pi},${bi},'text',this.value)`,fc);
+  else if(b.type==="text")f=fRich(id,pi,bi,b);
+  else if(b.type==="image")f=fMedia(pi,bi,"תמונה",b.src,"image/*")+fInput("כיתוב (רשות)",b.caption,`updBlock(${pi},${bi},'caption',this.value)`,fc)+fWidth(pi,bi,b.width)+fAlign(pi,bi,b.align,"יישור התמונה");
+  else if(b.type==="imagetext")f=fMedia(pi,bi,"תמונה",b.src,"image/*")+fInput("כיתוב לתמונה (רשות)",b.caption,`updBlock(${pi},${bi},'caption',this.value)`,fc)+fRich(id,pi,bi,b,"טקסט לצד התמונה")+fSideWidth(pi,bi,b);
+  else if(b.type==="imagerow")f=fImageRow(pi,bi,b);
+  else if(b.type==="video")f=fMedia(pi,bi,"וידאו",b.src,"video/*")+fInput("כיתוב (רשות)",b.caption,`updBlock(${pi},${bi},'caption',this.value)`,fc);
+  else if(b.type==="link")f=fInput("טקסט הקישור",b.text,`updBlock(${pi},${bi},'text',this.value)`,fc)+fInput("כתובת / שם קובץ",b.url,`updBlock(${pi},${bi},'url',this.value)`,fc);
+  else if(b.type==="quiz")f=fQuiz(id,pi,bi,b);
+  else if(b.type==="callout")f=fCalloutVariant(pi,bi,b)+fRich(id,pi,bi,b,"תוכן התיבה");
+  else if(b.type==="accordion")f=fInput("כותרת (מה שרואים לפני הפתיחה)",b.title,`updBlock(${pi},${bi},'title',this.value)`,fc)+fRich(id,pi,bi,b,"תוכן שנפתח");
+  else if(b.type==="table")f=fTable(pi,bi,b);
+  else if(b.type==="divider")f=`<div class="uplNote">קו מפריד עדין בין חלקים בדף. אין מה להגדיר.</div>`;
+  else if(b.type==="open")f=fInput("השאלה הפתוחה",b.question,`updBlock(${pi},${bi},'question',this.value)`,fc)+fInput("רמז / הנחיה (רשות)",b.hint,`updBlock(${pi},${bi},'hint',this.value)`,fc)+`<div class="uplNote">התלמיד יכתוב תשובה חופשית. בסיום הלומדה הוא יוכל להוריד PDF עם כל השאלות והתשובות שלו.</div>`;
+  return `<div class="blk" id="blkCard_${pi}_${bi}" ondragover="blkDragOver(${pi},${bi},event)" ondrop="blkDrop(${pi},${bi},event)"><div class="blkTop"><span class="grip" draggable="true" title="גרירה לשינוי סדר" aria-label="גרירה לשינוי סדר הבלוק" ondragstart="blkDragStart(${pi},${bi},event)" ondragend="dragBlk=null">${eic("grip",15)}</span>${sel}<div class="ops">${opBtns(`moveBlock(${pi},${bi},-1)`,`moveBlock(${pi},${bi},1)`,`dupBlock(${pi},${bi})`,`delBlock(${pi},${bi})`)}</div></div><div class="blkFields">${f}</div></div>`;
+}
+function pageCard(p,pi){
+  const open=activePage===pi;
+  const blocks=(p.blocks||[]).map((b,bi)=>blockCard(b,pi,bi)).join("")||`<div class="empty">אין בלוקים עדיין</div>`;
+  const groups=[["טקסט",["subheading","text","callout"]],["מדיה",["image","imagetext","imagerow","video"]],["מבנה",["table","accordion","link","divider"]],["הערכה",["quiz","open"]]];
+  const groupHtml=groups.map(([name,ts])=>`<div class="addGroup"><div class="addGroupTitle">${name}</div><div class="addOpts">${ts.map(t=>`<button type="button" class="addOpt" onclick="addBlock(${pi},'${t}')">${blkIcon(t)} ${blkLabel(t)}</button>`).join("")}</div></div>`).join("");
+  const add=`<div class="addBlk"><details class="addMenu"${open?" open":""}><summary>${eic("plus",14)} הוסף בלוק</summary><div class="addMenuPanel">${groupHtml}</div></details></div>`;
+  const nb=(p.blocks||[]).length;
+  const meta=`<span class="pageMeta" title="${open?"פתוח לעריכה":"לחצו לפתיחה ועריכה"}">${open?"בעריכה":`${nb} ${nb===1?"בלוק":"בלוקים"} · לחצו לפתיחה`}</span>`;
+  return `<div class="pageCard${open?"":" collapsed"}" id="pageCard_${pi}" ondragover="pageDragOver(${pi},event)" ondrop="pageDrop(${pi},event)"><div class="pageHead" onclick="togglePage(${pi})" title="פתיחה/סגירה"><span class="pageCaret">${eic("chevronDown",16)}</span><span class="grip" draggable="true" title="גרירה לשינוי סדר" aria-label="גרירה לשינוי סדר הדף" onclick="event.stopPropagation()" ondragstart="pageDragStart(${pi},event)" ondragend="dragPage=null">${eic("grip",15)}</span><span class="pageNum">${pi+1}</span><input class="pageTitle" value="${attr(p.title||"")}" placeholder="כותרת הדף" onclick="event.stopPropagation()" onfocus="pvGoPage(${pi})" oninput="updPageTitle(${pi},this.value)">${meta}<div class="ops" onclick="event.stopPropagation()">${opBtns(`movePage(${pi},-1)`,`movePage(${pi},1)`,`dupPage(${pi})`,`delPage(${pi})`)}</div></div><div class="blocks">${blocks}</div>${add}</div>`;
+}
+const PALETTE=[["#2563eb","כחול"],["#7c3aed","סגול"],["#059669","ירוק"],["#ea580c","כתום"],["#0891b2","טורקיז"],["#db2777","ורוד"]];
+const SIZE_LBL={regular:"רגיל",wide:"רחב"},SIZE_VAL={"רגיל":"regular","רחב":"wide"};
+const BG_PRESETS=[["clean","נקי"],["soft","רך"],["glow","זוהר"],["dots","נקודות"],["grid","רשת"]];
+function coverField(){const isData=/^data:/.test(book.cover||"");
+  return `<div class="field"><label>תמונת שער (רשות)</label><input list="tbImgFiles" value="${isData?"":attr(book.cover||"")}" placeholder="שם קובץ (למשל cover.jpg) או קישור" oninput="updMeta('cover',this.value)" onfocus="pvHome()">${isData?`<div class="mkbar" style="margin-top:6px"><span style="font-size:12px;color:var(--muted)">✔ מוטמע (מפרויקט קודם)</span></div>`:""}<div class="uplNote">הקלידו שם קובץ מ«תיקיית חומרים» או קישור. את הקובץ מעלים לתיקייה אחת ב-Moodle יחד עם הספר.</div></div>`}
+function themeField(){
+  const th=book.theme||{};
+  const brand=((th.brand)||"#2563eb").toLowerCase();
+  const size=th.size||"wide";
+  const font=th.font||"modern";
+  /* one palette row for a given theme key; withInherit adds a "same as book color" reset (clears the override) */
+  function palRow(key,curVal,withInherit){
+    const val=(curVal||brand).toLowerCase();
+    const inheritActive=withInherit&&!(th[key]);
+    const sw=PALETTE.map(([c,name])=>`<button type="button" class="swatch${(!inheritActive&&val===c)?" active":""}" data-c="${c}" style="background:${c}" title="${esc(name)}" onclick="updTheme('${key}','${c}')"></button>`).join("");
+    const custom=`<label class="swatch pick" title="צבע חופשי">${eic("palette")}<input type="color" class="cpick" value="${attr(val)}" oninput="updTheme('${key}',this.value)"></label>`;
+    const inherit=withInherit?`<button type="button" class="inheritBtn${inheritActive?" active":""}" title="ללא צבע נפרד — כמו צבע הספר" onclick="resetThemeColor('${key}')">כמו צבע הספר</button>`:"";
+    return `<div class="palRow" data-key="${key}">${sw}${custom}${inherit}</div>`;
+  }
+  const bg=th.bg||"clean";
+  const bgBtns=BG_PRESETS.map(([b,name])=>`<button type="button" class="bgvar bg-${b}${bg===b?" active":""}" data-b="${b}" title="${esc(name)}" onclick="updTheme('bg','${b}')"><span class="bgvarSwatch"></span><span class="bgvarName">${esc(name)}</span></button>`).join("");
+  const fontOpts=["מודרני (Heebo)","עגול (Varela)","קלאסי עם תגים","נקי (Rubik)"];
+  return `<div class="secHead">🎨 צבעים</div>`+
+    `<div class="field"><label>צבע הספר (בסיס)</label>${palRow('brand',brand,false)}</div>`+
+    `<div class="field"><label>צבע כותרות וקישורים (רשות)</label>${palRow('headingColor',th.headingColor,true)}<div class="uplNote">ריק = כמו צבע הספר.</div></div>`+
+    `<div class="field"><label>צבע הדגשות ותיבות (רשות)</label>${palRow('accentColor',th.accentColor,true)}<div class="uplNote">משפיע על תיבות ההדגשה, כותרת הטבלה והרקעים. ריק = כמו צבע הספר.</div></div>`+
+    `<div class="field"><label>רקע הספר (לגיוון בין לומדות)</label><div class="bgRow">${bgBtns}</div></div>`+
+    fSelect("גופן",FONT_LBL[font]||"מודרני (Heebo)",fontOpts,"updTheme('font',FONT_VAL[this.value])")+
+    `<div class="uplNote" style="margin-top:-6px">הגופן תלוי במכשיר הצופה; אם אינו מותקן, תוצג חלופה דומה.</div>`+
+    fSelect("גודל הספר (רוחב)",SIZE_LBL[size]||"רחב",["רגיל","רחב"],"updTheme('size',SIZE_VAL[this.value])");
+}
+/* ---------- home page layout: order + show/hide of the home sections ---------- */
+const HOME_LBL={title:"כותרת",subtitle:"כותרת משנה",intro:"פסקת פתיחה",cta:"כפתור התחלה",toc:"תוכן העניינים"};
+function ensureHomeSections(){book.home=book.home||{};if(!Array.isArray(book.home.sections)||!book.home.sections.length)book.home.sections=["title","subtitle","intro","cta","toc"].map(k=>({key:k,visible:true}));return book.home.sections}
+function moveHomeSec(i,d){const s=ensureHomeSections(),j=i+d;if(j<0||j>=s.length)return;snapshot();const x=s.splice(i,1)[0];s.splice(j,0,x);previewRoute="home";save();renderEditor();refreshPreview(true)}
+function toggleHomeSec(i){const s=ensureHomeSections();snapshot();s[i].visible=!(s[i].visible!==false);previewRoute="home";save();renderEditor();refreshPreview(true)}
+function toggleCover(){book.home=book.home||{};snapshot();book.home.showCover=!(book.home.showCover!==false);previewRoute="home";save();renderEditor();refreshPreview(true)}
+function toggleMeta(){book.home=book.home||{};snapshot();book.home.showMeta=!(book.home.showMeta!==false);previewRoute="home";save();renderEditor();refreshPreview(true)}
+function updReadTime(v){book.home=book.home||{};histCoalesce();book.home.readTime=v;previewRoute="home";save();refreshPreview()}
+function homeLayoutField(){
+  const s=ensureHomeSections();
+  const rows=s.map((sec,i)=>{const vis=sec.visible!==false;return `<div class="hsRow"><span class="hsName">${esc(HOME_LBL[sec.key]||sec.key)}</span><div class="ops"><button type="button" class="opb" title="למעלה" aria-label="הזזה למעלה" onclick="moveHomeSec(${i},-1)">${eic("up",14)}</button><button type="button" class="opb" title="למטה" aria-label="הזזה למטה" onclick="moveHomeSec(${i},1)">${eic("down",14)}</button><button type="button" class="opb hsVis${vis?" active":""}" title="${vis?"מוצג — לחצו להסתרה":"מוסתר — לחצו להצגה"}" onclick="toggleHomeSec(${i})">${vis?"מוצג":"מוסתר"}</button></div></div>`}).join("");
+  const showCover=!(book.home&&book.home.showCover===false);
+  const showMeta=!(book.home&&book.home.showMeta===false);
+  const readTime=(book.home&&book.home.readTime)||"";
+  return `<div class="field"><label>סדר ותצוגה של דף הבית</label><div class="hsList">${rows}</div>`+
+    `<label class="hsCover"><input type="checkbox" ${showCover?"checked":""} onchange="toggleCover()"> הצגת רצועת השער (התמונה העליונה)</label>`+
+    `<label class="hsCover"><input type="checkbox" ${showMeta?"checked":""} onchange="toggleMeta()"> הצגת שורת המידע (דפים · שאלות · זמן קריאה)</label></div>`+
+    `<div class="field"><label>זמן קריאה מוערך (רשות)</label><input value="${attr(readTime)}" placeholder="ריק = חישוב אוטומטי (למשל «45 דק׳»)" oninput="updReadTime(this.value)" onfocus="pvHome()"></div>`;
+}
+function renderEditor(){
+  applyEditorFont(); /* keep the editor chrome + RTE font in sync with the book's chosen font */
+  const panel=document.querySelector(".panel");const scrollTop=panel?panel.scrollTop:0; /* preserve scroll across the full re-render */
+  if(activePage>book.pages.length-1)activePage=book.pages.length-1;
+  const meta=`<div class="card" id="bookMetaCard"><div class="cardTitle">📚 פרטי הספר</div><div class="cardBody">${
+    fInput("כותרת הספר",book.title,"updMeta('title',this.value)","pvHome()")+
+    fInput("כותרת משנה",book.subtitle,"updMeta('subtitle',this.value)","pvHome()")+
+    coverField()+
+    themeField()+
+    fArea("tb_intro","פסקת פתיחה (דף הבית)",(book.home&&book.home.intro)||"","updHome(this.value)","pvHome()")+
+    homeLayoutField()+
+    fInput("כותרת מסך הסיום",(book.home&&book.home.doneTitle)||"","updDoneTitle(this.value)","pvDone()")+
+    fArea("tb_outro","טקסט סיום (מסך הסיום, רשות)",(book.home&&book.home.outro)||"","updOutro(this.value)","pvDone()")
+  }</div></div>`;
+  const jump=book.pages.length?`<div class="jumpBar"><span class="lbl">קפיצה לדף:</span>${book.pages.map((p,pi)=>`<button class="jumpChip${activePage===pi?" active":""}" title="${attr(p.title||("דף "+(pi+1)))}" onclick="jumpPage(${pi})">${pi+1}</button>`).join("")}</div>`:"";
+  const pgs=book.pages.map((p,pi)=>pageCard(p,pi)).join("")+`<button class="btn wide" onclick="addPage()">${eic("plus")} הוספת דף</button>`;
+  document.getElementById("editor").innerHTML=mediaDatalists()+folderCard()+meta+jump+`<div class="secTitle">דפים (${book.pages.length}) <span class="reorderHint">· גררו מהידית ⠿ או ▲▼ לשינוי הסדר</span></div>`+pgs;
+  if(panel)panel.scrollTop=scrollTop;
+}
+
+/* ---------- import / export ---------- */
+function dl(text,name,type){const b=new Blob([text],{type:type+";charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(a.href)}
+function slugify(s){const v=String(s||"").trim().replace(/[\\/:*?"<>|]+/g,"").replace(/\s+/g,"-").slice(0,60);return v||"textbook"}
+function exportReader(){dl(buildReaderHtml(book,{}),slugify(book.title)+".html","text/html");toast("קובץ ה-HTML ירד — הניחו אותו בתיקייה עם התמונות/וידאו")}
+/* ---------- SCORM 1.2 package export (self-contained ZIP; reports score/completion to Moodle) ---------- */
+let _crcTab;
+function crc32(bytes){if(!_crcTab){_crcTab=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);_crcTab[n]=c>>>0}}let crc=0xFFFFFFFF;for(let i=0;i<bytes.length;i++)crc=(crc>>>8)^_crcTab[(crc^bytes[i])&0xFF];return (crc^0xFFFFFFFF)>>>0}
+function zipStore(files){/* files:[{name,bytes:Uint8Array}] — store method (no compression); valid ZIP accepted by Moodle */
+  const enc=new TextEncoder(),u16=n=>[n&0xFF,(n>>>8)&0xFF],u32=n=>[n&0xFF,(n>>>8)&0xFF,(n>>>16)&0xFF,(n>>>24)&0xFF];
+  const parts=[],central=[];let offset=0;
+  files.forEach(f=>{const nameB=enc.encode(f.name),data=f.bytes,crc=crc32(data);
+    const local=[].concat(u32(0x04034b50),u16(20),u16(0x0800),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(nameB.length),u16(0));
+    parts.push(new Uint8Array(local),nameB,data);
+    const cen=[].concat(u32(0x02014b50),u16(20),u16(20),u16(0x0800),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(nameB.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset));
+    central.push({head:new Uint8Array(cen),name:nameB});
+    offset+=local.length+nameB.length+data.length});
+  const cdStart=offset;let cdSize=0;
+  central.forEach(c=>{parts.push(c.head,c.name);cdSize+=c.head.length+c.name.length});
+  parts.push(new Uint8Array([].concat(u32(0x06054b50),u16(0),u16(0),u16(files.length),u16(files.length),u32(cdSize),u32(cdStart),u16(0))));
+  return new Blob(parts,{type:"application/zip"});
+}
+function scormManifest(bk,fileNames){const title=esc(bk.title||"ספר לימוד");
+  const filesXml=fileNames.map(n=>`    <file href="${attr(n)}"/>`).join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="TB_MANIFEST" version="1.2" xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+  <metadata><schema>ADL SCORM</schema><schemaversion>1.2</schemaversion></metadata>
+  <organizations default="ORG"><organization identifier="ORG"><title>${title}</title>
+    <item identifier="ITEM1" identifierref="RES1" isvisible="true"><title>${title}</title></item>
+  </organization></organizations>
+  <resources>
+    <resource identifier="RES1" type="webcontent" adlcp:scormtype="sco" href="index.html">
+${filesXml}
+    </resource>
+  </resources>
+</manifest>`;
+}
+function isBareRef(s){return !!s&&!/^(data:|https?:|blob:|\/\/|\/)/i.test(s)}
+function collectMediaRefs(bk){const set={},add=s=>{if(isBareRef(s))set[s]=1};if(bk.cover)add(bk.cover);(bk.pages||[]).forEach(p=>(p.blocks||[]).forEach(b=>{if(!b)return;if(b.type==="image"||b.type==="imagetext"||b.type==="video")add(b.src);if(b.type==="imagerow")(b.images||[]).forEach(im=>add(im&&im.src))}));return set}
+async function exportScorm(){
+  const enc=new TextEncoder();
+  const files=[{name:"index.html",bytes:enc.encode(buildReaderHtml(book,{scorm:true}))}];
+  const refs=collectMediaRefs(book),byName={};mediaLib.forEach(m=>{byName[m.name]=m});
+  const missing=[];
+  for(const name of Object.keys(refs)){const m=byName[name];
+    if(m&&m.file){try{files.push({name,bytes:new Uint8Array(await m.file.arrayBuffer())})}catch(e){missing.push(name)}}
+    else missing.push(name)}
+  files.push({name:"imsmanifest.xml",bytes:enc.encode(scormManifest(book,files.map(f=>f.name)))});
+  const blob=zipStore(files),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=slugify(book.title)+"-scorm.zip";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(a.href);
+  if(missing.length)toast("חבילת SCORM נוצרה, אך חסרים קבצי מדיה ("+missing.slice(0,3).join(", ")+(missing.length>3?"…":"")+"). טענו «תיקיית חומרים» או הטמיעו תמונות לפני הייצוא.");
+  else toast("חבילת SCORM ירדה — העלו את ה-ZIP ל-Moodle כפעילות SCORM (הציון יירשם בגיליון הציונים)");
+}
+function saveProject(){dl(JSON.stringify(book,null,2),slugify(book.title)+"-project.json","application/json");toast("קובץ הפרויקט נשמר")}
+function extractObjectLiteral(s,i){let depth=0,inStr=false,q="",bs=false;for(let k=i;k<s.length;k++){const c=s[k];if(inStr){if(bs)bs=false;else if(c==="\\")bs=true;else if(c===q)inStr=false;}else{if(c==='"'||c==="'"||c==="`"){inStr=true;q=c}else if(c==="{")depth++;else if(c==="}"){depth--;if(depth===0)return s.slice(i,k+1)}}}throw new Error("unbalanced")}
+function parseBookFromText(txt){
+  const t=txt.trim();
+  if(t.charAt(0)==="{")return normalize(JSON.parse(t));
+  /* HTML export (this tool writes `let BOOK=...`; older exports used `const BOOK=...`) — safe: file is one the user themselves exported */
+  const m=txt.match(/(?:const|let|var)\s+BOOK\s*=/);if(!m)throw new Error("no book");
+  const bs=txt.indexOf("{",m.index+m[0].length);if(bs<0)throw new Error("no book");
+  const lit=extractObjectLiteral(txt,bs);
+  return normalize(Function('"use strict";return ('+lit+')')());
+}
+function loadProject(e){const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+  if((book.pages.length||book.title)&&!confirm("טעינת קובץ תחליף את הספר הנוכחי בעורך. להמשיך?")){return}
+  const r=new FileReader();r.onload=()=>{try{const nb=parseBookFromText(r.result);snapshot();book=nb;activePage=0;previewRoute=book.pages.length?"page=1":"home";save();renderEditor();refreshPreview(true);toast("נטען בהצלחה — אפשר להמשיך לערוך")}catch(err){toast("לא הצלחתי לקרוא את הקובץ")}};r.readAsText(f)}
+function resetBook(){if(!confirm("לאפס לתוכן הדוגמה? השינויים הנוכחיים יימחקו."))return;snapshot();book=normalize(clone(SAMPLE));activePage=0;previewRoute="page=1";save();renderEditor();refreshPreview(true)}
+
+/* ---------- editor chrome theme ---------- */
+function applyEditorTheme(t){document.documentElement.setAttribute("data-theme",t);document.getElementById("edThemeBtn").innerHTML=t==="dark"?eic("sun"):eic("moon");try{localStorage.setItem("tbe_theme",t)}catch(e){}}
+function toggleEditorTheme(){applyEditorTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark")}
+
+/* ---------- toast ---------- */
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("show"),2600)}
+
+/* ---------- first-run guided tour (coach marks) ---------- */
+const TOUR_KEY="tbe_tour_done";
+const TOUR_STEPS=[
+  {center:true,title:"ברוכים הבאים לעורך ספר הלימוד",text:"סיור קצר יראה לכם את עיקרי העבודה — כדקה. אפשר לדלג בכל שלב, ולהריץ שוב מכפתור ❔ למעלה."},
+  {sel:".previewWrap",place:"bottom",title:"תצוגה חיה",text:"כאן רואים את הספר כפי שהלומד יראה אותו. כל שינוי שתעשו בצד ימין מופיע כאן מיד. אפשר לעבור בין «בית», «תוכן» ו«סיום» ולהחליף מצב כהה/בהיר."},
+  {sel:"#bookMetaCard",place:"left",title:"פרטי הספר",text:"כותרת, תמונת שער, צבע וגודל, פסקת הפתיחה בדף הבית ומסך הסיום — הכול נערך כאן ומתעדכן בתצוגה תוך כדי הקלדה."},
+  {sel:"#folderCard",place:"left",title:"תיקיית חומרים",text:"מפנים לתמונות ולסרטונים לפי שם הקובץ. בחרו כאן פעם אחת את התיקייה — ותוכלו לבחור שמות בהשלמה אוטומטית ולראות אותם בתצוגה. (בגלל הדפדפן צריך לבחור מחדש בכל פתיחה.)"},
+  {sel:"#editor .pageCard",place:"left",title:"דפים ובלוקים",text:"כל דף בנוי מבלוקים: טקסט מעוצב, תמונה, תמונה-וטקסט, שורת תמונות, וידאו, קישור ושאלת בדיקה. הוסיפו בלוק מהצ'יפים שבתחתית הדף, וסדרו בגרירה מהידית ⠿ או בחצים."},
+  {sel:"#exportBtn",place:"bottom",title:"ייצוא ל-Moodle",text:"«ייצוא textbook.html» יוצר קובץ ספר עצמאי אחד. «ייצוא SCORM» יוצר חבילה ל-Moodle שמדווחת ציון והתקדמות. «שמירת פרויקט» שומרת עותק לעריכה בהמשך."},
+  {sel:"#saveStatus",place:"bottom",title:"שמירה אוטומטית",text:"העבודה נשמרת אוטומטית בדפדפן. אם יופיע «לא נשמר» (למשל כשמטמיעים הרבה מדיה) — לחצו עליו או על הכפתור האדום כדי לשמור פרויקט לקובץ. מומלץ לשמור פרויקט מדי פעם לגיבוי."},
+  {center:true,title:"זהו — אפשר להתחיל!",text:"פתחנו בדוגמה חיה שמדגימה את כל היכולות. החליפו אותה בתוכן שלכם, או «איפוס דוגמה» כדי לחזור אליה. בהצלחה!"}
+];
+let tourIdx=0;
+function startTour(){tourIdx=0;buildTourDom();showTourStep()}
+function buildTourDom(){
+  if(document.getElementById("tourOverlay"))return;
+  const o=document.createElement("div");o.id="tourOverlay";o.className="tourOverlay";
+  o.innerHTML='<div id="tourSpot" class="tourSpot"></div><div id="tourTip" class="tourTip" role="dialog" aria-live="polite"></div>';
+  document.body.appendChild(o);
+  window.addEventListener("resize",tourReposition);
+  document.addEventListener("keydown",tourKey);
+}
+function endTour(){const o=document.getElementById("tourOverlay");if(o)o.remove();window.removeEventListener("resize",tourReposition);document.removeEventListener("keydown",tourKey);try{localStorage.setItem(TOUR_KEY,"1")}catch(e){}}
+function tourKey(e){if(e.key==="Escape"){e.preventDefault();endTour()}else if(e.key==="ArrowLeft"){e.preventDefault();tourGo(1)}else if(e.key==="ArrowRight"){e.preventDefault();tourGo(-1)}}
+function tourGo(d){tourIdx+=d;if(tourIdx>=TOUR_STEPS.length){endTour();return}if(tourIdx<0)tourIdx=0;showTourStep()}
+function tourReposition(){if(document.getElementById("tourOverlay"))positionTour(TOUR_STEPS[tourIdx])}
+function showTourStep(){
+  const step=TOUR_STEPS[tourIdx];
+  const doIt=()=>{renderTourTip(step);positionTour(step)};
+  if(step.sel){const t=document.querySelector(step.sel);if(t){t.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(doIt,300);return}}
+  doIt();
+}
+function renderTourTip(step){
+  const tip=document.getElementById("tourTip");if(!tip)return;
+  const n=tourIdx+1,total=TOUR_STEPS.length;
+  const prev=tourIdx>0?`<button class="tBtn" onclick="tourGo(-1)">הקודם</button>`:"";
+  const next=`<button class="tBtn primary" onclick="tourGo(1)">${tourIdx<total-1?"הבא":"סיום"}</button>`;
+  const skip=tourIdx<total-1?`<button class="tBtn link" onclick="endTour()">דילוג</button>`:"";
+  tip.innerHTML=`<div class="tTitle">${esc(step.title)}</div><div class="tText">${esc(step.text)}</div>`+
+    `<div class="tBar"><span class="tCount">${n}/${total}</span><span class="grow"></span>${skip}${prev}${next}</div>`;
+}
+function positionTour(step){
+  const overlay=document.getElementById("tourOverlay"),spot=document.getElementById("tourSpot"),tip=document.getElementById("tourTip");
+  if(!spot||!tip)return;
+  const target=step.sel?document.querySelector(step.sel):null;
+  if(step.center||!target){
+    overlay.classList.add("centered");spot.style.display="none";
+    tip.style.width="";tip.style.top="50%";tip.style.left="50%";tip.style.transform="translate(-50%,-50%)";
+    return;
+  }
+  overlay.classList.remove("centered");spot.style.display="block";tip.style.transform="none";
+  const r=target.getBoundingClientRect(),pad=8,vw=window.innerWidth,vh=window.innerHeight;
+  const x=Math.max(6,r.left-pad),y=Math.max(6,r.top-pad),w=r.width+pad*2,h=r.height+pad*2;
+  spot.style.left=x+"px";spot.style.top=y+"px";spot.style.width=w+"px";spot.style.height=h+"px";
+  const tw=Math.min(340,vw-24);tip.style.width=tw+"px";const th=tip.offsetHeight||160;
+  const clampX=v=>Math.min(Math.max(6,v),vw-tw-6),clampY=v=>Math.min(Math.max(6,v),vh-th-6);
+  let tx,ty,place=step.place||"bottom";
+  if(place==="left"){tx=x-tw-12;if(tx<6)tx=x+w+12;ty=clampY(r.top)}
+  else if(place==="top"){ty=y-th-12;tx=clampX(r.left)}
+  else{ty=y+h+12;tx=clampX(r.left)}
+  if(place!=="left"&&ty+th>vh-6)ty=Math.max(6,y-th-12);
+  tip.style.left=clampX(tx)+"px";tip.style.top=Math.max(6,ty)+"px";
+}
+
+/* ---------- init ---------- */
+(function(){
+  document.querySelectorAll("[data-eic]").forEach(function(el){el.innerHTML=eic(el.getAttribute("data-eic"),Number(el.getAttribute("data-eic-size"))||16)});
+  document.getElementById("undoBtn").innerHTML=eic("undo",16);
+  document.getElementById("redoBtn").innerHTML=eic("redo",16);
+  document.getElementById("pvThemeBtn").innerHTML=previewTheme==="dark"?eic("sun"):eic("moon");
+  let et="light";try{et=localStorage.getItem("tbe_theme")||"light"}catch(e){}applyEditorTheme(et);renderEditor();refreshPreview(true);
+  /* reverse sync: a click in the live preview asks the editor to open + scroll to that block's editor */
+  window.addEventListener("message",function(e){
+    const pv=document.getElementById("pv");
+    if(!pv||e.source!==pv.contentWindow)return;
+    const d=e.data||{};if(d.__tb!=="editBlock")return;
+    editBlockFromPreview(d.pi,d.bi);
+  });
+  /* run the guided tour automatically on the very first visit */
+  try{if(!localStorage.getItem(TOUR_KEY))setTimeout(startTour,650)}catch(e){}
+  /* keyboard: undo/redo (skip while typing in a field) */
+  document.addEventListener("keydown",function(e){
+    const t=e.target,tag=t&&t.tagName,editing=tag==="INPUT"||tag==="TEXTAREA"||tag==="SELECT"||(t&&t.isContentEditable);
+    if((e.ctrlKey||e.metaKey)&&(e.key==="z"||e.key==="Z")){if(editing)return;e.preventDefault();if(e.shiftKey)redo();else undo();}
+    else if((e.ctrlKey||e.metaKey)&&(e.key==="y"||e.key==="Y")){if(editing)return;e.preventDefault();redo();}
+  });
+  /* warn before leaving only when the latest autosave failed (real risk of losing work) */
+  window.addEventListener("beforeunload",function(e){if(saveState==="error"){e.preventDefault();e.returnValue=""}});
+})();
+</script>
+</body>
+</html>
